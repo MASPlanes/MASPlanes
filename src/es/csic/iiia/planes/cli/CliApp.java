@@ -36,9 +36,10 @@
  */
 package es.csic.iiia.planes.cli;
 
+import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.Display;
+import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.World;
-import es.csic.iiia.planes.io.DProblem;
 
 /**
  *
@@ -46,15 +47,19 @@ import es.csic.iiia.planes.io.DProblem;
  */
 public class CliApp {
     
-    public boolean gui = false;
-    public long seed = 0;
-    public DProblem problemDefinition = null;
+    private final Configuration config;
+    
+    public CliApp(Configuration c) {
+        this.config = c;
+    }
     
     public void run() {
-        World w = new World();
-        w.init(problemDefinition, seed);
+        Factory f = new Factory(config);
+        World w = new World(f);
+        f.setWorld(w);
+        w.init(config.problemDefinition);
         
-        if (gui) {
+        if (config.gui) {
             Display d = new Display(w);
             w.setDisplay(d);
         }

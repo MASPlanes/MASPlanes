@@ -106,7 +106,7 @@ public class Plane extends AbstractDrawable implements Agent {
         return nearestTask;
     }
 
-    void addTask(Task task) {
+    public void addTask(Task task) {
         tasks.add(task);
         nextTask = getNearestTask();
     }

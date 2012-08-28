@@ -37,33 +37,49 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.definition.DTask;
+import java.util.ArrayList;
+
 /**
- *
+ * Factory that will be used to create most elements.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Factory {
     
-    private static World world;
+    private World world;
+    private final Configuration config;
+
+    public Factory(Configuration config) {
+        this.config = config;
+    }
     
-    public static void setWorld(World w) {
+    public void setWorld(World w) {
         world = w;
     }
     
-    public static Plane buildPlane(Location location) {
+    public Plane buildPlane(Location location) {
         Plane p = new Plane(location);
         initialize(p);
         return p;
     }
     
-    public static Task buildTask(Location location) {
+    public Task buildTask(Location location) {
         Task t = new Task(location);
         initialize(t);
         return t;
     }
     
-    public static void initialize(Element e) {
+    private void initialize(Element e) {
         e.setWorld(world);
         e.initialize();
+    }
+
+    public Operator buildOperator(ArrayList<DTask> tasks) {
+        Operator o = new Operator(tasks);
+        o.setStrategy(config.operatorStrategy);
+        initialize(o);
+        return o;
     }
     
 }

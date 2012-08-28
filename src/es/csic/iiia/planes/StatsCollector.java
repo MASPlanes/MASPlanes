@@ -62,7 +62,7 @@ class StatsCollector {
     public void display() {
         // Final stats
         StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/max/avg: ");
+        buf.append("\n").append("min/avg/max: ");
         buf.append((int)stats.getMin()).append("/")
            .append((int)stats.getMean()).append("/")
            .append((int)stats.getMax()).append("\t")

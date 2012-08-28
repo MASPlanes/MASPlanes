@@ -37,74 +37,110 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.io.DTask;
+import es.csic.iiia.planes.definition.DTask;
+import es.csic.iiia.planes.operator_strategy.OperatorStrategy;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
 
 /**
+ * Operator that will be submitting tasks to the UAVs.
  *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Operator extends AbstractElement implements Agent {
     
+    /**
+     * List of the definitions of all the tasks that this operator will submit
+     * during the simulation.
+     */
     private ArrayList<DTask> tasks;
-    private int nextTask = 0;
-    private Random r = new Random(0);
-    private boolean done = false;
     
+    /**
+     * Index of the next task to be submitted.
+     */
+    private int nextTask = 0;
+    
+    /**
+     * Time step at which the next task has to be submitted.
+     */
+    private long nextTaskTime;
+    
+    /**
+     * The strategy that this operator will use to submit tasks.
+     */
+    private OperatorStrategy strategy;
+    
+    /**
+     * Creates a new operator that will submit the given list of tasks.
+     * 
+     * @param tasks to be submitted by this operator.
+     */
     public Operator(ArrayList<DTask> tasks) {
         this.tasks = tasks;
         Collections.sort(this.tasks, new TaskSorter());
+        nextTaskTime = this.tasks.get(0).getTime();
+    }
+    
+    /**
+     * Get the strategy used by this operator.
+     * 
+     * @return stategy used by this operator.
+     */
+    public OperatorStrategy getStrategy() {
+        return strategy;
     }
 
+    /**
+     * Set the strategy used by this operator.
+     * 
+     * @param strategy used by this operator.
+     */
+    public void setStrategy(OperatorStrategy strategy) {
+        this.strategy = strategy;
+    }
+
+    /**
+     * Single-step advance of this operator.
+     * 
+     * If the simulation has reached a point where one task should be submitted,
+     * the operator creates and submits it according to the specified submission
+     * strategy.
+     */
     @Override
     public void step() {
-        while (!done && tasks.get(nextTask).getTime() == getWorld().getTime()) {
+        while (nextTaskTime == getWorld().getTime()) {
             Task t = createTask(tasks.get(nextTask));
-            submitTaskToPlane(t);
+            strategy.submitTask(getWorld(), t);
             
             tasks.set(nextTask, null);
             nextTask++;
             
             if (nextTask == tasks.size()) {
-                tasks = null;
-                done = true;
+                nextTaskTime = 0;
+            } else {
+                nextTaskTime = tasks.get(nextTask).getTime();
             }
         }
     }
 
+    /**
+     * Create a simulation Task from the given Task definition.
+     * 
+     * @param task definition.
+     * @return actual simulation Task.
+     */
     private Task createTask(DTask nt) {
         Location l = new Location(nt.getX(), nt.getY());
-        Task t = Factory.buildTask(l);
+        Task t = getWorld().getFactory().buildTask(l);
         getWorld().addTask(t);
         return t;
     }
-
-//    private void submitTaskToPlane(Task t) {
-//        final List<Plane> planes = getWorld().getPlanes();
-//        int pnum = r.nextInt(planes.size());
-//        planes.get(pnum).addTask(t);
-//    }
     
-    private void submitTaskToPlane(Task t) {
-        final List<Plane> planes = getWorld().getPlanes();
-        Location l = t.getLocation();
-        
-        double mind = Double.MAX_VALUE;
-        Plane nearest = null;
-        for (Plane p : planes) {
-            final double d = p.getLocation().getDistance(l);
-            if (d < mind) {
-                mind = d;
-                nearest = p;
-            }
-        }
-        nearest.addTask(t);
-    }
-    
+    /**
+     * Comparator of DTasks that is used to sort the list of task definitions
+     * by increasing submission time.
+     */
     private class TaskSorter implements Comparator<DTask> {
         @Override
         public int compare(DTask t, DTask t1) {

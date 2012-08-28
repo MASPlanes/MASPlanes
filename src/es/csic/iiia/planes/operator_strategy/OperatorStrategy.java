@@ -34,74 +34,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.definition;
+package es.csic.iiia.planes.operator_strategy;
 
-import java.util.ArrayList;
+import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.World;
 
 /**
- * A complete problem definition (description), including:
+ * Defines a strategy that an operator may use to submit tasks.
  * 
- * - The world's properties (width, height, and duration)
- * - An enumeration of all the planes, with their initial locations and maximum
- *   speeds.
- * - An enumeration of all the tasks that will be submitted throghout the
- *   simulation.
- *
+ * This interface makes no assumptions about the actual information that the
+ * operator will have when submitting tasks. This is, the strategy receives
+ * the current "world" instance, giving it access to all of the world's
+ * information. Therefore, it is up to the strategy to limit itself to the 
+ * information that a real operator would have.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class DProblem {
-    private int width = 1000;
-    private int height = 1000;
-    private long duration = 3600*24*30;
-    private ArrayList<DPlane> planes = new ArrayList<DPlane>();
-    private ArrayList<DTask> tasks = new ArrayList<DTask>();
-    private ArrayList<DStation> stations = new ArrayList<DStation>();
-
-    public int getWidth() {
-        return width;
-    }
-
-    public void setWidth(int width) {
-        this.width = width;
-    }
-
-    public int getHeight() {
-        return height;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
-    }
-
-    public long getDuration() {
-        return duration;
-    }
-
-    public void setDuration(long duration) {
-        this.duration = duration;
-    }
-
-    public ArrayList<DPlane> getPlanes() {
-        return planes;
-    }
-
-    public void setPlanes(ArrayList<DPlane> planes) {
-        this.planes = planes;
-    }
-
-    public ArrayList<DTask> getTasks() {
-        return tasks;
-    }
-
-    public void setTasks(ArrayList<DTask> tasks) {
-        this.tasks = tasks;
-    }
-
-    public ArrayList<DStation> getStations() {
-        return stations;
-    }
-
-    public void setStations(ArrayList<DStation> stations) {
-        this.stations = stations;
-    }
+public interface OperatorStrategy {
+    public void submitTask(World w, Task t);
 }

@@ -37,13 +37,12 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.io.DPlane;
-import es.csic.iiia.planes.io.DProblem;
+import es.csic.iiia.planes.definition.DPlane;
+import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.util.FrameTracker;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 /**
  *
@@ -62,20 +61,26 @@ public class World implements Runnable {
     private Display display;
     
     private FrameTracker ftracker = new FrameTracker("world");
+    private final Factory factory;
+
+    public Factory getFactory() {
+        return factory;
+    }
     
-    public World() {}
+    public World(Factory f) {
+        this.factory = f;
+    }
     
-    public void init(DProblem d, long seed) {
+    public void init(DProblem d) {
         this.reset();
         space = new Space(d.getWidth(), d.getHeight());
         duration = d.getDuration();
         
-        operator = new Operator(d.getTasks());
-        operator.setWorld(this);
+        operator = factory.buildOperator(d.getTasks());
         
         for (DPlane pd : d.getPlanes()) {
             Location l = new Location(pd.getX(), pd.getY());
-            Plane p = Factory.buildPlane(l);
+            Plane p = factory.buildPlane(l);
             p.setSpeed(pd.getSpeed());
             p.setBattery(pd.getBattery());
             planes.add(p);
@@ -94,30 +99,36 @@ public class World implements Runnable {
     public void run() {
         
         for (time=0; time<duration; time++) {
-            //System.out.println("Computation step");
-            for (Plane p : planes) {
-                p.step();
-            }
-            operator.step();
             
-            //System.out.println("Painting update...");
-            if (display != null) {
-                synchronized(display) {
-                    Graphics2D surface = display.getTransformedGraphics2D();
-                    for (Plane p : planes) {
-                        p.draw(surface);
-                    }
-                    for (Task t : tasks) {
-                        t.draw(surface);
-                    }
-                }
-                display.repaint();
-            }
-            
+            computeStep();
+            displayStep();
             ftracker.tick();
+            
         }
         
         stats.display();
+    }
+    
+    private void computeStep() {
+        for (Plane p : planes) {
+            p.step();
+        }
+        operator.step();
+    }
+    
+    private void displayStep() {
+        if (display != null) {
+            synchronized (display) {
+                Graphics2D surface = display.getTransformedGraphics2D();
+                for (Plane p : planes) {
+                    p.draw(surface);
+                }
+                for (Task t : tasks) {
+                    t.draw(surface);
+                }
+            }
+            display.repaint();
+        }
     }
     
     public List<Plane> getPlanes() {
@@ -131,7 +142,6 @@ public class World implements Runnable {
     public void reset() {
         planes.clear();
         tasks.clear();
-        Factory.setWorld(this);
     }
     
     public void addTask(Task task) {

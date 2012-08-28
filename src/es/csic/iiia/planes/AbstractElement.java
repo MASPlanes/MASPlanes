@@ -42,16 +42,21 @@ package es.csic.iiia.planes;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public abstract class AbstractElement implements Element {
+    
     private World world;
+    
     public AbstractElement() {}
+    
     @Override
     public World getWorld() {
         return world;
     }
+    
     @Override
     public void setWorld(World world) {
         this.world = world;
     }
+    
     @Override
     public void initialize() {}
 }

@@ -37,10 +37,13 @@
  */
 package es.csic.iiia.planes.cli;
 
+import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.Display;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.generator.Generator;
-import es.csic.iiia.planes.io.DProblem;
+import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.operator_strategy.Nearest;
+import es.csic.iiia.planes.operator_strategy.Random;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -69,12 +72,17 @@ public class Cli {
     public static void main(String[] args) {
         initializeLogging();
         
-        options.addOption("g", "gui", false, "graphically display the simulation." );
+        options.addOption("g", "gui", false, "graphically display the simulation.");
         options.addOption("h", "help", false, "show this help message.");
-        options.addOption("s", "seed", true, "set the random seed for this simulation (simulation number)." );
+        options.addOption(OptionBuilder.withArgName("operator")
+                .hasArg()
+                .withDescription("set the strategy used by the operator to submit tasks to UAVs.")
+                .withArgName("random|nearest")
+                .withLongOpt("operator")
+                .create('o'));
         
-        CliApp app = new CliApp();
-        parseOptions(args, app);
+        Configuration config = parseOptions(args);
+        CliApp app = new CliApp(config);
         app.run();
     }
     
@@ -84,7 +92,8 @@ public class Cli {
         System.exit(1);
     }
     
-    private static void parseOptions(String[] in_args, CliApp app) {
+    private static Configuration parseOptions(String[] in_args) {
+        Configuration config = new Configuration();
         CommandLineParser parser = new PosixParser();
         CommandLine line = null;
         try {
@@ -95,13 +104,20 @@ public class Cli {
         }
         
         if (line.hasOption('g')) {
-            app.gui = true;
+            config.gui = true;
         }
         if (line.hasOption('h')) {
             showHelp();
         }
-        if (line.hasOption('s')) {
-            app.seed = Long.valueOf(line.getOptionValue('s'));
+        if (line.hasOption('o')) {
+            String value = line.getOptionValue('o');
+            if (value.equalsIgnoreCase("nearest")) {
+                config.operatorStrategy = new Nearest();
+            } else if (value.equalsIgnoreCase("random")) {
+                config.operatorStrategy = new Random();
+            } else {
+                throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
+            }
         }
 
         String[] args = line.getArgs();
@@ -116,7 +132,9 @@ public class Cli {
         } catch (IOException ex) {
             Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, ex);
         }
-        app.problemDefinition = d;
+        config.problemDefinition = d;
+        
+        return config;
     }
 
     private static void initializeLogging() {

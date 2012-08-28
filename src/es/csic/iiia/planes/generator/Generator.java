@@ -36,10 +36,10 @@
  */
 package es.csic.iiia.planes.generator;
 
-import es.csic.iiia.planes.io.DPlane;
-import es.csic.iiia.planes.io.DProblem;
-import es.csic.iiia.planes.io.DStation;
-import es.csic.iiia.planes.io.DTask;
+import es.csic.iiia.planes.definition.DPlane;
+import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.definition.DStation;
+import es.csic.iiia.planes.definition.DTask;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
