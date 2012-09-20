@@ -43,15 +43,15 @@ import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.color.ColorSpace;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -114,6 +114,8 @@ public class Display extends Frame {
     
     private void buildBuffer() {
         Dimension dd = this.getSize();
+        dd = new Dimension(dd);
+        dd.setSize(dd.getWidth()-50, dd.getHeight()-50);
         synchronized (this) {
             this.buffer = new BufferedImage(dd.width, dd.height, BufferedImage.TYPE_INT_ARGB);
             bufferGraphics = buffer.createGraphics();
@@ -121,13 +123,14 @@ public class Display extends Frame {
             Dimension wd = world.getSpace().getDimension();
             AffineTransform t = new AffineTransform();
             t.scale(dd.width/wd.getWidth(), dd.height/wd.getHeight());
-            //t.scale(2.,2.);
             bufferGraphics.setTransform(t);
         }
     }
     
     public Graphics2D getTransformedGraphics2D() {
         Dimension dd = this.getSize();
+        dd = new Dimension(dd);
+        dd.setSize(dd.getWidth()-50, dd.getHeight()-50);
         synchronized(this) {
             Graphics2D g = buffer.createGraphics();
             g.setColor(new Color(255,255,255));
@@ -145,11 +148,18 @@ public class Display extends Frame {
      */
     @Override
     public void paint(Graphics go) {
-        Graphics2D g = (Graphics2D)go;
-        synchronized(this) {
-            g.drawImage(this.buffer, 0, 0, this);
-            ftracker.tick();
-        }
+//        try {
+            Graphics2D g = (Graphics2D)go;
+            synchronized(this) {
+                g.drawImage(this.buffer, 25, 25, this);
+                g.drawString("Time: " + world.getTime(), getWidth() - 50, getHeight()-5);
+                ftracker.tick();
+            }
+            
+//            Thread.sleep(1);
+//        } catch (InterruptedException ex) {
+//            Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);
+//        }
     }
     
 }

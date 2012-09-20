@@ -39,6 +39,7 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.util.FrameTracker;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
@@ -52,6 +53,7 @@ public class World implements Runnable {
     private Space space = null;
     private List<Plane> planes = new ArrayList<Plane>();
     private List<Task> tasks = new ArrayList<Task>();
+    private List<Station> stations = new ArrayList<Station>();
     private StatsCollector stats = new StatsCollector(this);
     private Operator operator;
     
@@ -83,7 +85,14 @@ public class World implements Runnable {
             Plane p = factory.buildPlane(l);
             p.setSpeed(pd.getSpeed());
             p.setBattery(pd.getBattery());
+            p.setMaxBattery(pd.getBattery());
             planes.add(p);
+        }
+        
+        for (DStation sd : d.getStations()) {
+            Location l = new Location(sd.getX(), sd.getY());
+            Station s = factory.buildStation(l);
+            stations.add(s);
         }
     }
     
@@ -98,7 +107,7 @@ public class World implements Runnable {
     @Override
     public void run() {
         
-        for (time=0; time<duration; time++) {
+        for (time=0; time<duration || tasks.size() > 0; time++) {
             
             computeStep();
             displayStep();
@@ -125,6 +134,9 @@ public class World implements Runnable {
                 }
                 for (Task t : tasks) {
                     t.draw(surface);
+                }
+                for (Station s : stations) {
+                    s.equals(surface);
                 }
             }
             display.repaint();
@@ -155,6 +167,19 @@ public class World implements Runnable {
     public void removeTask(Task t) {
         tasks.remove(t);
         stats.collect(t);
+    }
+
+    public Station getNearestStation(Location location) {
+        double mind = Double.MAX_VALUE;
+        Station best = null;
+        for (Station s : stations) {
+            final double d = location.getDistance(s.getLocation());
+            if (d < mind) {
+                best = s;
+                mind = d;
+            }
+        }
+        return best;
     }
     
 }

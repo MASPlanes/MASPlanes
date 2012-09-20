@@ -58,6 +58,7 @@ public class Plane extends AbstractDrawable implements Agent {
     
     // Speed in meters per second
     private double speed = 50/3.6d;
+    private boolean charging = false;
 
     public double getSpeed() {
         return speed;
@@ -77,6 +78,21 @@ public class Plane extends AbstractDrawable implements Agent {
     
     @Override
     public void step() {
+        if (charging) {
+            this.battery += rechargeRatio;
+            if (this.battery >= this.maxBattery) {
+                battery = maxBattery;
+                charging = false;
+            }
+            return;
+        }
+        
+        Station st = getWorld().getNearestStation(getLocation());
+        if (battery <= Math.floor(getLocation().getDistance(st.getLocation())/speed)) {
+            goCharge(st);
+            return;
+        }
+        
         if (nextTask != null) {
             if (location.move(nextTask.getLocation(), speed)) {
                 taskCompleted(nextTask);
@@ -133,6 +149,7 @@ public class Plane extends AbstractDrawable implements Agent {
             final Location l = nextTask.getLocation();
             g.drawLine(x, y, l.getXInt(), l.getYInt());
         }
+        
         // Line to other assigned tasks
         Stroke previousStroke = g.getStroke();
         g.setStroke(ownedLines);
@@ -147,6 +164,7 @@ public class Plane extends AbstractDrawable implements Agent {
         g.setColor(Color.RED);
         g.fillOval(x-200, y-200, 400, 400);
         
+        // Plane id
         Font f = new Font(Font.SANS_SERIF, Font.BOLD, 160);
         String sid = String.valueOf(id);
         g.setFont(f);
@@ -155,12 +173,18 @@ public class Plane extends AbstractDrawable implements Agent {
         int h = m.getHeight()-2;
         g.setColor(Color.WHITE);
         g.drawString(sid, x-(w/2), y+(h/2));
+        // Battery
+        g.setColor(Color.DARK_GRAY);
+        String bat = String.valueOf(getBattery());
+        g.drawString(bat, x-(w/2), y+2*(h/2));
         
         g.setColor(previous);
     }
 
     
+    private long rechargeRatio = 3;
     private long battery;
+    private long maxBattery;
     
     public void setBattery(long battery) {
         this.battery = battery;
@@ -171,6 +195,16 @@ public class Plane extends AbstractDrawable implements Agent {
 
     private void updateBattery() {
         battery--;
+    }
+
+    private void goCharge(Station st) {
+        if (this.location.move(st.getLocation(), speed)) {
+            charging = true;
+        }
+    }
+
+    void setMaxBattery(long battery) {
+        this.maxBattery = battery;
     }
     
 }

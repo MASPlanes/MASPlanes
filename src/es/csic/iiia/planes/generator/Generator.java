@@ -62,7 +62,7 @@ public class Generator {
     private int width = 10000;
     private int height = 10000;
     private int num_planes = 10;
-    private int num_tasks = 43200;
+    private int num_tasks = 60*24*30;
     private int num_stations = 1;
     private int num_crisis = 4;
     
@@ -109,6 +109,7 @@ public class Generator {
             pl.setX(r.nextInt(p.getWidth()));
             pl.setY(r.nextInt(p.getHeight()));
             pl.setBattery(3600*3);
+            pl.setBattery(5000);
             planes.add(pl);
         }
     }
