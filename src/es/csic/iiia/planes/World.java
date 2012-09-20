@@ -41,7 +41,12 @@ import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.util.FrameTracker;
+import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
+import java.awt.geom.AffineTransform;
+import java.awt.image.BufferStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -106,29 +111,48 @@ public class World implements Runnable {
     
     @Override
     public void run() {
-        
+
         for (time=0; time<duration || tasks.size() > 0; time++) {
             
             computeStep();
             displayStep();
-            ftracker.tick();
             
         }
         
         stats.display();
     }
     
-    private void computeStep() {
+    public void computeStep() {
         for (Plane p : planes) {
             p.step();
         }
         operator.step();
     }
     
-    private void displayStep() {
-        if (display != null) {
-            synchronized (display) {
-                Graphics2D surface = display.getTransformedGraphics2D();
+    
+    public void displayStep() {
+        if (display == null) return;
+        
+        //if (time % 10 != 0) return;
+        
+        BufferStrategy strategy = display.getBufferStrategy();
+        
+        do {
+            do {
+                Graphics2D surface = (Graphics2D)(strategy.getDrawGraphics());
+                surface.setColor(Color.WHITE);
+                surface.fillRect(0, 0, display.getWidth(), display.getHeight());
+                surface.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                surface.setColor(Color.BLACK);
+                surface.drawString("Time: " + time, 100, 100);
+
+                
+                Dimension wd = space.getDimension();
+                Dimension dd = display.getSize();
+                AffineTransform tr = new AffineTransform();
+                tr.scale(dd.width/wd.getWidth(), dd.height/wd.getHeight());
+                surface.setTransform(tr);
+                
                 for (Plane p : planes) {
                     p.draw(surface);
                 }
@@ -136,11 +160,16 @@ public class World implements Runnable {
                     t.draw(surface);
                 }
                 for (Station s : stations) {
-                    s.equals(surface);
+                    s.draw(surface);
                 }
-            }
-            display.repaint();
-        }
+                
+                surface.dispose();
+                
+            } while (strategy.contentsRestored());
+            
+            strategy.show();
+            
+        } while (strategy.contentsLost());
     }
     
     public List<Plane> getPlanes() {

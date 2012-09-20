@@ -37,21 +37,15 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.util.FrameTracker;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.RenderingHints;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -68,14 +62,14 @@ public class Display extends Frame {
     private BufferedImage buffer;
     private Graphics2D bufferGraphics;
     
-    private World world;
+    
+    private boolean rebuildBuffer = false;
     
     public Display(World world) {
-        this.world = world;
         Dimension d = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
         setPreferredSize(d);
         this.pack();
-        this.buildBuffer();
+        this.setVisible(true);
         
 
         // Observador que s'encarrega de finalitzar el programa en
@@ -94,72 +88,35 @@ public class Display extends Frame {
                 // Bloquegem l'aspect ratio
                 Dimension d  = Display.this.getSize();
                 double ratio = d.getWidth() / d.getHeight();
+                System.err.println("Ratio: " + ratio);
                 if (ratio > 1) {
                   Display.this.setSize((int)(d.getWidth()/ratio), d.height);
                 } else if (ratio < 1) {
-                  Display.this.setSize(d.width, (int)(d.getHeight()/ratio));
+                  Display.this.setSize(d.width, (int)(d.getHeight()*ratio));
                 }
                 
-                synchronized(Display.this) {
-                    Display.this.buildBuffer();
-                }
+                //Display.this.buildBuffer();
+                //rebuildBuffer = true;
                 
                 super.componentResized(ce);
             }
             
         });
         
-        this.setVisible(true);
+        buildBuffer();
     }
+//
+//    @Override
+//    public void paint(Graphics grphcs) {
+//        super.paint(grphcs);
+//        System.err.println("Repainted!");
+//    }
+//    
+    
     
     private void buildBuffer() {
-        Dimension dd = this.getSize();
-        dd = new Dimension(dd);
-        dd.setSize(dd.getWidth()-50, dd.getHeight()-50);
-        synchronized (this) {
-            this.buffer = new BufferedImage(dd.width, dd.height, BufferedImage.TYPE_INT_ARGB);
-            bufferGraphics = buffer.createGraphics();
-            bufferGraphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            Dimension wd = world.getSpace().getDimension();
-            AffineTransform t = new AffineTransform();
-            t.scale(dd.width/wd.getWidth(), dd.height/wd.getHeight());
-            bufferGraphics.setTransform(t);
-        }
+        createBufferStrategy(2);
+        rebuildBuffer = false;
     }
-    
-    public Graphics2D getTransformedGraphics2D() {
-        Dimension dd = this.getSize();
-        dd = new Dimension(dd);
-        dd.setSize(dd.getWidth()-50, dd.getHeight()-50);
-        synchronized(this) {
-            Graphics2D g = buffer.createGraphics();
-            g.setColor(new Color(255,255,255));
-            g.fillRect(0, 0, dd.width, dd.height);
-            g.setColor(Color.BLACK);
-            g.drawString("Time: " + world.getTime(), 100, 100);
-            return bufferGraphics;
-        }
-    }
-    
-    private FrameTracker ftracker = new FrameTracker("display");
-    
-    /**
-     * Redibuixa la finestra.
-     */
-    @Override
-    public void paint(Graphics go) {
-//        try {
-            Graphics2D g = (Graphics2D)go;
-            synchronized(this) {
-                g.drawImage(this.buffer, 25, 25, this);
-                g.drawString("Time: " + world.getTime(), getWidth() - 50, getHeight()-5);
-                ftracker.tick();
-            }
-            
-//            Thread.sleep(1);
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-    }
-    
+
 }
