@@ -37,59 +37,20 @@
  */
 package es.csic.iiia.planes;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.util.concurrent.atomic.AtomicInteger;
-
 /**
- *
+ * Factory that will be used to create most elements.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public class Task extends AbstractDrawable {
-    
-    private final static AtomicInteger idGenerator = new AtomicInteger();
-    private final int id = idGenerator.incrementAndGet();
-    
-    private long submissionTime;
-    
-    public Task(Location location) {
-        super(location);
-    }
-    
-    @Override
-    public void initialize() {
-        submissionTime = getWorld().getTime();
-    }
-    
-    public long getSubmissionTime() {
-        return submissionTime;
-    }
-    
-    public int getId() {
-        return id;
+public class DefaultFactory extends AbstractFactory {
+
+    public DefaultFactory(Configuration config) {
+        super(config);
     }
 
     @Override
-    public void draw(Graphics2D g) {
-        int x = location.getXInt();
-        int y = location.getYInt();
-        
-        Color previous = g.getColor();
-        g.setColor(Color.BLUE);
-        g.fillOval(x-10, y-10, 20, 20);
-        
-        
-        Font f = new Font(Font.SANS_SERIF, Font.BOLD, 8);
-        String sid = String.valueOf(id);
-        g.setFont(f);
-        FontMetrics m = g.getFontMetrics(f);
-        int w = m.stringWidth(sid);
-        int h = m.getHeight()-2;
-        g.setColor(Color.WHITE);
-        g.drawString(sid, x-(w/2), y+(h/2));
-        g.setColor(previous);
+    public World buildWorld() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
     
 }

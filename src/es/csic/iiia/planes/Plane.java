@@ -1,28 +1,27 @@
 /*
  * Software License Agreement (BSD License)
- * 
- * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
- * All rights reserved.
- * 
+ *
+ * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
+ *
  *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,174 +36,129 @@
  */
 package es.csic.iiia.planes;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Stroke;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Plane extends AbstractDrawable implements Agent {
+public interface Plane extends Agent, Positioned {
     
-    final private static AtomicInteger idGenerator = new AtomicInteger();
-    final int id = idGenerator.incrementAndGet();
+    /**
+     * Plane states
+     */
+    public enum State {
+        NORMAL, TO_CHARGE, CHARGING
+    }
     
-    // Speed in meters per second
-    private double speed = 50/3.6d;
-    private boolean charging = false;
+    /**
+     * Number of history points to store, for debugging and displaying
+     * reasons.
+     */
+    public static int NUM_COMPLETED_TASKS = 20;
+    
+    /**
+     * Gets the plane's id.
+     * 
+     * @return the id.
+     */
+    public int getId();
 
-    public double getSpeed() {
-        return speed;
-    }
+    /**
+     * Adds a new task to the list of tasks owned by this plane
+     *
+     * Task addition triggers a reevaluation of the next task to be completed
+     *
+     * @param task to add
+     */
+    void addTask(Task task);
+    
+    /**
+     * Gets the list of tasks assigned to this plane.
+     * 
+     * @return list of tasks.
+     */
+    List<Task> getTasks();
 
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
+    /**
+     * Set plane's the remaining battery, in seconds
+     *
+     * @param battery
+     */
+    void setBattery(long battery);
     
-    private List<Task> tasks = null;
-    private Task nextTask = null;
+    /**
+     * Get the plane's remianing battery in seconds
+     * @return
+     */
+    long getBattery();
     
-    public Plane(Location location) {
-        super(location);
-        tasks = new ArrayList<Task>();
-    }
-    
-    @Override
-    public void step() {
-        if (charging) {
-            this.battery += rechargeRatio;
-            if (this.battery >= this.maxBattery) {
-                battery = maxBattery;
-                charging = false;
-            }
-            return;
-        }
-        
-        Station st = getWorld().getNearestStation(getLocation());
-        if (battery <= Math.floor(getLocation().getDistance(st.getLocation())/speed)) {
-            goCharge(st);
-            return;
-        }
-        
-        if (nextTask != null) {
-            if (location.move(nextTask.getLocation(), speed)) {
-                taskCompleted(nextTask);
-            }
-            updateBattery();
-        }
-    }
-    
-    private void taskCompleted(Task t) {
-        tasks.remove(t);
-        getWorld().removeTask(t);
-        nextTask = getNearestTask();
-    }
-    
-    private Task getNearestTask() {
-        Task nearestTask = null;
-        double mind = Double.MAX_VALUE;
-        
-        for(Task t : tasks) {
-            double d = location.getDistance(t.getLocation());
-            if (d < mind) {
-                nearestTask = t;
-                mind = d;
-            }
-        }
-        
-        return nearestTask;
-    }
+    /**
+     * Get the plane's current angle
+     * 
+     * @return the angle.
+     */
+    double getAngle();
 
-    public void addTask(Task task) {
-        tasks.add(task);
-        nextTask = getNearestTask();
-    }
-
+    /**
+     * Set the plane's speed, in meters per second
+     *
+     * @param speed
+     */
+    void setSpeed(double speed);
     
-    final private static Stroke ownedLines =
-            new BasicStroke(1.0f,   // Width
-            BasicStroke.CAP_SQUARE, // End cap
-            BasicStroke.JOIN_MITER, // Join style
-            10.0f,                  // Miter limit
-            new float[]{16.0f, 20.0f}, // Dash pattern
-            0.0f);                     // Dash phase
+    /**
+     * Get the plane's speed in meters per second
+     *
+     * @return
+     */
+    double getSpeed();
     
-    @Override
-    public void draw(Graphics2D g) {
-        int x = location.getXInt();
-        int y = location.getYInt();
-        Color previous = g.getColor();
-        
-        // Line to destination (if exists)
-        if (nextTask != null) {
-            g.setColor(Color.RED);
-            
-            final Location l = nextTask.getLocation();
-            g.drawLine(x, y, l.getXInt(), l.getYInt());
-        }
-        
-        // Line to other assigned tasks
-        Stroke previousStroke = g.getStroke();
-        g.setStroke(ownedLines);
-        for (Task t : tasks) {
-            if (t == nextTask) continue;
-            
-            final Location l = t.getLocation();
-            g.drawLine(x, y, l.getXInt(), l.getYInt());
-        }
-        g.setStroke(previousStroke);
-        
-        g.setColor(Color.RED);
-        g.fillOval(x-200, y-200, 400, 400);
-        
-        // Plane id
-        Font f = new Font(Font.SANS_SERIF, Font.BOLD, 160);
-        String sid = String.valueOf(id);
-        g.setFont(f);
-        FontMetrics m = g.getFontMetrics(f);
-        int w = m.stringWidth(sid);
-        int h = m.getHeight()-2;
-        g.setColor(Color.WHITE);
-        g.drawString(sid, x-(w/2), y+(h/2));
-        // Battery
-        g.setColor(Color.DARK_GRAY);
-        String bat = String.valueOf(getBattery());
-        g.drawString(bat, x-(w/2), y+2*(h/2));
-        
-        g.setColor(previous);
-    }
-
+    /**
+     * Set the battery capacity (maximum battery charge in seconds)
+     * 
+     * @param capacity 
+     */
+    public void setBatteryCapacity(long capacity);
     
-    private long rechargeRatio = 3;
-    private long battery;
-    private long maxBattery;
+    /**
+     * Get the battery capacity (maximum battery charge in seconds)
+     * 
+     * @return
+     */
+    public long getBatteryCapacity();
     
-    public void setBattery(long battery) {
-        this.battery = battery;
-    }
-    public long getBattery() {
-        return battery;
-    }
-
-    private void updateBattery() {
-        battery--;
-    }
-
-    private void goCharge(Station st) {
-        if (this.location.move(st.getLocation(), speed)) {
-            charging = true;
-        }
-    }
-
-    void setMaxBattery(long battery) {
-        this.maxBattery = battery;
-    }
+    /**
+     * Get the completed locations.
+     */
+    public List<Location> getCompletedLocations();
+    
+    /**
+     * Get the planned locations.
+     */
+    public List<Location> getPlannedLocations();
+    
+    /**
+     * Get the next planned task.
+     */
+    public Task getNextTask();
+    
+    /**
+     * Get the drawer for this plane.
+     */
+    public Drawable getDrawer();
+    
+    /**
+     * Get the plane's color.
+     */
+    public Color getColor();
+    
+    /**
+     * Set the plane's color.
+     * 
+     * @param color.
+     */
+    public void setColor(Color color);
     
 }

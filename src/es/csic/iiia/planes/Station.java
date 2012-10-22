@@ -36,6 +36,15 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.graphics.PlaneGraphic;
+import es.csic.iiia.planes.graphics.StationGraphic;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics2D;
+import java.awt.Stroke;
+import java.awt.geom.AffineTransform;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -49,6 +58,35 @@ public class Station extends AbstractDrawable {
     
     public Station(Location l) {
         super(l);
+    }
+    
+    @Override
+    public void draw(Graphics2D g) {
+        int x = location.getXInt();
+        int y = location.getYInt();
+        Color previousColor = g.getColor();
+        Stroke previousStroke = g.getStroke();
+        AffineTransform previousTransform = g.getTransform();
+        
+        // The background circle
+        g.setColor(Color.DARK_GRAY);
+        g.setStroke(new BasicStroke(40f));
+        g.fillOval(x-250,y-250,500,500);
+        
+        // The inner circle
+        g.setColor(new Color(255,210,0));
+        g.drawOval(x-190, y-190, 380, 380);
+        
+        // The power graphic
+        AffineTransform t = new AffineTransform(previousTransform);
+        t.translate(x-250, y-250);
+        t.scale(500, 500);
+        g.setTransform(t);
+        g.fill(StationGraphic.getImage());
+        
+        g.setTransform(previousTransform);
+        g.setColor(previousColor);
+        g.setStroke(previousStroke);
     }
     
 }

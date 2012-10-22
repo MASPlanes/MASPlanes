@@ -45,9 +45,10 @@ import java.util.logging.Logger;
  */
 public class FrameTracker {
     
-    private long lastTime = System.currentTimeMillis();
+    private long lastTime = System.nanoTime();
     private int counter = 0;
     private String identifier;
+    public final Object lock = new Object();
     
     public FrameTracker(String identifier) {
         this.identifier = identifier;
@@ -55,27 +56,72 @@ public class FrameTracker {
     
     public void tick() {
         counter += 1;
-        final long time = System.currentTimeMillis();
-        if (time-lastTime > 1000) {
-            Logger.getLogger(FrameTracker.class.getName()).log(Level.FINER, "{0} rate: {1}fps.", new Object[]{identifier, counter});
+        final long time = System.nanoTime();
+        if (time-lastTime > 10e9) {
+            Logger.getLogger(FrameTracker.class.getName()).log(Level.INFO, "{0} rate: {1}fps.", new Object[]{identifier, counter});
             counter = 0;
             lastTime = time;
         }
     }
     
-    public void delay() {
-        final long time = System.currentTimeMillis();
-        final long remainder = Math.max(0,1000 - (time - lastTime));
+    private long calibrateIter() {
+        long t1 = System.nanoTime();
+        try {
+            Thread.sleep(0l, 1);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        long t2 = System.nanoTime();
+        return t2 - t1;
+    }
+    
+    public void calibrate() {
+        double avg = calibrateIter();
+        long min = (long)avg;
+        long max = (long)avg;
+        for (int i=1; i<1000; i++) {
+            final long x = calibrateIter();
+            avg += (x - avg)/i+1;
+            min = Math.min(min, x);
+            max = Math.max(x, max);
+        }
+        System.err.println("Sleep nanoseconds: " + min + "/" + avg + "/" + max);
+    }
+    
+    private double avg = 1;
+    public void delay(int ratio) {
+        final long time = System.nanoTime();
+        final long remainder = (long)Math.max(0,1e9/ratio - (time - lastTime));
         
-//        try {
-//            Thread.sleep(remainder/100000);
-//            //Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, "Error when trying to sleep for " + remainder + "ns:");
-//        } catch (InterruptedException ex) {
-//            Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, null, ex);
-//        }
+        avg = remainder*0.1 + avg*0.9;
+        counter += 1;
+        
+        try {
+            final long milis = (long)(remainder/1e6);
+            final int  nanos = (int)(remainder%1e6);
+            if (milis > 16) {
+                //System.err.println("Sleeping for (" + remainder + ") " + milis + "ms " + nanos);
+                synchronized(lock) {
+                    lock.wait(milis, nanos);
+                }
+            } else if (milis > 0 || nanos > 0) {
+                double dice = Math.random()*16e6;
+                if (dice < avg) {
+                    //System.err.println("AVGSLeep for (" + remainder + ") " + milis + "ms " + nanos + "ns. AVG: " + avg + ", DICE: " + dice);
+                    synchronized(lock) {
+                        lock.wait(milis, nanos);
+                    }
+                } else {
+                    //System.err.println("NOTSLeep for (" + remainder + ") " + milis + "ms " + nanos + "ns. AVG: " + avg + ", DICE: " + dice);
+                }
+            }
+            //Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, "Error when trying to sleep for " + remainder + "ns:");
+        } catch (InterruptedException ex) {
+            Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, null, ex);
+        }
         
         
-        lastTime = time + remainder;
+        lastTime = System.nanoTime();
     }
     
 }

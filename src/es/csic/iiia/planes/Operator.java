@@ -39,9 +39,9 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.operator_strategy.OperatorStrategy;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Operator that will be submitting tasks to the UAVs.
@@ -54,7 +54,7 @@ public class Operator extends AbstractElement implements Agent {
      * List of the definitions of all the tasks that this operator will submit
      * during the simulation.
      */
-    private ArrayList<DTask> tasks;
+    private List<DTask> tasks;
     
     /**
      * Index of the next task to be submitted.
@@ -76,7 +76,7 @@ public class Operator extends AbstractElement implements Agent {
      * 
      * @param tasks to be submitted by this operator.
      */
-    public Operator(ArrayList<DTask> tasks) {
+    public Operator(List<DTask> tasks) {
         this.tasks = tasks;
         Collections.sort(this.tasks, new TaskSorter());
         nextTaskTime = this.tasks.get(0).getTime();

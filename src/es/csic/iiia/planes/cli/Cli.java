@@ -38,9 +38,6 @@
 package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.planes.Configuration;
-import es.csic.iiia.planes.Display;
-import es.csic.iiia.planes.World;
-import es.csic.iiia.planes.generator.Generator;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.operator_strategy.Nearest;
 import es.csic.iiia.planes.operator_strategy.Random;
@@ -49,13 +46,7 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import org.apache.commons.cli.CommandLine;
-import org.apache.commons.cli.CommandLineParser;
-import org.apache.commons.cli.HelpFormatter;
-import org.apache.commons.cli.OptionBuilder;
-import org.apache.commons.cli.Options;
-import org.apache.commons.cli.ParseException;
-import org.apache.commons.cli.PosixParser;
+import org.apache.commons.cli.*;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -130,7 +121,8 @@ public class Cli {
         try {
             d = mapper.readValue(new File(args[0]), DProblem.class);
         } catch (IOException ex) {
-            Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, ex);
+            System.err.println("Error reading file: " + ex.getLocalizedMessage());
+            System.exit(1);
         }
         config.problemDefinition = d;
         

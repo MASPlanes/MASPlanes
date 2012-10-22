@@ -1,28 +1,27 @@
 /*
  * Software License Agreement (BSD License)
- * 
- * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
- * All rights reserved.
- * 
+ *
+ * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
+ *
  *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,61 +34,35 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.graphics;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.awt.geom.GeneralPath;
 
 /**
  *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Task extends AbstractDrawable {
+public class StationGraphic {
     
-    private final static AtomicInteger idGenerator = new AtomicInteger();
-    private final int id = idGenerator.incrementAndGet();
+    private static double[] xs = new double[]{.475, .37, .475, .37, .66, .535, .66};
+    private static double[] ys = new double[]{.285, .55, .55, .76, .455, .455, .285};
     
-    private long submissionTime;
+    private static GeneralPath instance = null;
     
-    public Task(Location location) {
-        super(location);
-    }
-    
-    @Override
-    public void initialize() {
-        submissionTime = getWorld().getTime();
-    }
-    
-    public long getSubmissionTime() {
-        return submissionTime;
-    }
-    
-    public int getId() {
-        return id;
-    }
+    public static GeneralPath getImage() {
+        if (instance != null) {
+            return instance;
+        }
 
-    @Override
-    public void draw(Graphics2D g) {
-        int x = location.getXInt();
-        int y = location.getYInt();
+        GeneralPath polygon = new GeneralPath(GeneralPath.WIND_NON_ZERO, xs.length);
+        polygon.moveTo(xs[0], ys[0]);
+        for (int i=0; i<xs.length; i++) {
+            polygon.lineTo(xs[i], ys[i]);
+        }
+        polygon.closePath();
         
-        Color previous = g.getColor();
-        g.setColor(Color.BLUE);
-        g.fillOval(x-10, y-10, 20, 20);
-        
-        
-        Font f = new Font(Font.SANS_SERIF, Font.BOLD, 8);
-        String sid = String.valueOf(id);
-        g.setFont(f);
-        FontMetrics m = g.getFontMetrics(f);
-        int w = m.stringWidth(sid);
-        int h = m.getHeight()-2;
-        g.setColor(Color.WHITE);
-        g.drawString(sid, x-(w/2), y+(h/2));
-        g.setColor(previous);
+        instance = polygon;
+        return polygon;
     }
     
 }

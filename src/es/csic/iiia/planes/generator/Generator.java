@@ -40,6 +40,7 @@ import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.definition.DTask;
+import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -65,6 +66,14 @@ public class Generator {
     private int num_tasks = 60*24*30;
     private int num_stations = 1;
     private int num_crisis = 4;
+    
+    private int[][] colorList = new int[][]{
+        new int[]{0, 0, 0}, new int[]{233, 222, 187}, new int[]{173, 35, 35},
+        new int[]{255, 238, 51}, new int[]{255, 146, 51}, new int[]{255, 205, 243},
+        new int[]{42, 75, 215}, new int[]{29, 105, 20}, new int[]{129, 74, 25},
+        new int[]{129, 38, 192}, new int[]{160, 160, 160}, new int[]{129, 197, 122},
+        new int[]{157, 175, 255}, new int[]{41, 208, 208}, new int[]{87, 87, 87},
+    };
     
     private Random r = new Random();
     
@@ -110,6 +119,7 @@ public class Generator {
             pl.setY(r.nextInt(p.getHeight()));
             pl.setBattery(3600*3);
             pl.setBattery(5000);
+            pl.setColor(colorList[i]);
             planes.add(pl);
         }
     }

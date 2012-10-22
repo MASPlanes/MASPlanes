@@ -37,9 +37,13 @@
 package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.planes.Configuration;
-import es.csic.iiia.planes.Display;
+import es.csic.iiia.planes.DefaultFactory;
+import es.csic.iiia.planes.DefaultWorld;
+import es.csic.iiia.planes.gui.Display;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.World;
+import es.csic.iiia.planes.gui.GUIFactory;
+import es.csic.iiia.planes.gui.GUIWorld;
 
 /**
  *
@@ -54,17 +58,16 @@ public class CliApp {
     }
     
     public void run() {
-        Factory f = new Factory(config);
-        World w = new World(f);
-        f.setWorld(w);
-        w.init(config.problemDefinition);
-        
+        Factory f;
         if (config.gui) {
-            Display d = new Display(w);
-            w.setDisplay(d);
+            f = new GUIFactory(config);
+        } else {
+            f = new DefaultFactory(config);
         }
         
-        new Thread(w).start();
+        World world = f.buildWorld();
+        world.init(config.problemDefinition);
+        new Thread(world).start();
     }
     
 }

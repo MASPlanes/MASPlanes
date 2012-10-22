@@ -36,6 +36,8 @@
  */
 package es.csic.iiia.planes.definition;
 
+import java.awt.Color;
+
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
@@ -43,6 +45,15 @@ package es.csic.iiia.planes.definition;
 public class DPlane extends DLocation {
     private double speed;
     private long battery;
+    private int[] color;
+
+    public int[] getColor() {
+        return color;
+    }
+
+    public void setColor(int[] color) {
+        this.color = color;
+    }
 
     public double getSpeed() {
         return speed;

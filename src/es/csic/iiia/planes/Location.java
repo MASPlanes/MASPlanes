@@ -37,11 +37,13 @@
  */
 package es.csic.iiia.planes;
 
+import java.awt.geom.Point2D;
+
 /**
  *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public class Location {
+public class Location extends Point2D {
     
     private double x;
     private double y;
@@ -49,6 +51,11 @@ public class Location {
     public Location(double x, double y) {
         this.x = x;
         this.y = y;
+    }
+
+    public Location(Point2D point) {
+        this.x = point.getX();
+        this.y = point.getY();
     }
     
     /**
@@ -112,5 +119,17 @@ public class Location {
     
     @Override public String toString() {
         return "(" + getXInt() + "," + getYInt() + ")";
+    }
+
+    public double getAngle(Location destination) {
+        double dx = x - destination.x;
+        double dy = y - destination.y;
+        return Math.atan2(dy, dx);
+    }
+
+    @Override
+    public void setLocation(double d, double d1) {
+        x = d;
+        y = d1;
     }
 }
