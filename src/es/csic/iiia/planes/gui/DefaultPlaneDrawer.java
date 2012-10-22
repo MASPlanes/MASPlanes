@@ -37,8 +37,12 @@
 package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.Drawable;
+import es.csic.iiia.planes.Drawable;
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.graphics.PlaneGraphic;
 import java.awt.BasicStroke;

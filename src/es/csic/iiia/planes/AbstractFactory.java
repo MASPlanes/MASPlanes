@@ -69,8 +69,8 @@ public abstract class AbstractFactory implements Factory {
     }
 
     @Override
-    public DefaultPlane buildPlane(Location location) {
-        DefaultPlane p = new DefaultPlane(location);
+    public Plane buildPlane(Location location) {
+        Plane p = new DefaultPlane(location);
         initialize(p);
         return p;
     }

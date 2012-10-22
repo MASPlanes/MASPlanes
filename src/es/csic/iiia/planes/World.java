@@ -67,13 +67,13 @@ public abstract class World implements Runnable {
     private long duration;
     
     private final Factory factory;
-
-    public Factory getFactory() {
-        return factory;
-    }
     
     public World(Factory f) {
         this.factory = f;
+    }
+
+    public Factory getFactory() {
+        return factory;
     }
     
     public void init(DProblem d) {
