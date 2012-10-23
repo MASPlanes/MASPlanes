@@ -38,6 +38,7 @@
 package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.planes.Configuration;
+import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.operator_strategy.Nearest;
 import es.csic.iiia.planes.operator_strategy.Random;
@@ -71,6 +72,12 @@ public class Cli {
                 .withArgName("random|nearest")
                 .withLongOpt("operator")
                 .create('o'));
+        options.addOption(OptionBuilder.withArgName("planestype")
+                .hasArg()
+                .withDescription("set the type of planes in this simulation.")
+                .withArgName("default")
+                .withLongOpt("planes-type")
+                .create('p'));
         
         Configuration config = parseOptions(args);
         CliApp app = new CliApp(config);
@@ -108,6 +115,16 @@ public class Cli {
                 config.operatorStrategy = new Random();
             } else {
                 throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
+            }
+        }
+        if (line.hasOption('p')) {
+            String value = line.getOptionValue('p');
+            if (value.equalsIgnoreCase("newtypeofplane")) {
+                
+            } else if (value.equalsIgnoreCase("default")) {
+                config.planesClass = DefaultPlane.class;
+            } else {
+                throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
             }
         }
 

@@ -39,6 +39,8 @@ package es.csic.iiia.planes;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.operator_strategy.OperatorStrategy;
 import es.csic.iiia.planes.operator_strategy.Random;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -49,5 +51,6 @@ public class Configuration {
     public boolean gui = false;
     public DProblem problemDefinition = null;
     public OperatorStrategy operatorStrategy = new Random();
+    public Class<? extends Plane> planesClass = DefaultPlane.class;
     
 }

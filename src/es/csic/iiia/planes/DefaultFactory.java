@@ -50,7 +50,9 @@ public class DefaultFactory extends AbstractFactory {
 
     @Override
     public World buildWorld() {
-        throw new UnsupportedOperationException("Not supported yet.");
+        World w = new DefaultWorld(this);
+        this.setWorld(w);
+        return w;
     }
     
 }

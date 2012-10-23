@@ -36,8 +36,6 @@
  */
 package es.csic.iiia.planes;
 
-import java.util.Map;
-import java.util.TreeMap;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**

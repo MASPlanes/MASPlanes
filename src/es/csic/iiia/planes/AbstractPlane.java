@@ -257,6 +257,11 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
         }
     }
     
+    /**
+     * Signals that a task has been completed.
+     * 
+     * @param t task that has been completed.
+     */
     protected abstract void taskCompleted(Task t);
     
     protected void setNextTask(Task t) {
@@ -276,6 +281,11 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
         taskCompleted(t);
     }
     
+    /**
+     * Signals that a new task has been added.
+     * 
+     * @param t task that has been added.
+     */
     protected abstract void taskAdded(Task t);
 
     /**
