@@ -37,6 +37,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.gui.Drawable;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.FontMetrics;
@@ -44,16 +45,32 @@ import java.awt.Graphics2D;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * Represents a location that must be checked by some plane.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public class Task extends AbstractDrawable {
+public class Task extends AbstractPositionedElement implements Drawable {
     
+    /**
+     * Generator of unique identifiers.
+     */
     private final static AtomicInteger idGenerator = new AtomicInteger();
+    
+    /**
+     * Identifier of this task.
+     */
     private final int id = idGenerator.incrementAndGet();
     
+    /**
+     * Time at which this task has been submitted.
+     */
     private long submissionTime;
     
+    /**
+     * Builds a new task.
+     * 
+     * @param location that must be checked by some plane.
+     */
     public Task(Location location) {
         super(location);
     }
@@ -63,18 +80,30 @@ public class Task extends AbstractDrawable {
         submissionTime = getWorld().getTime();
     }
     
+    /**
+     * Get the time at which this task was submitted by the operator (created).
+     * @return submission time.
+     */
     public long getSubmissionTime() {
         return submissionTime;
     }
     
+    /**
+     * Get the identifier of this task.
+     * 
+     * Identifiers are sequential (in order of submission) and guaranteed to be
+     * unique.
+     * 
+     * @return the identifier of this Task.
+     */
     public int getId() {
         return id;
     }
 
     @Override
     public void draw(Graphics2D g) {
-        int x = location.getXInt();
-        int y = location.getYInt();
+        int x = getLocation().getXInt();
+        int y = getLocation().getYInt();
         
         Color previous = g.getColor();
         g.setColor(Color.BLUE);

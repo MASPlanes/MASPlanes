@@ -36,11 +36,13 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.gui.Drawable;
 import java.awt.Color;
 import java.util.List;
 
 /**
- *
+ * Represents an Unmannered Aerial Vehicle (UAV).
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Plane extends Agent, Positioned {
@@ -90,7 +92,8 @@ public interface Plane extends Agent, Positioned {
     
     /**
      * Get the plane's remianing battery in seconds
-     * @return
+     * 
+     * @return the reamining battery of this plane (in flight seconds)
      */
     long getBattery();
     
@@ -111,7 +114,7 @@ public interface Plane extends Agent, Positioned {
     /**
      * Get the plane's speed in meters per second
      *
-     * @return
+     * @return the plane's speed.
      */
     double getSpeed();
     
@@ -125,7 +128,7 @@ public interface Plane extends Agent, Positioned {
     /**
      * Get the battery capacity (maximum battery charge in seconds)
      * 
-     * @return
+     * @return the capacity of the battery of this plane.
      */
     public long getBatteryCapacity();
     
@@ -155,9 +158,12 @@ public interface Plane extends Agent, Positioned {
     public Color getColor();
     
     /**
-     * Set the plane's color.
+     * Set the plane's color, used when drawing the GUI.
      * 
-     * @param color.
+     * The color must be specified as an int array of length 3, representing
+     * the RGB color values in the range 0-255.
+     * 
+     * @param color 
      */
     public void setColor(Color color);
     

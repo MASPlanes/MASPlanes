@@ -37,7 +37,9 @@
  */
 package es.csic.iiia.planes.gui;
 
-import es.csic.iiia.planes.*;
+import es.csic.iiia.planes.AbstractFactory;
+import es.csic.iiia.planes.Configuration;
+import es.csic.iiia.planes.AbstractWorld;
 
 /**
  * Factory that will be used to create most elements.
@@ -50,12 +52,17 @@ public class GUIFactory extends AbstractFactory {
         super(config);
     }
 
+    /**
+     * Creates a GUIWorld and the Display window, linking them together.
+     * 
+     * @return the created world.
+     */
     @Override
-    public World buildWorld() {
+    public GUIWorld buildWorld() {
         GUIWorld w = new GUIWorld(this);
         Display d = new Display(w);
         w.setDisplay(d);
-        setWorld(w);
+        world = w;
         return w;
     }
     

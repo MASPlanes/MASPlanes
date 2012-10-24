@@ -48,10 +48,13 @@ public class DefaultFactory extends AbstractFactory {
         super(config);
     }
 
+    /**
+     * Builds a {@link DefaultWorld}.
+     */
     @Override
-    public World buildWorld() {
-        World w = new DefaultWorld(this);
-        this.setWorld(w);
+    public DefaultWorld buildWorld() {
+        DefaultWorld w = new DefaultWorld(this);
+        world = w;
         return w;
     }
     

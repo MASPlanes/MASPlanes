@@ -37,20 +37,39 @@
 package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DProblem;
-import es.csic.iiia.planes.operator_strategy.OperatorStrategy;
-import es.csic.iiia.planes.operator_strategy.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
+import es.csic.iiia.planes.operator_behavior.Random;
 
 /**
- *
+ * Holds the configuration settings of the simulator.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class Configuration {
     
+    /**
+     * True if running with a graphical display, false otherwise.
+     */
     public boolean gui = false;
+    
+    /**
+     * Pointer to the problem definition of the problem (scenario definition)
+     * being simulated.
+     */
     public DProblem problemDefinition = null;
+    
+    /**
+     * Strategy used by the {@link Operator} to decide to which plane it will
+     * submit the task.
+     */
     public OperatorStrategy operatorStrategy = new Random();
+    
+    /**
+     * Class of planes used by this simulation.
+     * 
+     * Because different planes use different solving strategies, changing their
+     * class is how the simulator runs one solving algorithm or another.
+     */
     public Class<? extends Plane> planesClass = DefaultPlane.class;
     
 }

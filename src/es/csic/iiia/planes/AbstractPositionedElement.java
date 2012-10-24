@@ -38,30 +38,37 @@
 package es.csic.iiia.planes;
 
 /**
- * Represents a physical element (participant) of the simulation.
+ * Skeletal implementation of elements that have a position in the world's space.
  * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public interface Element {
-
-    /**
-     * Get the {@link AbstractWorld} (simulation) where this element is participating.
-     * @return the world.
-     */
-    World getWorld();
-
-    /**
-     * Set the {@link AbstractWorld} (simulation) where this element will participate.
-     * @param world where this element will participate.
-     */
-    void setWorld(World world);
+public abstract class AbstractPositionedElement extends AbstractElement 
+    implements Positioned
+{
     
     /**
-     * Initialize this element.
-     * 
-     * This method is called exactly once before starting every simulation,
-     * allowing it to perform any required setup/bootstraping.
+     * The element's location.
      */
-    void initialize();
+    private Location location;
+    
+    /**
+     * Constructor, that requires the initial position of this element in order
+     * to instantiate it.
+     * 
+     * @param location initial location of thi selement.
+     */
+    public AbstractPositionedElement(Location location) {
+        this.location = location;
+    }
+    
+    @Override
+    public Location getLocation() {
+        return location;
+    }
+    
+    @Override
+    public void setLocation(Location location) {
+        this.location = location;
+    }
     
 }

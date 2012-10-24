@@ -37,141 +37,83 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
-import es.csic.iiia.planes.definition.DStation;
-import es.csic.iiia.planes.util.FrameTracker;
-import java.awt.Color;
-import java.awt.Image;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
- *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * Represents the world where a simulation runs.
+ * 
+ * This is the object that keeps track of all the elements participating in the
+ * simulation, and that synchronizes their actions.
+ * 
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class World implements Runnable {
-    private Space space = null;
-    private List<Plane> planes = new ArrayList<Plane>();
-    private List<Task> tasks = new ArrayList<Task>();
-    private List<Station> stations = new ArrayList<Station>();
+public interface World extends Runnable {
 
-    public List<Station> getStations() {
-        return stations;
-    }
-    private StatsCollector stats = new StatsCollector(this);
-    private Operator operator;
-    
-    private long time = 0;
-    private long duration;
-    
-    private final Factory factory;
-    
-    public World(Factory f) {
-        this.factory = f;
-    }
+    /**
+     * Get the factory used to build elements for this simulation.
+     * 
+     * @return the factory.
+     */
+    Factory getFactory();
 
-    public Factory getFactory() {
-        return factory;
-    }
-    
-    public void init(DProblem d) {
-        this.reset();
-        space = new Space(d.getWidth(), d.getHeight());
-        duration = d.getDuration();
-        
-        operator = factory.buildOperator(d.getTasks());
-        
-        for (DPlane pd : d.getPlanes()) {
-            Location l = new Location(pd.getX(), pd.getY());
-            Plane p = factory.buildPlane(l);
-            p.setSpeed(pd.getSpeed());
-            p.setBattery(pd.getBattery());
-            p.setBatteryCapacity(pd.getBattery());
-            int[] i = pd.getColor();
-            Color c = new Color(i[0],i[1],i[2]);
-            p.setColor(c);
-            planes.add(p);
-        }
-        
-        for (DStation sd : d.getStations()) {
-            Location l = new Location(sd.getX(), sd.getY());
-            Station s = factory.buildStation(l);
-            stations.add(s);
-        }
-    }
-    
-    public long getTime() {
-        return time;
-    }
-    
-    public Space getSpace() {
-        return space;
-    }
-    
-    @Override
-    public void run() {
-        
-        for (time=0; time<duration || tasks.size() > 0; time++) {
-            
-            computeStep();
-            displayStep();
-            
-        }
-        
-        stats.display();
-        
-        while(!graphicsQueue.isEmpty()) {
-            displayStep();
-        }
-    }
-    
-    public void computeStep() {
-        for (Plane p : planes) {
-            p.step();
-        }
-        operator.step();
-    }
-    
-    
-    public ConcurrentLinkedQueue<Image> graphicsQueue = new ConcurrentLinkedQueue<Image>();
-    public abstract void displayStep();
-    private FrameTracker slow = new FrameTracker("sim");
-    
-    public List<Plane> getPlanes() {
-        return planes;
-    }
-    
-    public List<Task> getTasks() {
-        return tasks;
-    }
-    
-    public void reset() {
-        planes.clear();
-        tasks.clear();
-    }
-    
-    public void addTask(Task task) {
-        tasks.add(task);
-    }
+    /**
+     * Get the list of planes in this simulation.
+     * 
+     * @return list of the simulation's planes.
+     */
+    List<Plane> getPlanes();
 
-    public void removeTask(Task t) {
-        tasks.remove(t);
-        stats.collect(t);
-    }
+    /**
+     * Get the {@link Space} of this simulation.
+     * 
+     * @return the {@link Space} of this simulation.
+     */
+    Space getSpace();
+    
+    /**
+     * Get the charging station that is closest to the given location.
+     * 
+     * @param location where an element is querying from.
+     * @return the recharging station that is closest to the given location.
+     */
+    Station getNearestStation(Location location);
+    
+    /**
+     * Add a new task to the world.
+     * 
+     * The world keeps track of the tasks just for counting purposes.
+     * {@link Plane}s must not obtain information about the tasks from here.
+     * Instead, it is the {@link Operator}'s responsibility to communicate any
+     * required tasks to the planes.
+     * 
+     * @param task to add.
+     */
+    void addTask(Task task);
+    
+    /**
+     * Remove the given task from the world.
+     * 
+     * The world keeps track of the tasks just for counting purposes.
+     * The {@link Plane}s must notify to the world that a Task has been
+     * completed by calling this method.
+     * 
+     * @param task to remove.
+     */
+    void removeTask(Task task);
 
-    public Station getNearestStation(Location location) {
-        double mind = Double.MAX_VALUE;
-        Station best = null;
-        for (Station s : stations) {
-            final double d = location.getDistance(s.getLocation());
-            if (d < mind) {
-                best = s;
-                mind = d;
-            }
-        }
-        return best;
-    }
+    /**
+     * Get the current simulation time (in seconds).
+     * 
+     * @return current simulation time (in seconds).
+     */
+    long getTime();
+
+    /**
+     * Initialize the simulation according to the given problem definition.
+     * 
+     * @param d problem definition.
+     */
+    void init(DProblem d);
     
 }

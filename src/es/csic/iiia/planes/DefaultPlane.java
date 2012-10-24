@@ -40,7 +40,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Dummy plane that simply heads toward the nearest task among the ones it has
+ * been assigned. This plane never communicates with its teammates, so they
+ * never exchange tasks.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DefaultPlane extends AbstractPlane {
@@ -48,6 +51,9 @@ public class DefaultPlane extends AbstractPlane {
     public DefaultPlane(Location location) {
         super(location);
     }
+    
+    @Override
+    public void initialize() {}
 
     @Override
     protected void taskCompleted(Task t) {

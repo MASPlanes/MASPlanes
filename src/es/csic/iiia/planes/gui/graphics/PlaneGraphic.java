@@ -34,18 +34,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.graphics;
+package es.csic.iiia.planes.gui.graphics;
 
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.Image;
-import java.awt.RenderingHints;
-import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
-import java.awt.image.BufferedImage;
 
 /**
- *
+ * Graphic that represents a plane.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class PlaneGraphic {
@@ -59,6 +54,11 @@ public class PlaneGraphic {
     
     private static GeneralPath instance = null;
     
+    /**
+     * Get the plane's graphic as a java awt Polygon.
+     * 
+     * @return charging stations' icon.
+     */
     public static GeneralPath getImage() {
         if (instance != null) {
             return instance;

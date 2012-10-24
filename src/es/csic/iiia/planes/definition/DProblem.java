@@ -39,17 +39,20 @@ package es.csic.iiia.planes.definition;
 import java.util.ArrayList;
 
 /**
- * A complete problem definition (description), including:
- * 
- * - The world's properties (width, height, and duration)
- * - An enumeration of all the planes, with their initial locations and maximum
- *   speeds.
- * - An enumeration of all the tasks that will be submitted throghout the
- *   simulation.
+ * Definition of a problem.
+ * <p/>
+ * The definition of a problem or scenario includes:
+ * <ul>
+ * <li>The world's properties (width, height, and duration)
+ * <li>An enumeration of all the planes, with their initial locations and 
+ *     maximum speeds.
+ * <li>An enumeration of all the tasks that will be submitted throghout the
+ *     simulation.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DProblem {
+    
     private int width = 1000;
     private int height = 1000;
     private long duration = 3600*24*30;
@@ -57,50 +60,110 @@ public class DProblem {
     private ArrayList<DTask> tasks = new ArrayList<DTask>();
     private ArrayList<DStation> stations = new ArrayList<DStation>();
 
+    /**
+     * Get the width of the simulation space.
+     * 
+     * @return width of the simulation space.
+     */
     public int getWidth() {
         return width;
     }
 
+    /**
+     * Set the width of the simulation space.
+     * 
+     * @param width of the simulation space.
+     */
     public void setWidth(int width) {
         this.width = width;
     }
 
+    /**
+     * Get the height of the simulation space.
+     * 
+     * @return height of the simulation space.
+     */
     public int getHeight() {
         return height;
     }
 
+    /**
+     * Set the height of the simulation space.
+     * 
+     * @param height of the simulation space.
+     */
     public void setHeight(int height) {
         this.height = height;
     }
 
+    /**
+     * Get the duration of this scenario.
+     * 
+     * @return duration of this scenario (in seconds).
+     */
     public long getDuration() {
         return duration;
     }
 
+    /**
+     * Set the duration of this scenario.
+     * 
+     * @param duration of this scenario (in seconds).
+     */
     public void setDuration(long duration) {
         this.duration = duration;
     }
 
+    /**
+     * Get a list of the planes in this scenario.
+     * 
+     * @return list of planes in this scenario.
+     */
     public ArrayList<DPlane> getPlanes() {
         return planes;
     }
 
+    /**
+     * Set the list of planes in this scenario.
+     * 
+     * @param planes list of planes to set.
+     */
     public void setPlanes(ArrayList<DPlane> planes) {
         this.planes = planes;
     }
 
+    /**
+     * Get the list of tasks in this scenario.
+     * 
+     * @return list of tasks in this scenario.
+     */
     public ArrayList<DTask> getTasks() {
         return tasks;
     }
 
+    /**
+     * Set the list of tasks in this scenario.
+     * 
+     * @param tasks list of tasks to set.
+     */
     public void setTasks(ArrayList<DTask> tasks) {
         this.tasks = tasks;
     }
 
+    /**
+     * Get the list of recharging stations in this scenario.
+     * 
+     * @return list of recharging stations.
+     */
     public ArrayList<DStation> getStations() {
         return stations;
     }
 
+    /**
+     * Set the list of recharging stations in this scenario.
+     * 
+     * @param stations list of recharging stations to set.
+     */
     public void setStations(ArrayList<DStation> stations) {
         this.stations = stations;
     }

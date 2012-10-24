@@ -38,11 +38,19 @@
 package es.csic.iiia.planes;
 
 /**
- *
+ * Represents an Agent: an {@link Element} that performs some action(s) 
+ * during the simulation.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public interface Agent extends Element {
     
+    /**
+     * Action method for the Agents.
+     * 
+     * This method is called every second. All actors must implement it so that
+     * they perform the desired actions.
+     */
     public void step();
     
 }

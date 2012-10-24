@@ -36,17 +36,31 @@
  */
 package es.csic.iiia.planes.definition;
 
+import es.csic.iiia.planes.Task;
+
 /**
- *
+ * Definition of a task.
+ * 
+ * @see Task
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DTask extends DLocation {
     private long time;
 
+    /**
+     * Get the time at which this task will be submitted.
+     * 
+     * @return time at which this task will be submitted.
+     */
     public long getTime() {
         return time;
     }
 
+    /**
+     * Set the time at which this task will be submitted.
+     * 
+     * @param time to set.
+     */
     public void setTime(long time) {
         this.time = time;
     }

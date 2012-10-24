@@ -44,10 +44,10 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  */
 class StatsCollector {
     
-    private World world;
+    private AbstractWorld world;
     private DescriptiveStatistics stats = new DescriptiveStatistics();
 
-    public StatsCollector(World w) {
+    public StatsCollector(AbstractWorld w) {
         world = w;
     }
     

@@ -36,15 +36,13 @@
  */
 package es.csic.iiia.planes.gui;
 
-import es.csic.iiia.planes.Drawable;
-import es.csic.iiia.planes.Drawable;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.graphics.PlaneGraphic;
+import es.csic.iiia.planes.gui.graphics.PlaneGraphic;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
@@ -59,7 +57,7 @@ import java.util.List;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class DefaultPlaneDrawer implements Drawable {
+public class PlaneDrawer implements Drawable {
     
     private Plane plane;
     
@@ -68,7 +66,7 @@ public class DefaultPlaneDrawer implements Drawable {
      */
     private static final Stroke normalStroke = new BasicStroke(10f);
 
-    public DefaultPlaneDrawer(Plane p) {
+    public PlaneDrawer(Plane p) {
         this.plane = p;
     }
 

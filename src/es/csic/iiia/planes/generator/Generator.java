@@ -40,7 +40,6 @@ import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.definition.DTask;
-import java.awt.Color;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
@@ -54,7 +53,8 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
- *
+ * Generator of problem instances (scenarios).
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class Generator {
@@ -77,11 +77,19 @@ public class Generator {
     
     private Random r = new Random();
     
+    /**
+     * Entry point of the execution of this generator.
+     * 
+     * @param args list of command line arguments (ignored)
+     */
     public static void main(String[] args) {
         Generator t = new Generator();
         t.run();
     }
     
+    /**
+     * Executes the generator.
+     */
     public void run() {
         DProblem p = createProblemDefinition();
         addPlanes(p);
@@ -117,8 +125,8 @@ public class Generator {
             pl.setSpeed(50/3.6);
             pl.setX(r.nextInt(p.getWidth()));
             pl.setY(r.nextInt(p.getHeight()));
-            pl.setBattery(3600*3);
-            pl.setBattery(5000);
+            pl.setBatteryCapacity(3600*3);
+            pl.setBatteryCapacity(5000);
             pl.setColor(colorList[i]);
             planes.add(pl);
         }

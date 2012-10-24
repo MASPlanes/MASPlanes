@@ -38,26 +38,31 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
+ * Skeletal implementation of a Factory to minimize the effort required to build
+ * an actual factory.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractFactory implements Factory {
     
     private final Configuration config;
-    private World world;
+    
+    /**
+     * World being used in the current simulation.
+     * 
+     * This *must* be set by the concrete Factory class when implementing the
+     * {@link Factory#buildWorld() } method.
+     * 
+     * @see Factory#buildWorld() 
+     */
+    protected World world;
     
     public AbstractFactory(Configuration config) {
         this.config = config;
-    }
-    
-    public World getWorld() {
-        return world;
-    }
-
-    public void setWorld(World world) {
-        this.world = world;
     }
 
     @Override
@@ -70,7 +75,12 @@ public abstract class AbstractFactory implements Factory {
 
     @Override
     public Plane buildPlane(Location location) {
-        Plane p = new DefaultPlane(location);
+        Plane p = null;
+        try {
+            p = config.planesClass.getConstructor(Location.class).newInstance(location);
+        } catch (Exception ex) {
+            Logger.getLogger(AbstractFactory.class.getName()).log(Level.SEVERE, null, ex);
+        }
         initialize(p);
         return p;
     }
@@ -89,9 +99,14 @@ public abstract class AbstractFactory implements Factory {
         return t;
     }
 
-    protected void initialize(Element e) {
-        e.setWorld(world);
-        e.initialize();
+    /**
+     * Initializes an element.
+     * 
+     * @param element to initialize.
+     */
+    protected void initialize(Element element) {
+        element.setWorld(world);
+        element.initialize();
     }
     
 }

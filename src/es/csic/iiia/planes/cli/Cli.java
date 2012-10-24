@@ -40,8 +40,8 @@ package es.csic.iiia.planes.cli;
 import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.definition.DProblem;
-import es.csic.iiia.planes.operator_strategy.Nearest;
-import es.csic.iiia.planes.operator_strategy.Random;
+import es.csic.iiia.planes.operator_behavior.Nearest;
+import es.csic.iiia.planes.operator_behavior.Random;
 import java.io.File;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -51,14 +51,20 @@ import org.apache.commons.cli.*;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
- *
+ * Main class for the CLI interface.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Cli {
     
+    /**
+     * List of available cli options.
+     */
     private static Options options = new Options();
 
     /**
+     * Cli's entry point.
+     * 
      * @param args the command line arguments
      */
     public static void main(String[] args) {
@@ -90,6 +96,12 @@ public class Cli {
         System.exit(1);
     }
     
+    /**
+     * Parse the provided list of arguments according to the program's options.
+     * 
+     * @param in_args list of input arguments.
+     * @return a configuration object set according to the input options.
+     */
     private static Configuration parseOptions(String[] in_args) {
         Configuration config = new Configuration();
         CommandLineParser parser = new PosixParser();
@@ -146,6 +158,9 @@ public class Cli {
         return config;
     }
 
+    /**
+     * Initializes the logging system.
+     */
     private static void initializeLogging() {
         try {
             // Load logging configuration

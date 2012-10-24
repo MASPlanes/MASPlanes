@@ -36,10 +36,12 @@
  */
 package es.csic.iiia.planes.definition;
 
-import java.awt.Color;
+import es.csic.iiia.planes.Plane;
 
 /**
- *
+ * Definition of a Plane.
+ * 
+ * @see Plane
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DPlane extends DLocation {
@@ -47,27 +49,65 @@ public class DPlane extends DLocation {
     private long battery;
     private int[] color;
 
+    /**
+     * Get the color of this plane.
+     * 
+     * The color is defined as an array of exactly three integers, containing
+     * the amount of red, green, and blue (RGB) in a 0-255 scale.
+     * 
+     * @return color of this plane, as an RGB triplet.
+     */
     public int[] getColor() {
         return color;
     }
 
+    /**
+     * Set the color of this plane.
+     * 
+     * @see #getColor() on the format of the color parameter.
+     * 
+     * @param color to set.
+     */
     public void setColor(int[] color) {
         this.color = color;
     }
 
+    /**
+     * Get the speed of this plane, in meters per second.
+     * 
+     * @return speed of this plane, in meters per second.
+     */
     public double getSpeed() {
         return speed;
     }
 
+    /**
+     * Set the speed of this plane
+     * 
+     * @param speed of this plane in meters per second.
+     */
     public void setSpeed(double speed) {
         this.speed = speed;
     }
 
-    public long getBattery() {
+    /**
+     * Get the battery capacity of this plane.
+     * 
+     * At the beggining of a simulation, all of the planes are supposed to be
+     * fully charged.
+     * 
+     * @return battery capacity of this plane.
+     */
+    public long getBatteryCapacity() {
         return battery;
     }
 
-    public void setBattery(long battery) {
+    /**
+     * Set the battery capacity of this plane.
+     * 
+     * @param battery capacity of this plane.
+     */
+    public void setBatteryCapacity(long battery) {
         this.battery = battery;
     }
 }

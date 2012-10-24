@@ -36,8 +36,12 @@
  */
 package es.csic.iiia.planes.definition;
 
+import es.csic.iiia.planes.Station;
+
 /**
- *
+ * Definition of a charging station
+ * 
+ * @see Station
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DStation extends DLocation {

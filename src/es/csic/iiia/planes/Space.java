@@ -40,8 +40,9 @@ package es.csic.iiia.planes;
 import java.awt.Dimension;
 
 /**
- *
- * @author marc
+ * Represents the physical space covered by the planes.
+ * 
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 
 

@@ -39,7 +39,14 @@ package es.csic.iiia.planes.util;
 import java.util.AbstractList;
 
 /**
- *
+ * Circular buffer of fixed capacity.
+ * 
+ * At first, the buffer just fills as normal. Once {@link #capacity} elements
+ * have been inserted, adding a new element drops the oldest one.
+ * 
+ * The default iterator goes through the buffer starting on the oldest element
+ * and finishing on the last inserted one.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class RotatingList<T> extends AbstractList<T> {

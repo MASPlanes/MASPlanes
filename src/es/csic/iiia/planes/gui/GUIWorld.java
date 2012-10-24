@@ -45,6 +45,7 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
+import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
@@ -52,6 +53,7 @@ import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,23 +61,36 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class GUIWorld extends World {
+public class GUIWorld extends AbstractWorld {
     
     public final FrameTracker ftracker = new FrameTracker("world");
     private Display display;
     private int speed = 100;
     private AffineTransform transform;
+    public ConcurrentLinkedQueue<Image> graphicsQueue = new ConcurrentLinkedQueue<Image>();
     
     public GUIWorld(Factory factory) {
         super(factory);
     }
+
+    @Override
+    public void run() {
+        super.run();
+        
+        while(!graphicsQueue.isEmpty()) {
+            displayStep();
+        }
+    }
+    
+    
     
     @Override public void init(DProblem d) {
         super.init(d);
         ftracker.calibrate();
     }
     
-    @Override public void displayStep() {
+    @Override
+    protected void displayStep() {
         if (display == null) return;
         
         ftracker.delay(speed);

@@ -38,25 +38,41 @@ package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultFactory;
-import es.csic.iiia.planes.DefaultWorld;
-import es.csic.iiia.planes.gui.Display;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.gui.GUIFactory;
-import es.csic.iiia.planes.gui.GUIWorld;
 
 /**
- *
+ * Actual object in charge of executing the simulation.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class CliApp {
     
     private final Configuration config;
     
-    public CliApp(Configuration c) {
-        this.config = c;
+    /**
+     * Default constructor.
+     * 
+     * @param configuration with which the simulator will run.
+     */
+    public CliApp(Configuration configuration) {
+        this.config = configuration;
     }
-    
+   
+    /**
+     * Runs a simulation.
+     * <p/>
+     * Specifically, CliApp executes the following steps:
+     * <ol>
+     *   <li>Create either a {@link DefaultFactory} (no gui option set) or a
+     *       {@link GUIFactory} (gui option set).</li>
+     *   <li>Create a new {@link World} using that factory.</li>
+     *   <li>Initialize the world by calling 
+     *       {@link World#init(es.csic.iiia.planes.definition.DProblem) }</li>
+     *   <li>Launching the world in its own thread</li>
+     * </ol>
+     */
     public void run() {
         Factory f;
         if (config.gui) {

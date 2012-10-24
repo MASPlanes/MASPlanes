@@ -40,19 +40,59 @@ import es.csic.iiia.planes.definition.DTask;
 import java.util.List;
 
 /**
- *
+ * Factory used to build all of the simulation's participants.
+ * 
+ * Every element participating in the simulation is instantiated through this
+ * factory, which is the responsible of "gluing" them together.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Factory {
 
-    Operator buildOperator(List<DTask> tasks);
+    /**
+     * Builds an {@link Operator}.
+     * 
+     * The created operator will create and submit tasks according to the given 
+     * list of task definitions.
+     * 
+     * @param taskDefinitions list of task definitions
+     * @return Operator newly build Operator.
+     */
+    public Operator buildOperator(List<DTask> taskDefinitions);
 
-    Plane buildPlane(Location location);
+    /**
+     * Builds a {@link Plane}.
+     * 
+     * @param location initial location of the plane.
+     * @return newly built plane.
+     */
+    public Plane buildPlane(Location location);
 
-    Station buildStation(Location l);
+    /**
+     * Builds a charging {@link Station}.
+     * 
+     * @param location location of the recharging station.
+     * @return newly built station.
+     */
+    public Station buildStation(Location location);
 
-    Task buildTask(Location location);
+    /**
+     * Builds a new {@link Task}.
+     * 
+     * The task's submission time is automatically set to the current simulation
+     * time.
+     * 
+     * @see Task#getSubmissionTime() 
+     * 
+     * @param location that must be visited by some plane.
+     * @return newly built task.
+     */
+    public Task buildTask(Location location);
 
-    World buildWorld();
+    /**
+     * Builds a new {@link World}.
+     * @return newly built World;
+     */
+    public World buildWorld();
     
 }

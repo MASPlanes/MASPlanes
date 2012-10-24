@@ -37,26 +37,49 @@
 package es.csic.iiia.planes.definition;
 
 /**
- *
+ * Skeletal definition of an object that has a specific location in the
+ * simulation space.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class DLocation {
     private int x;
     private int y;
 
+    /**
+     * Get the x axis value of this location.
+     * 
+     * @return x axis value of this location.
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Set the x axis value of this location.
+     * 
+     * @param x axis value to set.
+     */
     public void setX(int x) {
         this.x = x;
     }
 
+    /**
+     * Get the y axis value of this location.
+     * 
+     * @return y axis value of this location.
+     */
     public int getY() {
         return y;
     }
 
+    /**
+     * Set the y axis value of this location.
+     * 
+     * @param y axis value to set.
+     */
     public void setY(int y) {
         this.y = y;
     }
+
 }

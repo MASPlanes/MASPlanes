@@ -37,17 +37,25 @@
 package es.csic.iiia.planes;
 
 /**
- *
+ * Default implementation of a World, to be used when running on a command
+ * line (batch) interface.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class DefaultWorld extends World {
+public class DefaultWorld extends AbstractWorld {
     
     public DefaultWorld(Factory factory) {
         super(factory);
+        System.err.print("Completed:  0,00%");
     }
 
     @Override
     public void displayStep() {
+        final long t = getTime();
+        if (t % 10000 == 0) {
+            Double percent = t*100 / (double)duration;
+            System.err.print(String.format("\b\b\b\b\b\b%5.2f%%", percent));
+        }
     }
     
 }

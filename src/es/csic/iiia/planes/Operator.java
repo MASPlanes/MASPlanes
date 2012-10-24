@@ -38,7 +38,7 @@
 package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
-import es.csic.iiia.planes.operator_strategy.OperatorStrategy;
+import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -81,6 +81,9 @@ public class Operator extends AbstractElement implements Agent {
         Collections.sort(this.tasks, new TaskSorter());
         nextTaskTime = this.tasks.get(0).getTime();
     }
+    
+    @Override
+    public void initialize() {}
     
     /**
      * Get the strategy used by this operator.

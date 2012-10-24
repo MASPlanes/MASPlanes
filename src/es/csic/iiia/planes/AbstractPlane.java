@@ -37,7 +37,8 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.gui.DefaultPlaneDrawer;
+import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -45,7 +46,9 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * Skeletal implementation of a Plane, that implements very basic lower-level
+ * behavior.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public abstract class AbstractPlane extends AbstractElement implements Plane {
@@ -95,7 +98,6 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
      */
     private RotatingList<Location> completedLocations;
     
-    
     /**
      * List of tasks owned by this plane
      */
@@ -132,21 +134,11 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
         return id;
     }
     
-    /**
-     * Set plane's the remaining battery, in seconds
-     * 
-     * @param battery 
-     */
     @Override
     public void setBattery(long battery) {
         this.battery = battery;
     }
     
-    /**
-     * Get the plane's remianing battery in seconds
-     * 
-     * @return 
-     */
     @Override
     public long getBattery() {
         return battery;
@@ -159,61 +151,30 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
         battery--;
     }
 
-    /**
-     * Set the battery capacity (maximum battery charge in seconds)
-     * 
-     * @param capacity 
-     */
     @Override
     public void setBatteryCapacity(long capacity) {
         batteryCapacity = capacity;
     }
     
-    /**
-     * Get the battery capacity (maximum battery charge in seconds)
-     * 
-     * @return
-     */
     @Override
     public long getBatteryCapacity() {
         return batteryCapacity;
     }
     
-    /**
-     * Get the plane's speed in meters per second
-     * 
-     * @return 
-     */
     @Override
     public double getSpeed() {
         return speed;
     }
 
-    /**
-     * Set the plane's speed, in meters per second
-     * 
-     * @param speed 
-     */
     @Override
     public void setSpeed(double speed) {
         this.speed = speed;
     }
     
-    /**
-     * Set the plane's color, used when drawing the GUI.
-     * 
-     * The color must be specified as an int array of length 3, representing
-     * the RGB color values in the range 0-255.
-     * 
-     * @param color 
-     */
     public void setColor(int[] color) {
         this.color = new Color(color[0], color[1], color[2]);
     }
     
-    /**
-     * Simulation step function
-     */
     @Override
     public void step() {
         if (state == State.CHARGING) {
@@ -264,6 +225,17 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
      */
     protected abstract void taskCompleted(Task t);
     
+    /**
+     * Sets the next task that this plane is going to fulfill.
+     * 
+     * This plane will fly in a straight line towards that location, until one
+     * of the following happens:
+     *   - It reaches (and thus completes) the given task.
+     *   - It runs out of battery (and therefore goes to recharse itself).
+     *   - A new "next task" is set by calling this method again.
+     * 
+     * @param t task to try to fulfill.
+     */
     protected void setNextTask(Task t) {
         nextTask = t;
     }
@@ -307,7 +279,7 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
         return tasks;
     }
     
-    private Drawable drawer = new DefaultPlaneDrawer(this);
+    private Drawable drawer = new PlaneDrawer(this);
     @Override
     public Drawable getDrawer() {
         return drawer;

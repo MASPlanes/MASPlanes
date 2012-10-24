@@ -35,33 +35,16 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.gui;
+
+import es.csic.iiia.planes.Location;
+import java.awt.Graphics2D;
 
 /**
- * Represents a physical element (participant) of the simulation.
- * 
+ *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public interface Element {
-
-    /**
-     * Get the {@link AbstractWorld} (simulation) where this element is participating.
-     * @return the world.
-     */
-    World getWorld();
-
-    /**
-     * Set the {@link AbstractWorld} (simulation) where this element will participate.
-     * @param world where this element will participate.
-     */
-    void setWorld(World world);
-    
-    /**
-     * Initialize this element.
-     * 
-     * This method is called exactly once before starting every simulation,
-     * allowing it to perform any required setup/bootstraping.
-     */
-    void initialize();
-    
+public interface Drawable {
+    public void draw(Graphics2D g);
+    public Location getLocation();
 }

@@ -38,7 +38,8 @@
 package es.csic.iiia.planes;
 
 /**
- *
+ * Skeletal implementation of an element.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public abstract class AbstractElement implements Element {
@@ -57,6 +58,4 @@ public abstract class AbstractElement implements Element {
         this.world = world;
     }
     
-    @Override
-    public void initialize() {}
 }

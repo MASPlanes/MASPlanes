@@ -36,34 +36,43 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.graphics.PlaneGraphic;
-import es.csic.iiia.planes.graphics.StationGraphic;
+import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.gui.graphics.StationGraphic;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
+ * Recharging station, where planes can go to refill their batteries.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Station extends AbstractDrawable {
+public class Station extends AbstractPositionedElement implements Drawable {
     
     final private static AtomicInteger idGenerator = new AtomicInteger();
     final int id = idGenerator.incrementAndGet();
-    
-    public Station(Location l) {
-        super(l);
+   
+    /**
+     * Default constructor.
+     * 
+     * Builds a recharge station at the given position.
+     * 
+     * @param position where this station is placed.
+     */
+    public Station(Location position) {
+        super(position);
     }
     
     @Override
+    public void initialize() {}
+    
+    @Override
     public void draw(Graphics2D g) {
-        int x = location.getXInt();
-        int y = location.getYInt();
+        int x = getLocation().getXInt();
+        int y = getLocation().getYInt();
         Color previousColor = g.getColor();
         Stroke previousStroke = g.getStroke();
         AffineTransform previousTransform = g.getTransform();

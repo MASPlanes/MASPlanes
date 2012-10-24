@@ -34,22 +34,27 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.operator_strategy;
+package es.csic.iiia.planes.operator_behavior;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
+import java.util.List;
 
 /**
- * Defines a strategy that an operator may use to submit tasks.
- * 
- * This interface makes no assumptions about the actual information that the
- * operator will have when submitting tasks. This is, the strategy receives
- * the current "world" instance, giving it access to all of the world's
- * information. Therefore, it is up to the strategy to limit itself to the 
- * information that a real operator would have.
- * 
+ * An OperatorStrategy that submits the tasks to a random plane.
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface OperatorStrategy {
-    public void submitTask(World w, Task t);
+public class Random implements OperatorStrategy {
+    
+    private java.util.Random r = new java.util.Random(0);
+
+    @Override
+    public void submitTask(World w, Task t) {
+        final List<Plane> planes = w.getPlanes();
+        int pnum = r.nextInt(planes.size());
+        planes.get(pnum).addTask(t);
+    }
+    
 }

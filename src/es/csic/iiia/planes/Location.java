@@ -40,7 +40,10 @@ package es.csic.iiia.planes;
 import java.awt.geom.Point2D;
 
 /**
- *
+ * Represents a point in the world's space.
+ * 
+ * @see World
+ * @see Space
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Location extends Point2D {
@@ -59,11 +62,12 @@ public class Location extends Point2D {
     }
     
     /**
-     * True if the destination has ben reached, false otherwise.
+     * Moves this location towards the given destination, at speed meters per
+     * second.
      * 
      * @param destination
      * @param speed
-     * @return 
+     * @return true if the destination has been reached, false otherwise.
      */
     public boolean move(Location destination, double speed) {
         if (destination == null) {
@@ -97,6 +101,7 @@ public class Location extends Point2D {
         return false;
     }
     
+    @Override
     public double getX() {
         return x;
     }
@@ -104,6 +109,7 @@ public class Location extends Point2D {
         return (int)x;
     }
     
+    @Override
     public double getY() {
         return y;
     }

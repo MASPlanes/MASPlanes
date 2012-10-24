@@ -35,15 +35,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
-
-import java.awt.Graphics2D;
 
 /**
- *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * Generator of UAV problem instances.
  */
-public interface Drawable {
-    public void draw(Graphics2D g);
-    public Location getLocation();
-}
+package es.csic.iiia.planes.generator;

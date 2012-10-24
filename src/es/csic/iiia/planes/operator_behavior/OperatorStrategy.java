@@ -1,28 +1,27 @@
 /*
  * Software License Agreement (BSD License)
- * 
- * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
- * All rights reserved.
- * 
+ *
+ * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
+ *
  *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -35,33 +34,22 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.operator_behavior;
+
+import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.World;
 
 /**
- * Represents a physical element (participant) of the simulation.
+ * Defines a strategy that an operator may use to submit tasks.
  * 
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * This interface makes no assumptions about the actual information that the
+ * operator will have when submitting tasks. This is, the strategy receives
+ * the current "world" instance, giving it access to all of the world's
+ * information. Therefore, it is up to the strategy to limit itself to the 
+ * information that a real operator would have.
+ * 
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Element {
-
-    /**
-     * Get the {@link AbstractWorld} (simulation) where this element is participating.
-     * @return the world.
-     */
-    World getWorld();
-
-    /**
-     * Set the {@link AbstractWorld} (simulation) where this element will participate.
-     * @param world where this element will participate.
-     */
-    void setWorld(World world);
-    
-    /**
-     * Initialize this element.
-     * 
-     * This method is called exactly once before starting every simulation,
-     * allowing it to perform any required setup/bootstraping.
-     */
-    void initialize();
-    
+public interface OperatorStrategy {
+    public void submitTask(World w, Task t);
 }

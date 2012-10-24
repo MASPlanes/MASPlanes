@@ -35,34 +35,12 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
-
-import java.awt.Color;
-import java.awt.Graphics2D;
 
 /**
- *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * Base package of the planes UAV simulator.
+ * 
+ * This package contains all of the basic classes required by the simulator,
+ * including the interfaces and default implementation for all the simulations'
+ * participants.
  */
-public abstract class AbstractDrawable extends AbstractElement implements Drawable {
-    
-    protected Location location;
-    
-    public AbstractDrawable(Location location) {
-        this.location = location;
-    }
-    
-    @Override
-    public Location getLocation() {
-        return location;
-    }
-
-    @Override
-    public void draw(Graphics2D g) {
-        Color previous = g.getColor();
-        g.setColor(Color.MAGENTA);
-        g.fillOval(location.getXInt()-5, location.getYInt()-5, 10, 10);
-        g.setColor(previous);
-    }
-    
-}
+package es.csic.iiia.planes;
