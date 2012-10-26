@@ -40,6 +40,7 @@ package es.csic.iiia.planes;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
+import es.csic.iiia.planes.messaging.Message;
 import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
@@ -116,6 +117,7 @@ public abstract class AbstractWorld implements World {
             p.setSpeed(pd.getSpeed());
             p.setBattery(pd.getBatteryCapacity());
             p.setBatteryCapacity(pd.getBatteryCapacity());
+            p.setCommunicationRange(pd.getCommunicationRange());
             int[] i = pd.getColor();
             Color c = new Color(i[0],i[1],i[2]);
             p.setColor(c);
@@ -159,6 +161,11 @@ public abstract class AbstractWorld implements World {
      * perform actions, by calling their {@link Agent#step()} methods.
      */
     protected void computeStep() {
+        for (Plane p : planes) {
+            p.preStep();
+        }
+        operator.preStep();
+        
         for (Plane p : planes) {
             p.step();
         }
@@ -210,6 +217,18 @@ public abstract class AbstractWorld implements World {
             }
         }
         return best;
+    }
+    
+    @Override
+    public void sendMessage(Message message) {
+        final Location origin = message.getSender().getLocation();
+        final double range = message.getSender().getCommunicationRange();
+        
+        for (Plane p : planes) {
+            if (origin.distance(p.getLocation()) <= range) {
+                p.receive(message);
+            }
+        }
     }
     
 }

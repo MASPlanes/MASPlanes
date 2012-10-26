@@ -91,8 +91,6 @@ public class GUIWorld extends AbstractWorld {
     
     @Override
     protected void displayStep() {
-        if (display == null) return;
-        
         ftracker.delay(speed);
         
         if (graphicsQueue.size() > 2) {

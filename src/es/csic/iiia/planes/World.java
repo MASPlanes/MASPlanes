@@ -37,6 +37,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.definition.DProblem;
 import java.util.List;
 
@@ -115,5 +116,15 @@ public interface World extends Runnable {
      * @param d problem definition.
      */
     void init(DProblem d);
+
+    /**
+     * Sends a message to all {@link MessagingAgent}s in range of the sender.
+     * 
+     * @see Message#getSender() 
+     * @see MessagingAgent#getCommunicationRange() 
+     * 
+     * @param message to be sent.
+     */
+    public void sendMessage(Message message);
     
 }

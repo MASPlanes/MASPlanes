@@ -34,40 +34,57 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.util;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import es.csic.iiia.planes.Positioned;
+import java.util.ArrayList;
 
 /**
- *
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class StatsCollector {
+public class HeuristicPathSorter<T extends Positioned>
+    extends ArrayList<T>
+{
+   
+    private Positioned origin;
     
-    private AbstractWorld world;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
-
-    public StatsCollector(AbstractWorld w) {
-        world = w;
-    }
-    
-    public void collect(Task t) {
-        final long time = world.getTime() - t.getSubmissionTime();
-        stats.addValue(time);
+    public HeuristicPathSorter(Positioned origin) {
+        this.origin = origin;
     }
 
-    public void display() {
-        // Final stats
-        StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/avg/max: ");
-        buf.append((int)stats.getMin()).append("/")
-           .append((int)stats.getMean()).append("/")
-           .append((int)stats.getMax()).append("\t")
-           .append("quartiles: " )
-           .append((int)stats.getPercentile(25)).append("/")
-           .append((int)stats.getPercentile(50)).append("/")
-           .append((int)stats.getPercentile(75)).append("\n");
-        System.err.println(buf);
+    @Override
+    public T set(int i, T e) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public boolean add(T e) {
+        if (isEmpty()) {
+            super.add(e);
+            return true;
+        }
+        
+        double mindiff = distance(origin,e);
+        int best = 0;
+        for (int i=0; i<size(); i++) {
+            final double diff = distance(get(i),e);
+            if (diff < mindiff) {
+                best = i+1;
+            }
+        }
+        
+        super.add(best, e);
+        return true;
+    }
+
+    @Override
+    public void add(int i, T e) {
+        throw new UnsupportedOperationException();
+    }
+
+    private static double distance(Positioned e1, Positioned e2) {
+        return e1.getLocation().distance(e2.getLocation());
     }
     
 }

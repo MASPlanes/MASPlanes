@@ -39,6 +39,7 @@ package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultPlane;
+import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.Random;
@@ -81,7 +82,7 @@ public class Cli {
         options.addOption(OptionBuilder.withArgName("planestype")
                 .hasArg()
                 .withDescription("set the type of planes in this simulation.")
-                .withArgName("default")
+                .withArgName("default|auction")
                 .withLongOpt("planes-type")
                 .create('p'));
         
@@ -131,8 +132,8 @@ public class Cli {
         }
         if (line.hasOption('p')) {
             String value = line.getOptionValue('p');
-            if (value.equalsIgnoreCase("newtypeofplane")) {
-                
+            if (value.equalsIgnoreCase("auction")) {
+                config.planesClass = AuctionPlane.class;
             } else if (value.equalsIgnoreCase("default")) {
                 config.planesClass = DefaultPlane.class;
             } else {

@@ -46,8 +46,18 @@ package es.csic.iiia.planes;
 public interface Agent extends Element {
     
     /**
+     * Pre-action method for the Agents.
+     * <p/>
+     * This method is also called every second. However, all of the
+     * <em>preStep</em> calls are made before any {@link #step()} call is done
+     * in the current iteration. This allows agents to perform some sort
+     * of "initialization" before each step.
+     */
+    public void preStep();
+    
+    /**
      * Action method for the Agents.
-     * 
+     * <p/>
      * This method is called every second. All actors must implement it so that
      * they perform the desired actions.
      */

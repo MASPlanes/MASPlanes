@@ -102,6 +102,12 @@ public class Operator extends AbstractElement implements Agent {
     public void setStrategy(OperatorStrategy strategy) {
         this.strategy = strategy;
     }
+    
+    /**
+     * Do nothing, because no step initialization is needed by the operator.
+     */
+    @Override
+    public void preStep() {}
 
     /**
      * Single-step advance of this operator.

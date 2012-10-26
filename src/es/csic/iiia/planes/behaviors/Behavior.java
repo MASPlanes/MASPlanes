@@ -34,40 +34,44 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.behaviors;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**
- *
+ * Defines some behavior for {@link MessagingAgent}s, by implementing arbitrary
+ * reactions to specific {@link Message}s.
+ * <p/>
+ * Unfortunately, java is very stupid when trying to implement a messaging
+ * system. Therefore, we use reflection here and there is no static checking
+ * of any type.
+ * <p/>
+ * In order to define the reaction to a specific type of event, a class 
+ * implementing this interface must implement an method<br/>
+ * <code>on(MessageType message)</code><br/>
+ * for each type of message that it reacts to.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class StatsCollector {
+public interface Behavior {
     
-    private AbstractWorld world;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
-
-    public StatsCollector(AbstractWorld w) {
-        world = w;
-    }
+    /**
+     * Get the agent that exhibits this behavior.
+     * 
+     * @return agent that exhibits this behavior.
+     */
+    public MessagingAgent getAgent();
     
-    public void collect(Task t) {
-        final long time = world.getTime() - t.getSubmissionTime();
-        stats.addValue(time);
-    }
-
-    public void display() {
-        // Final stats
-        StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/avg/max: ");
-        buf.append((int)stats.getMin()).append("/")
-           .append((int)stats.getMean()).append("/")
-           .append((int)stats.getMax()).append("\t")
-           .append("quartiles: " )
-           .append((int)stats.getPercentile(25)).append("/")
-           .append((int)stats.getPercentile(50)).append("/")
-           .append((int)stats.getPercentile(75)).append("\n");
-        System.err.println(buf);
-    }
+    /**
+     * Implements actions to be performed by this behavior *before* receiving
+     * any messages from the current iteration.
+     */
+    public void beforeMessages();
+    
+    /**
+     * Implements action to be performed *after* receiving all the messages
+     * from the current iteration.
+     */
+    public void afterMessages();
     
 }

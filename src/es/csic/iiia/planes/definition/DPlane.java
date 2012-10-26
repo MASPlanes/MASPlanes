@@ -46,8 +46,9 @@ import es.csic.iiia.planes.Plane;
  */
 public class DPlane extends DLocation {
     private double speed;
-    private long battery;
+    private long batteryCapacity;
     private int[] color;
+    private double communicationRange;
 
     /**
      * Get the color of this plane.
@@ -99,7 +100,7 @@ public class DPlane extends DLocation {
      * @return battery capacity of this plane.
      */
     public long getBatteryCapacity() {
-        return battery;
+        return batteryCapacity;
     }
 
     /**
@@ -108,6 +109,24 @@ public class DPlane extends DLocation {
      * @param battery capacity of this plane.
      */
     public void setBatteryCapacity(long battery) {
-        this.battery = battery;
+        this.batteryCapacity = battery;
+    }
+    
+    /**
+     * Get the communication range of this plane.
+     * 
+     * @return the communication range of this plane.
+     */
+    public double getCommunicationRange() {
+        return communicationRange;
+    }
+
+    /**
+     * Set the communication range of this plane.
+     * 
+     * @param communicationRange communication range to set.
+     */
+    public void setCommunicationRange(double communicationRange) {
+        this.communicationRange = communicationRange;
     }
 }

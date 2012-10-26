@@ -34,40 +34,43 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
-
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+package es.csic.iiia.planes.messaging;
 
 /**
- *
+ * Skeletal implementation of a message.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class StatsCollector {
+public abstract class AbstractMessage implements Message {
     
-    private AbstractWorld world;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
+    /**
+     * Get the message's sender.
+     */
+    private MessagingAgent sender;
+    
+    /**
+     * Get the message's recipient.
+     */
+    private MessagingAgent recipient;
 
-    public StatsCollector(AbstractWorld w) {
-        world = w;
+    @Override
+    public void setSender(MessagingAgent sender) {
+        this.sender = sender;
+    }
+
+    @Override
+    public void setRecipient(MessagingAgent recipient) {
+        this.recipient = recipient;
     }
     
-    public void collect(Task t) {
-        final long time = world.getTime() - t.getSubmissionTime();
-        stats.addValue(time);
+    @Override
+    public MessagingAgent getSender() {
+        return sender;
     }
 
-    public void display() {
-        // Final stats
-        StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/avg/max: ");
-        buf.append((int)stats.getMin()).append("/")
-           .append((int)stats.getMean()).append("/")
-           .append((int)stats.getMax()).append("\t")
-           .append("quartiles: " )
-           .append((int)stats.getPercentile(25)).append("/")
-           .append((int)stats.getPercentile(50)).append("/")
-           .append((int)stats.getPercentile(75)).append("\n");
-        System.err.println(buf);
+    @Override
+    public MessagingAgent getRecipient() {
+        return recipient;
     }
     
 }

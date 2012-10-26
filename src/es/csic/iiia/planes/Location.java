@@ -123,6 +123,16 @@ public class Location extends Point2D {
         return Math.sqrt(dx*dx + dy*dy);
     }
     
+    public boolean within(double range, Location l) {
+        double dx = x - l.x;
+        if (dx > range) return false;
+        
+        double dy = y - l.y;
+        if (dy > range) return false;
+        
+        return Math.sqrt(dx*dx + dy*dy) >= range;
+    }
+    
     @Override public String toString() {
         return "(" + getXInt() + "," + getYInt() + ")";
     }

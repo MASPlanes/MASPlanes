@@ -126,7 +126,7 @@ public class Generator {
             pl.setX(r.nextInt(p.getWidth()));
             pl.setY(r.nextInt(p.getHeight()));
             pl.setBatteryCapacity(3600*3);
-            pl.setBatteryCapacity(5000);
+            pl.setCommunicationRange(2000);
             pl.setColor(colorList[i]);
             planes.add(pl);
         }

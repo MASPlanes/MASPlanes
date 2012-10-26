@@ -39,6 +39,7 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
+import es.csic.iiia.planes.messaging.AbstractMessagingAgent;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -51,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public abstract class AbstractPlane extends AbstractElement implements Plane {
+public abstract class AbstractPlane extends AbstractMessagingAgent implements Plane {
     
     /**
      * ID Generator
@@ -72,11 +73,6 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
      * Recharge ratio (flight seconds per charning second)
      */
     private long rechargeRatio = 3;
-    
-    /**
-     * Set the plane's location.
-     */
-    private Location location;
     
     /**
      * Remaining battery in seconds
@@ -124,7 +120,7 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
      * @param location initial location of the plane
      */
     public AbstractPlane(Location location) {
-        this.location = location;
+        super(location);
         tasks = new ArrayList<Task>();
         completedLocations = new RotatingList<Location>(Plane.NUM_COMPLETED_TASKS);
     }
@@ -183,21 +179,29 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
                 battery = batteryCapacity;
                 state = State.NORMAL;
             }
+            super.step();
             return;
         }
         
-        Station st = getWorld().getNearestStation(location);
+        Station st = getWorld().getNearestStation(getLocation());
         if (  state == State.TO_CHARGE
-           || battery <= location.getDistance(st.getLocation())/speed)
+           || battery <= getLocation().getDistance(st.getLocation())/speed)
         {
             goCharge(st);
+            super.step();
             return;
         }
         
+        // Handle this iteration's messages
+        super.step();
+        
+        // Move the plane if not charging or going to charge
         if (nextTask != null) {
-            angle = location.getAngle(nextTask.getLocation());
-            if (location.move(nextTask.getLocation(), speed)) {
-                triggerTaskCompleted(nextTask);
+            angle = getLocation().getAngle(nextTask.getLocation());
+            if (getLocation().move(nextTask.getLocation(), speed)) {
+                final Task completed = nextTask;
+                nextTask = null;
+                triggerTaskCompleted(completed);
             }
             updateBattery();
         }
@@ -211,8 +215,8 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
      */
     private void goCharge(Station st) {
         state = State.TO_CHARGE;
-        angle = location.getAngle(st.getLocation());
-        if (this.location.move(st.getLocation(), speed)) {
+        angle = getLocation().getAngle(st.getLocation());
+        if (this.getLocation().move(st.getLocation(), speed)) {
             state = State.CHARGING;
             this.completedLocations.add(st.getLocation());
         }
@@ -270,7 +274,7 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
     @Override
     public void addTask(Task task) {
         tasks.add(task);
-        
+
         taskAdded(task);
     }
     
@@ -304,20 +308,15 @@ public abstract class AbstractPlane extends AbstractElement implements Plane {
     public double getAngle() {
         return angle;
     }
-
-    @Override
-    public void setLocation(Location position) {
-        this.location = position;
-    }
     
     @Override
     public Task getNextTask() {
         return nextTask;
     }
-
+    
     @Override
-    public Location getLocation() {
-        return location;
+    public String toString() {
+        return "Plane " + getId();
     }
     
 }

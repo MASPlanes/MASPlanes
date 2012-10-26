@@ -37,10 +37,7 @@
 package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.Location;
-import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
-import es.csic.iiia.planes.Plane;
-import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.gui.graphics.PlaneGraphic;
 import java.awt.BasicStroke;
@@ -192,8 +189,13 @@ public class PlaneDrawer implements Drawable {
         g.draw(PlaneGraphic.getImage());
         g.setColor(planeColor);
         g.fill(PlaneGraphic.getImage());
-        g.setStroke(olds);
+        
+        // Draw the communication circle
         g.setTransform(oldt);
+        final int r = (int)plane.getCommunicationRange();
+        g.drawOval(x-r, y-r, r*2, r*2);
+        
+        g.setStroke(olds);
     }
     
     private void drawBattery(Graphics2D g) {

@@ -34,40 +34,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.messaging;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import es.csic.iiia.planes.Agent;
+import es.csic.iiia.planes.Positioned;
 
 /**
- *
+ * An {@link Agent} that communicates with other agents using message passing.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class StatsCollector {
+public interface MessagingAgent extends Agent,Positioned {
     
-    private AbstractWorld world;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
-
-    public StatsCollector(AbstractWorld w) {
-        world = w;
-    }
+    /**
+     * Get the communication range of this agent.
+     * 
+     * The communication range of an agent defines the furthest distance (in
+     * meters) at which it is able to send messages.
+     * 
+     * @return communication range of this agent.
+     */
+    public double getCommunicationRange();
     
-    public void collect(Task t) {
-        final long time = world.getTime() - t.getSubmissionTime();
-        stats.addValue(time);
-    }
-
-    public void display() {
-        // Final stats
-        StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/avg/max: ");
-        buf.append((int)stats.getMin()).append("/")
-           .append((int)stats.getMean()).append("/")
-           .append((int)stats.getMax()).append("\t")
-           .append("quartiles: " )
-           .append((int)stats.getPercentile(25)).append("/")
-           .append((int)stats.getPercentile(50)).append("/")
-           .append((int)stats.getPercentile(75)).append("\n");
-        System.err.println(buf);
-    }
+    /**
+     * Set the communication range of this agent.
+     * 
+     * @see #getCommunicationRange() 
+     * @param range communication range.
+     */
+    public void setCommunicationRange(double range);
+    
+    /**
+     * Send a message.
+     */
+    public void send(Message message);
+    
+    /**
+     * Receive a message issued by another agent.
+     * 
+     * Since this is a synchronous platform, the messages must be stored
+     * so that they are <strong>not</strong> available to the agent
+     * until at least the next iteration (second).
+     */
+    public void receive(Message message);
     
 }

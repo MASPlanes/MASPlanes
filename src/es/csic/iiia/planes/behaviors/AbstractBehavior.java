@@ -34,40 +34,31 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.behaviors;
 
-import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
+import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**
- *
+ * Skeletal implementation of a behavior.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class StatsCollector {
+public abstract class AbstractBehavior implements Behavior {
     
-    private AbstractWorld world;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
+    private MessagingAgent agent;
 
-    public StatsCollector(AbstractWorld w) {
-        world = w;
-    }
-    
-    public void collect(Task t) {
-        final long time = world.getTime() - t.getSubmissionTime();
-        stats.addValue(time);
+    /**
+     * Builds a new behavior.
+     * 
+     * @param agent that will exhibit this behavior.
+     */
+    public AbstractBehavior(MessagingAgent agent) {
+        this.agent = agent;
     }
 
-    public void display() {
-        // Final stats
-        StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/avg/max: ");
-        buf.append((int)stats.getMin()).append("/")
-           .append((int)stats.getMean()).append("/")
-           .append((int)stats.getMax()).append("\t")
-           .append("quartiles: " )
-           .append((int)stats.getPercentile(25)).append("/")
-           .append((int)stats.getPercentile(50)).append("/")
-           .append((int)stats.getPercentile(75)).append("\n");
-        System.err.println(buf);
+    @Override
+    public MessagingAgent getAgent() {
+        return agent;
     }
     
 }

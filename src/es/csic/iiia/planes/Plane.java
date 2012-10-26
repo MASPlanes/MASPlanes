@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.messaging.MessagingAgent;
 import es.csic.iiia.planes.gui.Drawable;
 import java.awt.Color;
 import java.util.List;
@@ -45,7 +46,7 @@ import java.util.List;
  * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Plane extends Agent, Positioned {
+public interface Plane extends MessagingAgent {
     
     /**
      * Plane states
