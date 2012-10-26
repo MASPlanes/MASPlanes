@@ -250,11 +250,9 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
      * @param t task that has been completed
      */
     private void triggerTaskCompleted(Task t) {
-        tasks.remove(t);
-        getWorld().removeTask(t);
         completedLocations.add(t.getLocation());
-        
-        taskCompleted(t);
+        getWorld().removeTask(t);
+        removeTask(t);
     }
     
     /**
@@ -264,18 +262,25 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
      */
     protected abstract void taskAdded(Task t);
 
-    /**
-     * Adds a new task to the list of tasks owned by this plane
-     * 
-     * Task addition triggers a reevaluation of the next task to be completed
-     * 
-     * @param task to add
-     */
     @Override
     public void addTask(Task task) {
         tasks.add(task);
 
         taskAdded(task);
+    }
+    
+    /**
+     * Signals that a task has been removed.
+     * 
+     * @param t task that has been removed.
+     */
+    protected abstract void taskRemoved(Task t);
+    
+    @Override
+    public Task removeTask(Task task) {
+        tasks.remove(task);
+        taskRemoved(task);
+        return task;
     }
     
     @Override

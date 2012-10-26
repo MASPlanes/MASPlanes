@@ -225,7 +225,8 @@ public abstract class AbstractWorld implements World {
         final double range = message.getSender().getCommunicationRange();
         
         for (Plane p : planes) {
-            if (origin.distance(p.getLocation()) <= range) {
+            if (  origin.distance(p.getLocation()) <= range
+               && p != message.getSender()) {
                 p.receive(message);
             }
         }

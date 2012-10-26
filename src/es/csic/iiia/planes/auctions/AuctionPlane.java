@@ -57,6 +57,7 @@ public class AuctionPlane extends AbstractPlane
     @Override
     public void initialize() {
         addBehavior(new NeighborTracking(this));
+        addBehavior(new AuctionBehavior(this));
     }
 
     public AuctionPlane(Location location) {
@@ -83,38 +84,21 @@ public class AuctionPlane extends AbstractPlane
     }
 
     @Override
-    protected void taskCompleted(Task t) {
+    protected void taskCompleted(Task t) {}
+
+    @Override
+    protected void taskAdded(Task t) {
+        localTasks.add(t);
+        replan(getLocation(), localTasks);
+        setNextTask(localTasks.get(0));
+    }
+    
+    @Override
+    protected void taskRemoved(Task t) {
         localTasks.remove(t);
         if (!localTasks.isEmpty()) {
             setNextTask(localTasks.get(0));
         }
-    }
-
-    @Override
-    protected void taskAdded(Task t) {
-        smartAddTask(t);
-        setNextTask(localTasks.get(0));
-    }
-    
-//    @Override
-//    protected void taskCompleted(Task t) {
-//        localTasks.remove(t);
-//        if (!localTasks.isEmpty()) {
-//            setNextTask(findClosest(getLocation(), localTasks));
-//        }
-//    }
-//
-//    @Override
-//    protected void taskAdded(Task t) {
-//        localTasks.add(t);
-//        setNextTask(findClosest(getLocation(), localTasks));
-//    }
-    
-    private double smartAddTask(Task t) {
-        double currentCost = getCost(localTasks);
-        localTasks.add(t);
-        recomputeTasks();
-        return getCost(localTasks) - currentCost;
     }
     
     private void recomputeTasks() {
@@ -129,19 +113,37 @@ public class AuctionPlane extends AbstractPlane
         }
     }
     
-    private double getCost(List<Task> ts) {
-        if (ts.isEmpty()) {
-            return 0;
-        }
-        
-        double cost = getLocation().distance(ts.get(0).getLocation());
-        for (int i=0, len=ts.size()-1; i<len; i++) {
-            cost += ts.get(i).getLocation().distance(ts.get(i+1).getLocation());
+    /**
+     * Get the cost of adding this task.
+     * 
+     * The cost of adding a task is defined as the increment in total travel
+     * distance after a whole new plan that includes the given task is computed.
+     * 
+     * @param task to evaluate.
+     * @return cost of adding this task to the plane's plan.
+     */
+    protected double getTaskCost(Task task) {
+        List<Task> newPlan = new ArrayList<Task>(localTasks);
+        newPlan.add(task);
+        return replan(getLocation(), newPlan);
+    }
+    
+    private static double replan(Location origin, List<Task> tasks) {
+        List<Task> pending = new ArrayList<Task>(tasks);
+        tasks.clear();
+        Location current = origin;
+        double cost = 0;
+        while (!pending.isEmpty()) {
+            Task next = findClosest(current, pending);
+            cost += current.distance(next.getLocation());
+            pending.remove(next);
+            tasks.add(next);
+            current = next.getLocation();
         }
         return cost;
     }
     
-    private Task findClosest(Location location, List<Task> candidates) {
+    private static Task findClosest(Location location, List<Task> candidates) {
         double mind = Double.MAX_VALUE;
         Task result = null;
         for (Task t : candidates) {

@@ -71,11 +71,20 @@ public interface Plane extends MessagingAgent {
     /**
      * Adds a new task to the list of tasks owned by this plane
      *
-     * Task addition triggers a reevaluation of the next task to be completed
+     * Task addition triggers a reevaluation of the next task to be completed.
      *
      * @param task to add
      */
-    void addTask(Task task);
+    public void addTask(Task task);
+    
+    /**
+     * Removes a task from the list of tasks owned by this plane.
+     *
+     * Task removal triggers a reevaluation of the next task to be completed.
+     *
+     * @param task that has been removed
+     */
+    public Task removeTask(Task task);
     
     /**
      * Gets the list of tasks assigned to this plane.

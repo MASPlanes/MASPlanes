@@ -55,13 +55,25 @@ public class DefaultPlane extends AbstractPlane {
     @Override
     public void initialize() {}
 
+    /**
+     * No action needed on task completion.
+     * <p/>
+     * In this case, next task selection is handled by the task deletion
+     * trigger that is also fired whenever a task is completed (and thus
+     * removed from the agent).
+     * 
+     * @param t task being completed.
+     */
     @Override
-    protected void taskCompleted(Task t) {
+    protected void taskCompleted(Task t) {}
+    
+    @Override
+    protected void taskAdded(Task t) {
         setNextTask(getNearestTask());
     }
     
     @Override
-    protected void taskAdded(Task t) {
+    protected void taskRemoved(Task t) {
         setNextTask(getNearestTask());
     }
     
