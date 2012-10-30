@@ -38,22 +38,49 @@ package es.csic.iiia.planes.behaviors;
 
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.messaging.MessagingAgent;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class NeighborTracking extends AbstractBehavior {
+    private static final Logger LOG = Logger.getLogger(NeighborTracking.class.getName());
     
-    private Set<MessagingAgent> oldNeighbors = new HashSet<MessagingAgent>();
-    private Set<MessagingAgent> neighbors = new HashSet<MessagingAgent>();
-    private NeighborTrackingListener agent;
+    private Set<MessagingAgent> oldNeighbors = new LinkedHashSet<MessagingAgent>();
+    private Set<MessagingAgent> neighbors = new LinkedHashSet<MessagingAgent>();
 
-    public NeighborTracking(NeighborTrackingListener agent) {
+    public NeighborTracking(MessagingAgent agent) {
         super(agent);
-        this.agent = agent;
+    }
+    
+    /**
+     * Check if the given agent is a neighbor.
+     * 
+     * @param agent to check for.
+     * @return True if the given agent is a neighbor, or False otherwise.
+     */
+    public boolean isNeighbor(MessagingAgent agent) {
+        if (LOG.isLoggable(Level.FINEST)) {
+            LOG.log(Level.FINEST, "{2} checking if {0} is within my neighbor list: {1}",
+                    new Object[]{agent, neighbors, getAgent()});
+        }
+        
+        return neighbors.contains(agent);
+    }
+    
+    /**
+     * Return True because this behaviour is promiscuous (we want to receive
+     * all messages that we can hear, even if they are not intended for us).
+     * 
+     * @return True.
+     */
+    @Override
+    public boolean isPromiscuous() {
+        return true;
     }
 
     @Override
@@ -66,7 +93,16 @@ public class NeighborTracking extends AbstractBehavior {
     
     public void on(TrackingMessage m) {
         final MessagingAgent neighbor = m.getSender();
-        neighbors.add(neighbor);
+        
+        // The maximum distance on the next iteration is the current distance
+        // plus the maximum travel distance of each agent if they travelled on
+        // completely opposite directions.
+        final double d = getAgent().getLocation().distance(neighbor.getLocation());
+        final double maxd = d + getAgent().getSpeed() + neighbor.getSpeed();
+        
+        if (maxd < getAgent().getCommunicationRange()) {
+            neighbors.add(neighbor);
+        }
     }
 
     /**
@@ -77,38 +113,40 @@ public class NeighborTracking extends AbstractBehavior {
      */
     @Override
     public void afterMessages() {
-        
+        // Send a tracking message for the next iteration
+        getAgent().send(new TrackingMessage());
+    }
+    
+    /**
+     * Get the set of neighbors that have been added in the current iteration.
+     * 
+     * @return set of recently added neighbors.
+     */
+    public Set<MessagingAgent> getAddedNeighbors() {
+        Set<MessagingAgent> result = new LinkedHashSet<MessagingAgent>();
         for (MessagingAgent neighbor : neighbors) {
             if (!oldNeighbors.contains(neighbor)) {
-                agent.neighborDetected(neighbor);
+                result.add(neighbor);
             }
         }
-        
+        return result;
+    }
+    
+    /**
+     * Get the set of neighbors that have just gone out of range.
+     * 
+     * @return set of recently lost neighbors.
+     */
+    public Set<MessagingAgent> getRemovedNeighbors() {
+        Set<MessagingAgent> result = new LinkedHashSet<MessagingAgent>();
         for (MessagingAgent neighbor : oldNeighbors) {
             if (!neighbors.contains(neighbor)) {
-                agent.neighborLost(neighbor);
+                result.add(neighbor);
             }
         }
-        
-        // Send a tracking message for the next iteration
-        agent.send(new TrackingMessage());
+        return result;
     }
     
     public class TrackingMessage extends AbstractMessage {}
     
-    public interface NeighborTrackingListener extends MessagingAgent {
-        
-        /**
-         * Signals that a new neighbor has been detected.
-         * @param neighbor that has been detected.
-         */
-        public void neighborDetected(MessagingAgent neighbor);
-        
-        /**
-         * Signals that a neighbor has gone out of range.
-         * @param neighbor that has been lost.
-         */
-        public void neighborLost(MessagingAgent neighbor);
-        
-    }
 }

@@ -55,6 +55,16 @@ public abstract class AbstractBehavior implements Behavior {
     public AbstractBehavior(MessagingAgent agent) {
         this.agent = agent;
     }
+    
+    @Override
+    public Class[] getDependencies() {
+        return new Class[0];
+    }
+    
+    @Override
+    public void initialize() {
+        
+    }
 
     @Override
     public MessagingAgent getAgent() {

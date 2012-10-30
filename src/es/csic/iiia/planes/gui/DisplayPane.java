@@ -38,6 +38,7 @@ package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.Task;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
@@ -77,6 +78,7 @@ class DisplayPane extends JPanel {
 
                     @Override
                     public void run() {
+                        // Select or deselect a Plane
                         Location l = world.screenToWorld(new Point2D.Double(me.getX(), me.getY()));
                         Plane p = world.getPlaneAt(l);
                         world.togglePlaneSelection(p);
@@ -84,8 +86,17 @@ class DisplayPane extends JPanel {
                         synchronized(world.ftracker.lock) {
                             world.ftracker.lock.notify();
                         }
-                        System.err.println(me);
-                        System.err.println("Click at " + l.getXInt() + "," + l.getYInt());
+                        
+                        // If no plane is selected, try to find a task to give its information
+                        if (p == null) {
+                            Task t = world.getTaskAt(l);
+                            if (t != null) {
+                                System.err.println(t);
+                            }
+                        }
+                        
+//                        System.err.println(me);
+//                        System.err.println("Click at " + l.getXInt() + "," + l.getYInt());
                     }
                 });
                 

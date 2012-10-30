@@ -34,60 +34,29 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.messaging;
+package es.csic.iiia.planes.util;
 
-import es.csic.iiia.planes.Agent;
-import es.csic.iiia.planes.Positioned;
+import java.util.logging.Formatter;
+import java.util.logging.LogRecord;
 
 /**
- * An {@link Agent} that communicates with other agents using message passing.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface MessagingAgent extends Agent, Positioned {
-    
-    /**
-     * Get the communication range of this agent.
-     * 
-     * The communication range of an agent defines the furthest distance (in
-     * meters) at which it is able to send messages.
-     * 
-     * @return communication range of this agent.
-     */
-    public double getCommunicationRange();
-    
-    /**
-     * Set the communication range of this agent.
-     * 
-     * @see #getCommunicationRange() 
-     * @param range communication range.
-     */
-    public void setCommunicationRange(double range);
-    
-    /**
-     * Get the speed at which this agent moves (in meters per second).
-     * @return speed at which this agent moves.
-     */
-    public double getSpeed();
-    
-    /**
-     * Set the speed at which this agent moves.
-     * @param speed 
-     */
-    public void setSpeed(double speed);
-    
-    /**
-     * Send a message.
-     */
-    public void send(Message message);
-    
-    /**
-     * Receive a message issued by another agent.
-     * 
-     * Since this is a synchronous platform, the messages must be stored
-     * so that they are <strong>not</strong> available to the agent
-     * until at least the next iteration (second).
-     */
-    public void receive(Message message);
+public final class SimpleConsoleFormatter extends Formatter {
+
+    @Override
+    public String format(LogRecord lr) {
+        
+        StringBuilder buf = new StringBuilder();
+        
+        buf.append("[")
+                .append(lr.getLevel().getName().charAt(0))
+                .append("] ")
+                .append(formatMessage(lr))
+                .append("\n");
+        
+        return buf.toString();
+    }
     
 }

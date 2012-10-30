@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.behaviors;
 
+import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**
@@ -53,7 +54,7 @@ import es.csic.iiia.planes.messaging.MessagingAgent;
  * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Behavior {
+public interface Behavior {    
     
     /**
      * Get the agent that exhibits this behavior.
@@ -61,6 +62,31 @@ public interface Behavior {
      * @return agent that exhibits this behavior.
      */
     public MessagingAgent getAgent();
+    
+    /**
+     * Initialize this behavior.
+     */
+    public void initialize();
+    
+    /**
+     * Get the dependencies of this behavior.
+     * 
+     * @return list of the classes on which this behavior depends.
+     */
+    public Class[] getDependencies();
+    
+    /**
+     * Check if this behaviour uses promiscuous mode to receive messages.
+     * 
+     * Behaviors on promiscuous mode receive all messages that arrive to the
+     * agent, even if they are not the intended recipient of the message.<br/>
+     * Behavoirs on normal (non-promiscuous) mode drop all messages that have
+     * an intended recipient set and it is different than themselves.
+     * 
+     * @see Message#getRecipient() 
+     * @return True if this is a promiscuous behavior, or False otherwise.
+     */
+    public boolean isPromiscuous();
     
     /**
      * Implements actions to be performed by this behavior *before* receiving

@@ -150,6 +150,19 @@ public class GUIWorld extends AbstractWorld {
         return null;
     }
     
+    public Task getTaskAt(Location l) {
+        List<Task> ts = getTasks();
+        for (int i=ts.size()-1; i>=0; i--) {
+            final Task t = ts.get(i);
+            Location l2 = t.getLocation();
+            double dx = l.getDistance(l2);
+            if (dx < 600) {
+                return t;
+            }
+        }
+        return null;
+    }
+    
     public Location screenToWorld(Point2D point) {
         try {
             AffineTransform t = transform.createInverse();

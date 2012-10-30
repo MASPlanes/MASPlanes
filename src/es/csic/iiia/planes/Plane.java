@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 import es.csic.iiia.planes.gui.Drawable;
 import java.awt.Color;
@@ -113,20 +114,6 @@ public interface Plane extends MessagingAgent {
      * @return the angle.
      */
     double getAngle();
-
-    /**
-     * Set the plane's speed, in meters per second
-     *
-     * @param speed
-     */
-    void setSpeed(double speed);
-    
-    /**
-     * Get the plane's speed in meters per second
-     *
-     * @return the plane's speed.
-     */
-    double getSpeed();
     
     /**
      * Set the battery capacity (maximum battery charge in seconds)
@@ -173,8 +160,9 @@ public interface Plane extends MessagingAgent {
      * The color must be specified as an int array of length 3, representing
      * the RGB color values in the range 0-255.
      * 
+     * @see DPlane#getColor() 
      * @param color 
      */
-    public void setColor(Color color);
+    public void setColor(int[] color);
     
 }

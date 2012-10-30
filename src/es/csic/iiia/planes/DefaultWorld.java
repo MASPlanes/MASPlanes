@@ -46,7 +46,7 @@ public class DefaultWorld extends AbstractWorld {
     
     public DefaultWorld(Factory factory) {
         super(factory);
-        System.err.print("Completed:  0,00%");
+        System.err.print("Completed:   0,00%");
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DefaultWorld extends AbstractWorld {
         final long t = getTime();
         if (t % 10000 == 0) {
             Double percent = t*100 / (double)duration;
-            System.err.print(String.format("\b\b\b\b\b\b%5.2f%%", percent));
+            System.err.print(String.format("\b\b\b\b\b\b\b%6.2f%%", percent));
         }
     }
     

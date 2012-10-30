@@ -118,9 +118,7 @@ public abstract class AbstractWorld implements World {
             p.setBattery(pd.getBatteryCapacity());
             p.setBatteryCapacity(pd.getBatteryCapacity());
             p.setCommunicationRange(pd.getCommunicationRange());
-            int[] i = pd.getColor();
-            Color c = new Color(i[0],i[1],i[2]);
-            p.setColor(c);
+            p.setColor(pd.getColor());
             planes.add(p);
         }
         
@@ -148,6 +146,14 @@ public abstract class AbstractWorld implements World {
             
             computeStep();
             displayStep();
+            
+            if (time > duration*1.5) {
+                System.err.println("It looks like some tasks will never be completed: ");
+                for (Task t : tasks) {
+                    System.err.println("\t" + t);
+                }
+                break;
+            }
             
         }
         
@@ -190,7 +196,7 @@ public abstract class AbstractWorld implements World {
      * 
      * @return list of pending tasks in this world.
      */
-    protected List<Task> getTasks() {
+    public List<Task> getTasks() {
         return tasks;
     }
     
@@ -201,8 +207,12 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public void removeTask(Task t) {
-        tasks.remove(t);
-        stats.collect(t);
+        // Check if it has been removed before tracking the stats. Sometimes two
+        // planes may think that they complete a pending task, whereas in
+        // reality another plane has already completed it before (split brain).
+        if (tasks.remove(t)) {
+            stats.collect(t);
+        }
     }
 
     @Override

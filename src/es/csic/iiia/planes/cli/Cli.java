@@ -57,6 +57,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Cli {
+    private static final Logger LOG = Logger.getLogger(Cli.class.getName());
     
     /**
      * List of available cli options.
@@ -168,9 +169,9 @@ public class Cli {
             LogManager.getLogManager().readConfiguration(
                     Cli.class.getResourceAsStream("/logging.properties"));
         } catch (IOException ex) {
-            Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         } catch (SecurityException ex) {
-            Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
     }
 }

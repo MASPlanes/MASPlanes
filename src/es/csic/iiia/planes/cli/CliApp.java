@@ -41,6 +41,8 @@ import es.csic.iiia.planes.DefaultFactory;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.gui.GUIFactory;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Actual object in charge of executing the simulation.
@@ -82,6 +84,7 @@ public class CliApp {
         }
         
         World world = f.buildWorld();
+        
         world.init(config.problemDefinition);
         new Thread(world).start();
     }

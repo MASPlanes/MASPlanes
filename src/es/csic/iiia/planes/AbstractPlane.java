@@ -85,11 +85,6 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
     private long batteryCapacity;
     
     /**
-     * Plane speed in meters per second
-     */
-    private double speed = 50/3.6d;
-    
-    /**
      * List of completed tasks' locations, for tracking purposes
      */
     private RotatingList<Location> completedLocations;
@@ -112,7 +107,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
     /**
      * Color of this plane, used only for drawing purposes
      */
-    private Color color;
+    private int[] color;
     
     /**
      * Default constructor
@@ -158,20 +153,6 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
     }
     
     @Override
-    public double getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public void setSpeed(double speed) {
-        this.speed = speed;
-    }
-    
-    public void setColor(int[] color) {
-        this.color = new Color(color[0], color[1], color[2]);
-    }
-    
-    @Override
     public void step() {
         if (state == State.CHARGING) {
             this.battery += rechargeRatio;
@@ -185,7 +166,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
         
         Station st = getWorld().getNearestStation(getLocation());
         if (  state == State.TO_CHARGE
-           || battery <= getLocation().getDistance(st.getLocation())/speed)
+           || battery <= getLocation().getDistance(st.getLocation())/getSpeed())
         {
             goCharge(st);
             super.step();
@@ -198,7 +179,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
         // Move the plane if not charging or going to charge
         if (nextTask != null) {
             angle = getLocation().getAngle(nextTask.getLocation());
-            if (getLocation().move(nextTask.getLocation(), speed)) {
+            if (getLocation().move(nextTask.getLocation(), getSpeed())) {
                 final Task completed = nextTask;
                 nextTask = null;
                 triggerTaskCompleted(completed);
@@ -216,7 +197,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
     private void goCharge(Station st) {
         state = State.TO_CHARGE;
         angle = getLocation().getAngle(st.getLocation());
-        if (this.getLocation().move(st.getLocation(), speed)) {
+        if (this.getLocation().move(st.getLocation(), getSpeed())) {
             state = State.CHARGING;
             this.completedLocations.add(st.getLocation());
         }
@@ -299,13 +280,23 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
         return completedLocations;
     }
 
+    /* Horrible HACK:
+     * This is to avoid creating java.awt.Color objects when running without
+     * GUI, because creating a single Color object makes java think that this
+     * is a GUI application, launch the GUI Thread, etc...
+     */
+    private Color cachedColor = null;
+    
     @Override
     public Color getColor() {
-        return this.color;
+        if (cachedColor == null) {
+            cachedColor = new Color(color[0], color[1], color[2]);
+        }
+        return cachedColor;
     }
     
     @Override
-    public void setColor(Color color) {
+    public void setColor(int[] color) {
         this.color = color;
     }
     

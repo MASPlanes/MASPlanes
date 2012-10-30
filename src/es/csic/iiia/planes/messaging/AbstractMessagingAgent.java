@@ -36,9 +36,10 @@
  */
 package es.csic.iiia.planes.messaging;
 
-import es.csic.iiia.planes.behaviors.Behavior;
 import es.csic.iiia.planes.AbstractPositionedElement;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.behaviors.Behavior;
+import es.csic.iiia.planes.util.DependencyResolver;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -46,10 +47,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
  * Skeletal implementation of a messaging agent.
@@ -65,10 +65,9 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
     private static final Logger LOG = Logger.getLogger(AbstractMessagingAgent.class.getName());
     
     /**
-     * Cache of handling methods by message type.
+     * Agent speed in meters per second
      */
-    private HashMap<Class<? extends Message>, Map<Behavior, Method>> handlers = 
-            new HashMap<Class<? extends Message>, Map<Behavior, Method>>();
+    private double speed = 0;
     
     /**
      * The communication radius.
@@ -92,11 +91,36 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
      */
     private List<Behavior> behaviors;
     
+    /**
+     * Flag to prevent nodes from adding behaviors after being initialized.
+     */
+    private boolean initialized = false;
+    
     public AbstractMessagingAgent(Location location) {
         super(location);
         currentMessages = new ArrayList<Message>();
         futureMessages = new ArrayList<Message>();
         behaviors = new ArrayList<Behavior>();
+    }
+    
+    @Override
+    public void initialize() {
+        // Compute the behavior ordering from the declared dependencies
+        DependencyResolver d = new DependencyResolver();
+        for (Behavior v : behaviors) {
+            d.add(v.getClass(), v.getDependencies());
+        }
+        
+        // Get an ordered list of behavior classes, and construct a new
+        // (ordered) list of behavior objects.
+        List<Behavior> newBehaviors = new ArrayList<Behavior>(behaviors.size());
+        for (Class c : d.getOrderedList()) {
+            Behavior b = getBehavior(c);
+            b.initialize();
+            newBehaviors.add(b);
+        }
+        
+        behaviors = newBehaviors;
     }
     
     /**
@@ -109,8 +133,10 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
      * @param behavior to be added.
      */
     protected void addBehavior(Behavior behavior) {
+        if (initialized) {
+            throw new UnsupportedOperationException("You can only add behaviors to an agent inside its constructor, not here.");
+        }
         behaviors.add(behavior);
-        handlers.clear();
     }
     
     /**
@@ -119,6 +145,30 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
      */
     protected List<Behavior> getBehaviors() {
         return Collections.unmodifiableList(behaviors);
+    }
+    
+    /**
+     * Get the behavior that implements a specific class.
+     * 
+     * @return behavior that implements the given class.
+     */
+    public <T extends Behavior> T getBehavior(Class<T> behaviorClass) {
+        for (Behavior b : behaviors) {
+            if (b.getClass() == behaviorClass) {
+                return (T)b;
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public double getSpeed() {
+        return speed;
+    }
+
+    @Override
+    public void setSpeed(double speed) {
+        this.speed = speed;
     }
 
     @Override
@@ -161,9 +211,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
             b.beforeMessages();
         }
         
-        for (Message m : currentMessages) {
-            handle(m);
-        }
+        dispatchMessages();
         
         for (Behavior b : behaviors) {
             b.afterMessages();
@@ -177,48 +225,60 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         getWorld().sendMessage(message);
     }
     
-    
-    private void handle(Message m) {
-        final Class<? extends Message> mclass = m.getClass();
-        
-        // Populate the handlers cache if needed.
-        if (!handlers.containsKey(mclass)) {
-            computeHandlers(mclass);
-        }
-        
-        for (Entry<Behavior,Method> e : handlers.get(mclass).entrySet()) {
-                
-            try {
-                e.getValue().invoke(e.getKey(), m);
-            } catch (IllegalAccessException ex) {
-                LOG.log(Level.SEVERE, null, ex);
-            } catch (IllegalArgumentException ex) {
-                LOG.log(Level.SEVERE, null, ex);
-            } catch (InvocationTargetException ex) {
-                Throwable throwable = ex.getTargetException();
-                if (throwable instanceof Error) { 
-                    throw (Error) throwable; 
-                } else if(throwable instanceof RuntimeException) { 
-                    throw (RuntimeException) throwable; 
-                }
-                LOG.log(Level.SEVERE, null, throwable);
+    private void dispatchMessages() {
+        for (Behavior b : behaviors) {
+            for (Message m : currentMessages) {
+                handle(b, m);
             }
-                
         }
-        
     }
     
-    private void computeHandlers(Class<? extends Message> mclass) {
-        Map<Behavior, Method> mhandlers = new TreeMap<Behavior, Method>();
+    private static MultiKeyMap cache = new MultiKeyMap();
+    
+    private void handle(Behavior b, Message m) {
+        final Class bClass = b.getClass();
+        final Class mClass = m.getClass();
         
-        for (Behavior behavior : behaviors) {
-            Method handler = getMethod(behavior.getClass(), mclass);
-            if (handler != null) {
-                mhandlers.put(behavior, handler);
-            }
+        // Skip messages intended for other agents if the behavior is not 
+        // promiscuous (@see Behavior#isPromiscuous())
+        if (!b.isPromiscuous() && m.getRecipient() != null
+                && m.getRecipient() != this) {
+            return;
         }
         
-        this.handlers.put(mclass, mhandlers);
+        // Memoize the method
+        Method method = null;
+        if (cache.containsKey(bClass, mClass)) {
+            method = (Method)cache.get(bClass, mClass);
+        } else {
+            method = getMethod(bClass, mClass);
+            if (method != null) {
+                LOG.log(Level.FINEST, "Dispatching {0} to {1}", new Object[]{mClass.getSimpleName(), method.toGenericString()});
+            }
+            cache.put(bClass, mClass, method);
+        }
+        
+        if (method == null) {
+            return;
+        }
+        
+        // Invoke it
+        try {
+            method.invoke(b, m);
+        } catch (IllegalAccessException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+        } catch (IllegalArgumentException ex) {
+            LOG.log(Level.SEVERE, "Error invoking " + method.toGenericString() 
+                    + " on " + b + " with argument " + m, ex);
+        } catch (InvocationTargetException ex) {
+            Throwable throwable = ex.getTargetException();
+            if (throwable instanceof Error) { 
+                throw (Error) throwable; 
+            } else if(throwable instanceof RuntimeException) { 
+                throw (RuntimeException) throwable; 
+            }
+            LOG.log(Level.SEVERE, null, throwable);
+        }
     }
     
     private static Method getMethod(Class<? extends Behavior> bclass, 
@@ -228,7 +288,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         try {
             m = bclass.getMethod("on", mclass);
         } catch (NoSuchMethodException ex) {
-            Class c = bclass.getSuperclass();
+            Class c = mclass.getSuperclass();
             if (Message.class.isAssignableFrom(c)) {
                 m = getMethod(bclass, c);
             }
@@ -237,4 +297,5 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         }
         return m;
     }
+    
 }

@@ -37,6 +37,7 @@
 package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
+import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -48,6 +49,7 @@ import java.util.logging.Logger;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractFactory implements Factory {
+    private static final Logger LOG = Logger.getLogger(AbstractFactory.class.getName());
     
     private final Configuration config;
     
@@ -77,9 +79,10 @@ public abstract class AbstractFactory implements Factory {
     public Plane buildPlane(Location location) {
         Plane p = null;
         try {
-            p = config.planesClass.getConstructor(Location.class).newInstance(location);
+            Constructor<? extends Plane> c = config.planesClass.getConstructor(Location.class);
+            p = c.newInstance(location);
         } catch (Exception ex) {
-            Logger.getLogger(AbstractFactory.class.getName()).log(Level.SEVERE, null, ex);
+            LOG.log(Level.SEVERE, null, ex);
         }
         initialize(p);
         return p;

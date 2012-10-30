@@ -1,5 +1,6 @@
-manifest.mf
+anifest.mf
 build
 dist
 problem
 nbproject/private
+dependencies

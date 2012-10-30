@@ -49,7 +49,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public class Task extends AbstractPositionedElement implements Drawable {
+public class Task extends AbstractPositionedElement implements Drawable, Comparable {
     
     /**
      * Generator of unique identifiers.
@@ -99,6 +99,14 @@ public class Task extends AbstractPositionedElement implements Drawable {
     public int getId() {
         return id;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder();
+        buf.append("Task[").append(id).append("](").append(getLocation().getXInt())
+                .append(",").append(getLocation().getYInt()).append(")");
+        return buf.toString();
+    }
 
     @Override
     public void draw(Graphics2D g) {
@@ -119,6 +127,16 @@ public class Task extends AbstractPositionedElement implements Drawable {
         g.setColor(Color.WHITE);
         g.drawString(sid, x-(w/2), y+(h/2));
         g.setColor(previous);
+    }
+
+    @Override
+    public int compareTo(Object t) {
+        if (!(t instanceof Task)) {
+            throw new ClassCastException();
+        }
+        
+        final Task other = (Task)t;
+        return id - other.id;
     }
     
 }
