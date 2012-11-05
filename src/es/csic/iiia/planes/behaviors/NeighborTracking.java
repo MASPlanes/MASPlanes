@@ -44,7 +44,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Implementation of a neighbor tracking behavior.
+ * <p/>
+ * This behavior guarantees that all planes considered as neighbors in the
+ * current iteration will be in range in the next one.
+ * 
+ * @see #isNeighbor(es.csic.iiia.planes.messaging.MessagingAgent)
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class NeighborTracking extends AbstractBehavior {
@@ -91,6 +97,11 @@ public class NeighborTracking extends AbstractBehavior {
         neighbors.clear();
     }
     
+    /**
+     * Update our knowledge about this plane.
+     * 
+     * @param m beacon message of the detected possible neighbor.
+     */
     public void on(TrackingMessage m) {
         final MessagingAgent neighbor = m.getSender();
         
@@ -106,7 +117,7 @@ public class NeighborTracking extends AbstractBehavior {
     }
 
     /**
-     * @{inheritDoc}
+     * {@inheritDoc}
      * 
      * In this case, this behavior notifies the agent exhibiting it of each
      * and every new agent detected or lost.

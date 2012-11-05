@@ -52,7 +52,7 @@ import java.util.logging.Logger;
 /**
  * Implements the auctioning and replying behavior for AuctionPlanes.
  * 
- * @TODO Study how could we improve the situation for recharging planes.
+ * <strong>TODO:</strong> Study how could we improve the situation for recharging planes.
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class AuctionBehavior extends AbstractBehavior {

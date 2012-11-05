@@ -34,45 +34,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.auctions;
-
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.messaging.AbstractMessage;
-import es.csic.iiia.planes.messaging.Message;
 
 /**
- * Skeletal implementation of a message for the auction protocol.
- * <p/>
- * Auction messages always carry the (single) task that they are referring to,
- * so the burden of keeping track of that is handled at this base level, instead
- * of repeating that code on each message.
- * 
- * @author Marc Pujol <mpujol@iiia.csic.es>
+ * Implementation of message passing agents.
  */
-public abstract class AuctionMessage extends AbstractMessage {
-    
-    /**
-     * Task that this message refers to.
-     */
-    private final Task task;
-        
-    /**
-     * Build a new winner message.
-     * 
-     * @see Message#getRecipient()
-     * @param task that this message refers to.
-     */
-    public AuctionMessage(Task task) {
-        this.task = task;
-    }
-
-    /**
-     * Get the task that this message refers to.
-     * 
-     * @return task that this message refers to.
-     */
-    public Task getTask() {
-        return task;
-    }
-    
-}
+package es.csic.iiia.planes.messaging;

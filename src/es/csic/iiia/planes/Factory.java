@@ -52,7 +52,7 @@ public interface Factory {
     /**
      * Get the configuration object of this simulation.
      * 
-     * @return 
+     * @return the configuration of this simulation.
      */
     public Configuration getConfiguration();
 

@@ -44,7 +44,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Implementation of a plane that coordinates using auctions.
+ * <p/>
+ * Aside from the auction coordination, this plane use the "nearest task"
+ * strategy.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class AuctionPlane extends AbstractPlane {

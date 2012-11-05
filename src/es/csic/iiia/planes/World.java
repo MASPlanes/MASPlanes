@@ -37,8 +37,9 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.messaging.Message;
+import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.util.List;
 
 /**
