@@ -44,17 +44,56 @@ package es.csic.iiia.planes;
  */
 public class DefaultWorld extends AbstractWorld {
     
+    /**
+     * Whether we run in quiet mode or not.
+     * 
+     * @see Configuration#quiet
+     */
+    private boolean quiet;
+    
+    /**
+     * Builds a new world, whose elements will be created by the given factory.
+     * 
+     * @param factory 
+     */
     public DefaultWorld(Factory factory) {
-        super(factory);
-        System.err.print("Completed:   0,00%");
+        super(factory); 
+    }
+    
+    /**
+     * Check if this world runs in quiet mode.
+     * 
+     * @see Configuration#quiet
+     * @return whether quiet mode is set.
+     */
+    public boolean isQuiet() {
+        return quiet;
     }
 
+    /**
+     * Set the world in quiet/verbose mode.
+     * 
+     * @see Configuration#quiet
+     * @param quiet true to enable quiet mode, false to disable it.
+     */
+    public void setQuiet(boolean quiet) {
+        this.quiet = quiet;
+    }
+
+    /**
+     * Shows the simulation progress.
+     * <p/>
+     * In this case, a percentage of completion is updated in stderr unless
+     * quiet mode is specified in the command line.
+     */
     @Override
     public void displayStep() {
         final long t = getTime();
         if (t % 10000 == 0) {
             Double percent = t*100 / (double)duration;
-            System.err.print(String.format("\b\b\b\b\b\b\b%6.2f%%", percent));
+            if (!quiet) {
+                System.err.print(String.format("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\bCompleted: %6.2f%%", percent));
+            }
         }
     }
     

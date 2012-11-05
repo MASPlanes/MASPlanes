@@ -48,6 +48,13 @@ import java.util.List;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Factory {
+    
+    /**
+     * Get the configuration object of this simulation.
+     * 
+     * @return 
+     */
+    public Configuration getConfiguration();
 
     /**
      * Builds an {@link Operator}.

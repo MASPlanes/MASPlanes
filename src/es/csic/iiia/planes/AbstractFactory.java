@@ -66,6 +66,11 @@ public abstract class AbstractFactory implements Factory {
     public AbstractFactory(Configuration config) {
         this.config = config;
     }
+    
+    @Override
+    public Configuration getConfiguration() {
+        return config;
+    }
 
     @Override
     public Operator buildOperator(List<DTask> tasks) {

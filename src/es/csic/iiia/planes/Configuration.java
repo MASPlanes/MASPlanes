@@ -53,6 +53,12 @@ public class Configuration {
     public boolean gui = false;
     
     /**
+     * True if running in "quiet" mode (no output except for final 
+     * statistics & errors)
+     */
+    public boolean quiet = false;
+    
+    /**
      * Pointer to the problem definition of the problem (scenario definition)
      * being simulated.
      */

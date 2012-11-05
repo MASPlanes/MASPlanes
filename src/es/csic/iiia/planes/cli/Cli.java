@@ -86,6 +86,7 @@ public class Cli {
                 .withArgName("default|auction")
                 .withLongOpt("planes-type")
                 .create('p'));
+        options.addOption("q", "quiet", false, "disable all output except for results and errors.");
         
         Configuration config = parseOptions(args);
         CliApp app = new CliApp(config);
@@ -111,8 +112,8 @@ public class Cli {
         try {
             line = parser.parse(options, in_args);
         } catch (ParseException ex) {
-            Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
-            System.exit(1);
+            Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);
+            showHelp();
         }
         
         if (line.hasOption('g')) {
@@ -140,6 +141,9 @@ public class Cli {
             } else {
                 throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
             }
+        }
+        if (line.hasOption('q')) {
+            config.quiet = true;
         }
 
         String[] args = line.getArgs();
