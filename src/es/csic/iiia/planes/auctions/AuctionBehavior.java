@@ -151,8 +151,7 @@ public class AuctionBehavior extends AbstractBehavior {
     
     public void on(AskMessage ask) {
         final AuctionPlane agent = getAgent();
-        double offer = agent.getLocation().distance(ask.getTask().getLocation());
-        //double offer = agent.getTaskCost(ask.getTask());
+        double offer = agent.getOffer(ask.getTask());
         
         if (LOG.isLoggable(Level.FINEST)) {
             LOG.log(Level.FINEST, "Plane {0} bid for {1}: {2}", new Object[]{agent.getId(), ask.getTask().getId(), offer});
