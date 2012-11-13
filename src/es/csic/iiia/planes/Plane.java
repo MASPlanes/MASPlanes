@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -37,34 +37,34 @@
 package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DPlane;
-import es.csic.iiia.planes.messaging.MessagingAgent;
 import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.awt.Color;
 import java.util.List;
 
 /**
  * Represents an Unmannered Aerial Vehicle (UAV).
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Plane extends MessagingAgent {
-    
+
     /**
      * Plane states
      */
     public enum State {
         NORMAL, TO_CHARGE, CHARGING
     }
-    
+
     /**
      * Number of history points to store, for debugging and displaying
      * reasons.
      */
     public static int NUM_COMPLETED_TASKS = 20;
-    
+
     /**
      * Gets the plane's id.
-     * 
+     *
      * @return the id.
      */
     public int getId();
@@ -77,7 +77,7 @@ public interface Plane extends MessagingAgent {
      * @param task to add
      */
     public void addTask(Task task);
-    
+
     /**
      * Removes a task from the list of tasks owned by this plane.
      *
@@ -86,10 +86,10 @@ public interface Plane extends MessagingAgent {
      * @param task that has been removed
      */
     public Task removeTask(Task task);
-    
+
     /**
      * Gets the list of tasks assigned to this plane.
-     * 
+     *
      * @return list of tasks.
      */
     List<Task> getTasks();
@@ -100,69 +100,69 @@ public interface Plane extends MessagingAgent {
      * @param battery
      */
     void setBattery(long battery);
-    
+
     /**
      * Get the plane's remianing battery in seconds
-     * 
+     *
      * @return the reamining battery of this plane (in flight seconds)
      */
     long getBattery();
-    
+
     /**
      * Get the plane's current angle
-     * 
+     *
      * @return the angle.
      */
     double getAngle();
-    
+
     /**
      * Set the battery capacity (maximum battery charge in seconds)
-     * 
-     * @param capacity 
+     *
+     * @param capacity
      */
     public void setBatteryCapacity(long capacity);
-    
+
     /**
      * Get the battery capacity (maximum battery charge in seconds)
-     * 
+     *
      * @return the capacity of the battery of this plane.
      */
     public long getBatteryCapacity();
-    
+
     /**
      * Get the completed locations.
      */
     public List<Location> getCompletedLocations();
-    
+
     /**
      * Get the planned locations.
      */
     public List<Location> getPlannedLocations();
-    
+
     /**
      * Get the next planned task.
      */
     public Task getNextTask();
-    
+
     /**
      * Get the drawer for this plane.
      */
     public Drawable getDrawer();
-    
+
     /**
      * Get the plane's color.
      */
     public Color getColor();
-    
+
     /**
      * Set the plane's color, used when drawing the GUI.
-     * 
+     *
      * The color must be specified as an int array of length 3, representing
      * the RGB color values in the range 0-255.
-     * 
-     * @see DPlane#getColor() 
-     * @param color 
+     *
+     * @see DPlane#getColor()
+     * @param color
      */
     public void setColor(int[] color);
-    
+
 }

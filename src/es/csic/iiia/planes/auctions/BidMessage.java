@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,11 +40,11 @@ import es.csic.iiia.planes.Task;
 
 /**
  * Message to bid for a task.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class BidMessage extends AuctionMessage {
-    
+
     /**
      * Price of this bid.
      */
@@ -52,7 +52,7 @@ public class BidMessage extends AuctionMessage {
 
     /**
      * Builds a new message to bid for the specified task at the given price.
-     * 
+     *
      * @param task for which this message bids.
      * @param price of the bid.
      */
@@ -60,14 +60,14 @@ public class BidMessage extends AuctionMessage {
         super(task);
         this.price = price;
     }
-    
+
     /**
      * Get the price of this bid.
-     * 
+     *
      * @return price of this bid.
      */
     public double getPrice() {
         return this.price;
     }
-    
+
 }

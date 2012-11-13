@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -37,6 +37,7 @@
 package es.csic.iiia.planes.util;
 
 import es.csic.iiia.planes.behaviors.Behavior;
+import es.csic.iiia.planes.messaging.AbstractMessagingAgent;
 import java.util.ArrayList;
 import java.util.List;
 import org.jgrapht.graph.DefaultDirectedGraph;
@@ -44,21 +45,23 @@ import org.jgrapht.graph.DefaultEdge;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 /**
+ * Resolves the dependencies between behaviors.
  *
+ * @see AbstractMessagingAgent#addBehavior(Behavior)
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DependencyResolver {
-    
+
     DefaultDirectedGraph<Class, DefaultEdge> g;
-    
+
     public DependencyResolver() {
         g = new DefaultDirectedGraph<Class, DefaultEdge>(DefaultEdge.class);
     }
-    
+
     public void add(Class v) {
         g.addVertex(v);
     }
-    
+
     public void add(Class v, Class[] dependencies) {
         this.add(v);
         for(Class<? extends Behavior> d : dependencies) {
@@ -68,7 +71,7 @@ public class DependencyResolver {
             g.addEdge(d, v);
         }
     }
-    
+
     public List<Class> getOrderedList() {
         List<Class> result = new ArrayList<Class>();
         TopologicalOrderIterator<Class, DefaultEdge> orderIterator;
@@ -80,5 +83,5 @@ public class DependencyResolver {
 
         return result;
     }
-    
+
 }

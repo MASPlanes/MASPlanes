@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -48,17 +48,17 @@ import java.util.List;
  * <p/>
  * Aside from the auction coordination, this plane use the "nearest task"
  * strategy.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class AuctionPlane extends AbstractPlane {
-    
+
     private ArrayList<Task> localTasks = new ArrayList<Task>();
-    
+
     public AuctionPlane(Location location) {
         super(location);
     }
-    
+
     @Override
     public void initialize() {
         addBehavior(new NeighborTracking(this));
@@ -68,6 +68,7 @@ public class AuctionPlane extends AbstractPlane {
 
     @Override
     public List<Location> getPlannedLocations() {
+        replan(getLocation(), localTasks);
         List<Location> locations = new ArrayList<Location>();
         for (Task t : localTasks) {
             locations.add(t.getLocation());
@@ -81,15 +82,14 @@ public class AuctionPlane extends AbstractPlane {
     @Override
     protected void taskAdded(Task t) {
         localTasks.add(t);
-        
-        //replan(getLocation(), localTasks);
+
         final Task current = getNextTask();
         final double newdist = getLocation().distance(t.getLocation());
         if (current == null || newdist < getLocation().distance(current.getLocation())) {
             setNextTask(t);
         }
     }
-    
+
     @Override
     protected void taskRemoved(Task t) {
         localTasks.remove(t);
@@ -97,37 +97,22 @@ public class AuctionPlane extends AbstractPlane {
             setNextTask(findClosest(getLocation(), localTasks));
         }
     }
-    
-//    /**
-//     * Get the cost of adding this task.
-//     * 
-//     * The cost of adding a task is defined as the increment in total travel
-//     * distance after a whole new plan that includes the given task is computed.
-//     * 
-//     * @param task to evaluate.
-//     * @return cost of adding this task to the plane's plan.
-//     */
-//    protected double getTaskCost(Task task) {
-//        List<Task> newPlan = new ArrayList<Task>(localTasks);
-//        newPlan.add(task);
-//        return replan(getLocation(), newPlan);
-//    }
-//    
-//    private static double replan(Location origin, List<Task> tasks) {
-//        List<Task> pending = new ArrayList<Task>(tasks);
-//        tasks.clear();
-//        Location current = origin;
-//        double cost = 0;
-//        while (!pending.isEmpty()) {
-//            Task next = findClosest(current, pending);
-//            cost += current.distance(next.getLocation());
-//            pending.remove(next);
-//            tasks.add(next);
-//            current = next.getLocation();
-//        }
-//        return cost;
-//    }
-    
+
+    private static double replan(Location origin, List<Task> tasks) {
+        List<Task> pending = new ArrayList<Task>(tasks);
+        tasks.clear();
+        Location current = origin;
+        double cost = 0;
+        while (!pending.isEmpty()) {
+            Task next = findClosest(current, pending);
+            cost += current.distance(next.getLocation());
+            pending.remove(next);
+            tasks.add(next);
+            current = next.getLocation();
+        }
+        return cost;
+    }
+
     private static Task findClosest(Location location, List<Task> candidates) {
         double mind = Double.MAX_VALUE;
         Task result = null;

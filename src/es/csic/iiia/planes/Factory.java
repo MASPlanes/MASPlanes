@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -41,27 +41,27 @@ import java.util.List;
 
 /**
  * Factory used to build all of the simulation's participants.
- * 
+ *
  * Every element participating in the simulation is instantiated through this
  * factory, which is the responsible of "gluing" them together.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Factory {
-    
+
     /**
      * Get the configuration object of this simulation.
-     * 
+     *
      * @return the configuration of this simulation.
      */
     public Configuration getConfiguration();
 
     /**
      * Builds an {@link Operator}.
-     * 
-     * The created operator will create and submit tasks according to the given 
+     *
+     * The created operator will create and submit tasks according to the given
      * list of task definitions.
-     * 
+     *
      * @param taskDefinitions list of task definitions
      * @return Operator newly build Operator.
      */
@@ -69,7 +69,7 @@ public interface Factory {
 
     /**
      * Builds a {@link Plane}.
-     * 
+     *
      * @param location initial location of the plane.
      * @return newly built plane.
      */
@@ -77,7 +77,7 @@ public interface Factory {
 
     /**
      * Builds a charging {@link Station}.
-     * 
+     *
      * @param location location of the recharging station.
      * @return newly built station.
      */
@@ -85,12 +85,12 @@ public interface Factory {
 
     /**
      * Builds a new {@link Task}.
-     * 
+     *
      * The task's submission time is automatically set to the current simulation
      * time.
-     * 
-     * @see Task#getSubmissionTime() 
-     * 
+     *
+     * @see Task#getSubmissionTime()
+     *
      * @param location that must be visited by some plane.
      * @return newly built task.
      */
@@ -101,5 +101,5 @@ public interface Factory {
      * @return newly built World;
      */
     public World buildWorld();
-    
+
 }

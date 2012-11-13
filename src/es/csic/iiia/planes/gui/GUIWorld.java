@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -62,13 +62,13 @@ import java.util.logging.Logger;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class GUIWorld extends AbstractWorld {
-    
-    public final FrameTracker ftracker = new FrameTracker("world");
+
+    public final FrameTracker ftracker = new FrameTracker();
     private Display display;
     private int speed = 100;
     private AffineTransform transform;
     public ConcurrentLinkedQueue<Image> graphicsQueue = new ConcurrentLinkedQueue<Image>();
-    
+
     public GUIWorld(Factory factory) {
         super(factory);
     }
@@ -76,23 +76,23 @@ public class GUIWorld extends AbstractWorld {
     @Override
     public void run() {
         super.run();
-        
+
         while(!graphicsQueue.isEmpty()) {
             displayStep();
         }
     }
-    
-    
-    
+
+
+
     @Override public void init(DProblem d) {
         super.init(d);
         ftracker.calibrate();
     }
-    
+
     @Override
     protected void displayStep() {
         ftracker.delay(speed);
-        
+
         if (graphicsQueue.size() > 2) {
             return;
         }
@@ -102,7 +102,7 @@ public class GUIWorld extends AbstractWorld {
         GraphicsDevice gs = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gs.getDefaultConfiguration();
         BufferedImage bimage = gc.createCompatibleImage(display.getWidth(), display.getHeight(), Transparency.OPAQUE);
-        
+
         Graphics2D surface = (Graphics2D)(bimage.getGraphics());
 
         surface.setColor(Color.WHITE);
@@ -120,7 +120,7 @@ public class GUIWorld extends AbstractWorld {
         transform.translate(200, 200);
         surface.setTransform(transform);
 
-        
+
         for (Station s : getStations()) {
             s.draw(surface);
         }
@@ -132,11 +132,11 @@ public class GUIWorld extends AbstractWorld {
         }
 
         surface.dispose();
-        
+
         graphicsQueue.offer(bimage);
         display.repaint();
     }
-    
+
     public Plane getPlaneAt(Location l) {
         List<Plane> ps = getPlanes();
         for (int i=ps.size()-1; i>=0; i--) {
@@ -149,7 +149,7 @@ public class GUIWorld extends AbstractWorld {
         }
         return null;
     }
-    
+
     public Task getTaskAt(Location l) {
         List<Task> ts = getTasks();
         for (int i=ts.size()-1; i>=0; i--) {
@@ -162,7 +162,7 @@ public class GUIWorld extends AbstractWorld {
         }
         return null;
     }
-    
+
     public Location screenToWorld(Point2D point) {
         try {
             AffineTransform t = transform.createInverse();
@@ -172,7 +172,7 @@ public class GUIWorld extends AbstractWorld {
         }
         return null;
     }
-    
+
     public void setDisplay(Display d) {
         display = d;
     }

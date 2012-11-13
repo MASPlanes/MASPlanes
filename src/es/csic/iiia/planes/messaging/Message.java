@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -38,39 +38,39 @@ package es.csic.iiia.planes.messaging;
 
 /**
  * Base type for any messages exchanged by {@link MessagingAgent}s.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Message {
-    
+
     /**
      * Get the sender of this message.
      * @return sender of this message.
      */
     public MessagingAgent getSender();
-    
+
     /**
      * Set the sender of this message.
      * @param sender of this message.
      */
     public void setSender(MessagingAgent sender);
-    
+
     /**
      * Get the intended recipient of this message.
      * <p/>
      * A broadcast message should have an intended recipient of <em>null</em>.
      * The intended recipient is just informational: any agent within the
      * sender's {@link MessagingAgent#getCommunicationRange()} will receive it.
-     * 
+     *
      * @return intented recipient of this message.
      */
     public MessagingAgent getRecipient();
-    
+
     /**
      * Set the intended recipient of this message.
-     * @see #getRecipient() 
+     * @see #getRecipient()
      * @param recipient of this message.
      */
     public void setRecipient(MessagingAgent recipient);
-    
+
 }

@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,7 +40,7 @@ import es.csic.iiia.planes.Plane;
 
 /**
  * Definition of a Plane.
- * 
+ *
  * @see Plane
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -52,10 +52,10 @@ public class DPlane extends DLocation {
 
     /**
      * Get the color of this plane.
-     * 
+     *
      * The color is defined as an array of exactly three integers, containing
      * the amount of red, green, and blue (RGB) in a 0-255 scale.
-     * 
+     *
      * @return color of this plane, as an RGB triplet.
      */
     public int[] getColor() {
@@ -64,9 +64,9 @@ public class DPlane extends DLocation {
 
     /**
      * Set the color of this plane.
-     * 
+     *
      * @see #getColor() on the format of the color parameter.
-     * 
+     *
      * @param color to set.
      */
     public void setColor(int[] color) {
@@ -75,7 +75,7 @@ public class DPlane extends DLocation {
 
     /**
      * Get the speed of this plane, in meters per second.
-     * 
+     *
      * @return speed of this plane, in meters per second.
      */
     public double getSpeed() {
@@ -84,7 +84,7 @@ public class DPlane extends DLocation {
 
     /**
      * Set the speed of this plane
-     * 
+     *
      * @param speed of this plane in meters per second.
      */
     public void setSpeed(double speed) {
@@ -93,10 +93,10 @@ public class DPlane extends DLocation {
 
     /**
      * Get the battery capacity of this plane.
-     * 
+     *
      * At the beggining of a simulation, all of the planes are supposed to be
      * fully charged.
-     * 
+     *
      * @return battery capacity of this plane.
      */
     public long getBatteryCapacity() {
@@ -105,16 +105,16 @@ public class DPlane extends DLocation {
 
     /**
      * Set the battery capacity of this plane.
-     * 
+     *
      * @param battery capacity of this plane.
      */
     public void setBatteryCapacity(long battery) {
         this.batteryCapacity = battery;
     }
-    
+
     /**
      * Get the communication range of this plane.
-     * 
+     *
      * @return the communication range of this plane.
      */
     public double getCommunicationRange() {
@@ -123,7 +123,7 @@ public class DPlane extends DLocation {
 
     /**
      * Set the communication range of this plane.
-     * 
+     *
      * @param communicationRange communication range to set.
      */
     public void setCommunicationRange(double communicationRange) {

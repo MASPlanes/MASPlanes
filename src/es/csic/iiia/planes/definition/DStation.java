@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,7 +40,7 @@ import es.csic.iiia.planes.Station;
 
 /**
  * Definition of a charging station
- * 
+ *
  * @see Station
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */

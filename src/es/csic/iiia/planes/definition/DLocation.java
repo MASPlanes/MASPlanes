@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -39,7 +39,7 @@ package es.csic.iiia.planes.definition;
 /**
  * Skeletal definition of an object that has a specific location in the
  * simulation space.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class DLocation {
@@ -48,7 +48,7 @@ public abstract class DLocation {
 
     /**
      * Get the x axis value of this location.
-     * 
+     *
      * @return x axis value of this location.
      */
     public int getX() {
@@ -57,7 +57,7 @@ public abstract class DLocation {
 
     /**
      * Set the x axis value of this location.
-     * 
+     *
      * @param x axis value to set.
      */
     public void setX(int x) {
@@ -66,7 +66,7 @@ public abstract class DLocation {
 
     /**
      * Get the y axis value of this location.
-     * 
+     *
      * @return y axis value of this location.
      */
     public int getY() {
@@ -75,7 +75,7 @@ public abstract class DLocation {
 
     /**
      * Set the y axis value of this location.
-     * 
+     *
      * @param y axis value to set.
      */
     public void setY(int y) {

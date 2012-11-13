@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,19 +40,19 @@ import java.awt.geom.GeneralPath;
 
 /**
  * Icon of the charging stations.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class StationGraphic {
-    
+
     private static double[] xs = new double[]{.475, .37, .475, .37, .66, .535, .66};
     private static double[] ys = new double[]{.285, .55, .55, .76, .455, .455, .285};
-    
+
     private static GeneralPath instance = null;
-    
+
     /**
      * Get the icon of the chargin stations as a java awt Polygon.
-     * 
+     *
      * @return charging stations' icon.
      */
     public static GeneralPath getImage() {
@@ -66,9 +66,9 @@ public class StationGraphic {
             polygon.lineTo(xs[i], ys[i]);
         }
         polygon.closePath();
-        
+
         instance = polygon;
         return polygon;
     }
-    
+
 }

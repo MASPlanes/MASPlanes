@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -41,13 +41,13 @@ import es.csic.iiia.planes.World;
 
 /**
  * Defines a strategy that an operator may use to submit tasks.
- * 
+ *
  * This interface makes no assumptions about the actual information that the
  * operator will have when submitting tasks. This is, the strategy receives
  * the current "world" instance, giving it access to all of the world's
- * information. Therefore, it is up to the strategy to limit itself to the 
+ * information. Therefore, it is up to the strategy to limit itself to the
  * information that a real operator would have.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface OperatorStrategy {

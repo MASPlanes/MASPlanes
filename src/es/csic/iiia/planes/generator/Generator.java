@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -54,11 +54,11 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Generator of problem instances (scenarios).
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class Generator {
-    
+
     private long duration = 3600*24*30;
     private int width = 10000;
     private int height = 10000;
@@ -66,7 +66,7 @@ public class Generator {
     private int num_tasks = 60*24*30;
     private int num_stations = 1;
     private int num_crisis = 4;
-    
+
     private int[][] colorList = new int[][]{
         new int[]{0, 0, 0}, new int[]{233, 222, 187}, new int[]{173, 35, 35},
         new int[]{255, 238, 51}, new int[]{255, 146, 51}, new int[]{255, 205, 243},
@@ -74,19 +74,19 @@ public class Generator {
         new int[]{129, 38, 192}, new int[]{160, 160, 160}, new int[]{129, 197, 122},
         new int[]{157, 175, 255}, new int[]{41, 208, 208}, new int[]{87, 87, 87},
     };
-    
+
     private Random r = new Random();
-    
+
     /**
      * Entry point of the execution of this generator.
-     * 
+     *
      * @param args list of command line arguments (ignored)
      */
     public static void main(String[] args) {
         Generator t = new Generator();
         t.run();
     }
-    
+
     /**
      * Executes the generator.
      */
@@ -95,10 +95,10 @@ public class Generator {
         addPlanes(p);
         addTasks(p);
         addStations(p);
-        
+
         writeProblem(p);
     }
-    
+
     private void writeProblem(DProblem p) {
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -107,17 +107,17 @@ public class Generator {
             Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+
     private DProblem createProblemDefinition() {
         DProblem p = new DProblem();
-        
+
         p.setDuration(duration);
         p.setWidth(width);
         p.setHeight(height);
-        
+
         return p;
     }
-    
+
     private void addPlanes(DProblem p) {
         ArrayList<DPlane> planes = p.getPlanes();
         for (int i=0;i<num_planes;i++) {
@@ -133,7 +133,7 @@ public class Generator {
     }
 
     private void addTasks(DProblem p) {
-        
+
         // Create the tasks, randomly located
         ArrayList<DTask> tasks = p.getTasks();
         for (int i=0;i<num_tasks;i++) {
@@ -142,15 +142,15 @@ public class Generator {
             t.setY(r.nextInt(p.getHeight()));
             tasks.add(t);
         }
-        
+
         // Set task times. Use the crisis model for now.
-        
+
         // How is it done?
         // 1. Create a "base" uniform distribution between 0 and duration
         RealDistribution[] distributions = new RealDistribution[num_crisis+1];
         distributions[0] = new UniformRealDistribution(0, duration);
         distributions[0].reseedRandomGenerator(r.nextLong());
-        
+
         // 2. Create one gaussian distribution for each crisis, trying to
         //    spread them out through time.
         for (int i=1; i<=num_crisis; i++) {
@@ -159,7 +159,7 @@ public class Generator {
             distributions[i] = new NormalDistribution(mean, std);
             distributions[i].reseedRandomGenerator(r.nextLong());
         }
-        
+
         // 3. Uniformly sample task times from these distributions
         for (DTask t : tasks) {
             final int i = (int)(r.nextDouble()*(num_crisis+1));
@@ -169,21 +169,21 @@ public class Generator {
             }
             t.setTime(time);
         }
-        
+
         // 4. Debug stuff
         printTaskHistogram(tasks);
     }
-    
+
     private void printTaskHistogram(ArrayList<DTask> tasks) {
-        
+
         double[] data = new double[tasks.size()];
         for (int i=0; i<tasks.size(); i++) {
             data[i] = tasks.get(i).getTime();
         }
-        
+
         EmpiricalDistribution d = new EmpiricalDistribution(100);
         d.load(data);
-        
+
         for (SummaryStatistics stats : d.getBinStats()) {
             StringBuilder buf = new StringBuilder();
             for (int i=0, len=Math.round(stats.getN()/10f); i<len; i++) {
@@ -192,7 +192,7 @@ public class Generator {
             System.err.println(buf);
         }
     }
-    
+
     private void addStations(DProblem p) {
         ArrayList<DStation> stations = p.getStations();
         for (int i=0; i<num_stations; i++) {
@@ -202,5 +202,5 @@ public class Generator {
             stations.add(st);
         }
     }
-    
+
 }

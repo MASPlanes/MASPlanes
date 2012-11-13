@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -48,24 +48,24 @@ import java.util.logging.Logger;
  * <p/>
  * This behavior guarantees that all planes considered as neighbors in the
  * current iteration will be in range in the next one.
- * 
+ *
  * @see #isNeighbor(es.csic.iiia.planes.messaging.MessagingAgent)
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class NeighborTracking extends AbstractBehavior {
     private static final Logger LOG = Logger.getLogger(NeighborTracking.class.getName());
-    
+
     private Set<MessagingAgent> oldNeighbors = new LinkedHashSet<MessagingAgent>();
     private Set<MessagingAgent> neighbors = new LinkedHashSet<MessagingAgent>();
 
     public NeighborTracking(MessagingAgent agent) {
         super(agent);
     }
-    
+
     /**
      * Check if the given agent is a neighbor.
-     * 
+     *
      * @param agent to check for.
      * @return True if the given agent is a neighbor, or False otherwise.
      */
@@ -74,14 +74,14 @@ public class NeighborTracking extends AbstractBehavior {
             LOG.log(Level.FINEST, "{2} checking if {0} is within my neighbor list: {1}",
                     new Object[]{agent, neighbors, getAgent()});
         }
-        
+
         return neighbors.contains(agent);
     }
-    
+
     /**
      * Return True because this behaviour is promiscuous (we want to receive
      * all messages that we can hear, even if they are not intended for us).
-     * 
+     *
      * @return True.
      */
     @Override
@@ -96,21 +96,21 @@ public class NeighborTracking extends AbstractBehavior {
         neighbors = aux;
         neighbors.clear();
     }
-    
+
     /**
      * Update our knowledge about this plane.
-     * 
+     *
      * @param m beacon message of the detected possible neighbor.
      */
     public void on(TrackingMessage m) {
         final MessagingAgent neighbor = m.getSender();
-        
+
         // The maximum distance on the next iteration is the current distance
         // plus the maximum travel distance of each agent if they travelled on
         // completely opposite directions.
         final double d = getAgent().getLocation().distance(neighbor.getLocation());
         final double maxd = d + getAgent().getSpeed() + neighbor.getSpeed();
-        
+
         if (maxd < getAgent().getCommunicationRange()) {
             neighbors.add(neighbor);
         }
@@ -118,7 +118,7 @@ public class NeighborTracking extends AbstractBehavior {
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * In this case, this behavior notifies the agent exhibiting it of each
      * and every new agent detected or lost.
      */
@@ -127,10 +127,10 @@ public class NeighborTracking extends AbstractBehavior {
         // Send a tracking message for the next iteration
         getAgent().send(new TrackingMessage());
     }
-    
+
     /**
      * Get the set of neighbors that have been added in the current iteration.
-     * 
+     *
      * @return set of recently added neighbors.
      */
     public Set<MessagingAgent> getAddedNeighbors() {
@@ -142,10 +142,10 @@ public class NeighborTracking extends AbstractBehavior {
         }
         return result;
     }
-    
+
     /**
      * Get the set of neighbors that have just gone out of range.
-     * 
+     *
      * @return set of recently lost neighbors.
      */
     public Set<MessagingAgent> getRemovedNeighbors() {
@@ -157,7 +157,7 @@ public class NeighborTracking extends AbstractBehavior {
         }
         return result;
     }
-    
+
     public class TrackingMessage extends AbstractMessage {}
-    
+
 }

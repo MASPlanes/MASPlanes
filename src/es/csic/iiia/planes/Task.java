@@ -1,28 +1,28 @@
 /*
  * Software License Agreement (BSD License)
- * 
+ *
  * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
  * All rights reserved.
- * 
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -46,40 +46,40 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Represents a location that must be checked by some plane.
- * 
+ *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Task extends AbstractPositionedElement implements Drawable, Comparable {
-    
+
     /**
      * Generator of unique identifiers.
      */
     private final static AtomicInteger idGenerator = new AtomicInteger();
-    
+
     /**
      * Identifier of this task.
      */
     private final int id = idGenerator.incrementAndGet();
-    
+
     /**
      * Time at which this task has been submitted.
      */
     private long submissionTime;
-    
+
     /**
      * Builds a new task.
-     * 
+     *
      * @param location that must be checked by some plane.
      */
     public Task(Location location) {
         super(location);
     }
-    
+
     @Override
     public void initialize() {
         submissionTime = getWorld().getTime();
     }
-    
+
     /**
      * Get the time at which this task was submitted by the operator (created).
      * @return submission time.
@@ -87,19 +87,19 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
     public long getSubmissionTime() {
         return submissionTime;
     }
-    
+
     /**
      * Get the identifier of this task.
-     * 
+     *
      * Identifiers are sequential (in order of submission) and guaranteed to be
      * unique.
-     * 
+     *
      * @return the identifier of this Task.
      */
     public int getId() {
         return id;
     }
-    
+
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
@@ -112,12 +112,12 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
     public void draw(Graphics2D g) {
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
-        
+
         Color previous = g.getColor();
         g.setColor(Color.BLUE);
         g.fillOval(x-10, y-10, 20, 20);
-        
-        
+
+
         Font f = new Font(Font.SANS_SERIF, Font.BOLD, 8);
         String sid = String.valueOf(id);
         g.setFont(f);
@@ -134,9 +134,9 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
         if (!(t instanceof Task)) {
             throw new ClassCastException();
         }
-        
+
         final Task other = (Task)t;
         return id - other.id;
     }
-    
+
 }

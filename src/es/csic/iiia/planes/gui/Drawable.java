@@ -1,28 +1,28 @@
 /*
  * Software License Agreement (BSD License)
- * 
+ *
  * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
  * All rights reserved.
- * 
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -37,14 +37,21 @@
  */
 package es.csic.iiia.planes.gui;
 
-import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Positioned;
 import java.awt.Graphics2D;
 
 /**
+ * Objects that can be drawn in the simulation GUI.
  *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public interface Drawable {
+public interface Drawable extends Positioned {
+
+    /**
+     * Draws this object to the given canvas.
+     *
+     * @param g canvas where to draw.
+     */
     public void draw(Graphics2D g);
-    public Location getLocation();
+
 }

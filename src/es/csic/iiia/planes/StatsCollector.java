@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -43,14 +43,14 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class StatsCollector {
-    
+
     private AbstractWorld world;
     private DescriptiveStatistics stats = new DescriptiveStatistics();
 
     public StatsCollector(AbstractWorld w) {
         world = w;
     }
-    
+
     public void collect(Task t) {
         final long time = world.getTime() - t.getSubmissionTime();
         stats.addValue(time);
@@ -69,5 +69,5 @@ class StatsCollector {
            .append((int)stats.getPercentile(75)).append("\n");
         System.err.println(buf);
     }
-    
+
 }

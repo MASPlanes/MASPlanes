@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -42,40 +42,40 @@ import es.csic.iiia.planes.operator_behavior.Random;
 
 /**
  * Holds the configuration settings of the simulator.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class Configuration {
-    
+
     /**
      * True if running with a graphical display, false otherwise.
      */
     public boolean gui = false;
-    
+
     /**
-     * True if running in "quiet" mode (no output except for final 
+     * True if running in "quiet" mode (no output except for final
      * statistics & errors)
      */
     public boolean quiet = false;
-    
+
     /**
      * Pointer to the problem definition of the problem (scenario definition)
      * being simulated.
      */
     public DProblem problemDefinition = null;
-    
+
     /**
      * Strategy used by the {@link Operator} to decide to which plane it will
      * submit the task.
      */
     public OperatorStrategy operatorStrategy = new Random();
-    
+
     /**
      * Class of planes used by this simulation.
-     * 
+     *
      * Because different planes use different solving strategies, changing their
      * class is how the simulator runs one solving algorithm or another.
      */
     public Class<? extends Plane> planesClass = DefaultPlane.class;
-    
+
 }

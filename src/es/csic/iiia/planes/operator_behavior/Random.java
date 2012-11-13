@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -47,7 +47,7 @@ import java.util.List;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class Random implements OperatorStrategy {
-    
+
     private java.util.Random r = new java.util.Random(0);
 
     @Override
@@ -56,5 +56,5 @@ public class Random implements OperatorStrategy {
         int pnum = r.nextInt(planes.size());
         planes.get(pnum).addTask(t);
     }
-    
+
 }

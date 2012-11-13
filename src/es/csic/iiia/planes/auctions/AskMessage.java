@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,18 +40,18 @@ import es.csic.iiia.planes.Task;
 
 /**
  * Message to ask for bids over a task
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class AskMessage extends AuctionMessage {
 
     /**
      * Builds a message to auction the specified task.
-     * 
+     *
      * @param task that is being auctioned.
      */
     public AskMessage(Task task) {
         super(task);
     }
-    
+
 }

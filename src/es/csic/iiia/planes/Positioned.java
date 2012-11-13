@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -38,22 +38,22 @@ package es.csic.iiia.planes;
 
 /**
  * Represents an object that is positioned in the world's space.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Positioned {
- 
+
     /**
      * Set the object's location.
-     * 
+     *
      * @param position location.
      */
     public void setLocation(Location position);
-    
+
     /**
      * Get the object's location.
      * @return the object's location.
      */
     public Location getLocation();
-    
+
 }

@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -55,9 +55,9 @@ import java.util.List;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class PlaneDrawer implements Drawable {
-    
+
     private Plane plane;
-    
+
     /**
      * Stroke used to paint stuff
      */
@@ -70,7 +70,7 @@ public class PlaneDrawer implements Drawable {
     @Override
     public void draw(Graphics2D g) {
         GUIWorld w = (GUIWorld)plane.getWorld();
-        
+
         Plane selectedPlane = w.getSelectedPlane();
         if (selectedPlane == plane) {
             drawSelected(g);
@@ -85,30 +85,35 @@ public class PlaneDrawer implements Drawable {
     public Location getLocation() {
         return plane.getLocation();
     }
-    
+
+    @Override
+    public void setLocation(Location l) {
+        plane.setLocation(l);
+    }
+
     private void drawFutureLocations(Graphics2D g) {
         List<Location> plannedLocations = plane.getPlannedLocations();
         if (plannedLocations == null || plannedLocations.isEmpty()) {
             return;
         }
-        
+
         /*** Future locations */
         GeneralPath p = new GeneralPath(GeneralPath.WIND_EVEN_ODD, plannedLocations.size()+1);
         p.moveTo(getLocation().getXInt(), getLocation().getYInt());
-        
+
         // Add all the tasks to a list
         for (Location nextLocation : plannedLocations) {
             p.lineTo(nextLocation.getX(), nextLocation.getY());
         }
-        
+
         g.setStroke(normalStroke);
         g.setColor(Color.RED);
         g.draw(p);
     }
-    
+
     private void drawPastLocations(Graphics2D g) {
         List<Location> completedLocations = plane.getCompletedLocations();
-        
+
         /*** Past locations */
         GeneralPath p = new GeneralPath(GeneralPath.WIND_EVEN_ODD, completedLocations.size());
         boolean first = true;
@@ -125,43 +130,43 @@ public class PlaneDrawer implements Drawable {
         g.draw(p);
         g.setStroke(normalStroke);
     }
-    
+
     private void drawSelected(Graphics2D g) {
         Color previous = g.getColor();
-        
+
         // Line to destination (if exists)
         final int x = getLocation().getXInt();
         final int y = getLocation().getYInt();
-        
+
         drawFutureLocations(g);
         drawPastLocations(g);
-        
+
         drawTasks(g, plane.getColor());
         drawPlane(g, Color.DARK_GRAY, plane.getColor());
         drawBattery(g);
-        
+
         g.setColor(previous);
     }
-    
+
     private void drawUnselected(Graphics2D g) {
         Color previous = g.getColor();
-        
+
         // Line to destination (if exists)
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
         Task nextTask = plane.getNextTask();
         if (nextTask != null) {
-            g.setColor(Color.LIGHT_GRAY);    
+            g.setColor(Color.LIGHT_GRAY);
             final Location l = nextTask.getLocation();
             g.drawLine(x, y, l.getXInt(), l.getYInt());
         }
-        
+
         drawTasks(g, Color.LIGHT_GRAY);
         drawPlane(g, Color.DARK_GRAY, Color.LIGHT_GRAY);
         drawBattery(g);
-        
+
         g.setColor(previous);
-        
+
     }
 
     private void drawTasks(Graphics2D g, Color c) {
@@ -171,11 +176,11 @@ public class PlaneDrawer implements Drawable {
             g.fillOval(l.getXInt()-50, l.getYInt()-50, 100, 100);
         }
     }
-    
+
     private void drawPlane(Graphics2D g, Color lineColor, Color planeColor) {
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
-        
+
         AffineTransform oldt = g.getTransform();
         AffineTransform newt = new AffineTransform(oldt);
         newt.translate(x-175, y-175);
@@ -192,19 +197,19 @@ public class PlaneDrawer implements Drawable {
         g.draw(PlaneGraphic.getImage());
         g.setColor(planeColor);
         g.fill(PlaneGraphic.getImage());
-        
+
         // Draw the communication circle
         g.setTransform(oldt);
         final int r = (int)plane.getCommunicationRange();
         g.drawOval(x-r, y-r, r*2, r*2);
-        
+
         g.setStroke(olds);
     }
-    
+
     private void drawBattery(Graphics2D g) {
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
-        
+
         Font f = new Font(Font.SANS_SERIF, Font.BOLD, 160);
         g.setFont(f);
         String sid = String.valueOf(plane.getId());
@@ -218,25 +223,25 @@ public class PlaneDrawer implements Drawable {
         g.drawRect(x-(w/2), y+200, w, h);
         g.drawString(bat, x-(w/2), y+200+h-25);
     }
-    
+
     private void drawNormal(Graphics2D g) {
         Color previous = g.getColor();
-        
+
         // Line to destination (if exists)
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
         Task nextTask = plane.getNextTask();
         if (nextTask != null) {
-            g.setColor(Color.RED);    
+            g.setColor(Color.RED);
             final Location l = nextTask.getLocation();
             g.drawLine(x, y, l.getXInt(), l.getYInt());
         }
-        
+
         drawTasks(g, plane.getColor());
         drawPlane(g, Color.DARK_GRAY, plane.getColor());
         drawBattery(g);
-        
+
         g.setColor(previous);
     }
-    
+
 }

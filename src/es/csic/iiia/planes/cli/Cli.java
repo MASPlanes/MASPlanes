@@ -1,28 +1,28 @@
 /*
  * Software License Agreement (BSD License)
- * 
+ *
  * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
  * All rights reserved.
- * 
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -53,12 +53,12 @@ import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Main class for the CLI interface.
- * 
+ *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Cli {
     private static final Logger LOG = Logger.getLogger(Cli.class.getName());
-    
+
     /**
      * List of available cli options.
      */
@@ -66,12 +66,12 @@ public class Cli {
 
     /**
      * Cli's entry point.
-     * 
+     *
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         initializeLogging();
-        
+
         options.addOption("g", "gui", false, "graphically display the simulation.");
         options.addOption("h", "help", false, "show this help message.");
         options.addOption(OptionBuilder.withArgName("operator")
@@ -87,21 +87,21 @@ public class Cli {
                 .withLongOpt("planes-type")
                 .create('p'));
         options.addOption("q", "quiet", false, "disable all output except for results and errors.");
-        
+
         Configuration config = parseOptions(args);
         CliApp app = new CliApp(config);
         app.run();
     }
-    
+
     private static void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
         formatter.printHelp("planes [OPTIONS] <PROBLEM>", options);
         System.exit(1);
     }
-    
+
     /**
      * Parse the provided list of arguments according to the program's options.
-     * 
+     *
      * @param in_args list of input arguments.
      * @return a configuration object set according to the input options.
      */
@@ -115,7 +115,7 @@ public class Cli {
             Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, ex.getLocalizedMessage(), ex);
             showHelp();
         }
-        
+
         if (line.hasOption('g')) {
             config.gui = true;
         }
@@ -150,7 +150,7 @@ public class Cli {
         if (args.length < 1) {
             showHelp();
         }
-        
+
         DProblem d = new DProblem();
         ObjectMapper mapper = new ObjectMapper();
         try {
@@ -160,7 +160,7 @@ public class Cli {
             System.exit(1);
         }
         config.problemDefinition = d;
-        
+
         return config;
     }
 

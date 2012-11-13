@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,6 +40,7 @@ import java.util.logging.Formatter;
 import java.util.logging.LogRecord;
 
 /**
+ * Formatter used for a more simplistic error reporting.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -47,16 +48,16 @@ public final class SimpleConsoleFormatter extends Formatter {
 
     @Override
     public String format(LogRecord lr) {
-        
+
         StringBuilder buf = new StringBuilder();
-        
+
         buf.append("[")
                 .append(lr.getLevel().getName().charAt(0))
                 .append("] ")
                 .append(formatMessage(lr))
                 .append("\n");
-        
+
         return buf.toString();
     }
-    
+
 }

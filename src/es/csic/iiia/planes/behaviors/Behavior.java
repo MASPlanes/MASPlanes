@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -47,57 +47,57 @@ import es.csic.iiia.planes.messaging.MessagingAgent;
  * system. Therefore, we use reflection here and there is no static checking
  * of any type.
  * <p/>
- * In order to define the reaction to a specific type of event, a class 
+ * In order to define the reaction to a specific type of event, a class
  * implementing this interface must implement an method<br/>
  * <code>on(MessageType message)</code><br/>
  * for each type of message that it reacts to.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Behavior {    
-    
+public interface Behavior {
+
     /**
      * Get the agent that exhibits this behavior.
-     * 
+     *
      * @return agent that exhibits this behavior.
      */
     public MessagingAgent getAgent();
-    
+
     /**
      * Initialize this behavior.
      */
     public void initialize();
-    
+
     /**
      * Get the dependencies of this behavior.
-     * 
+     *
      * @return list of the classes on which this behavior depends.
      */
     public Class[] getDependencies();
-    
+
     /**
      * Check if this behaviour uses promiscuous mode to receive messages.
-     * 
+     *
      * Behaviors on promiscuous mode receive all messages that arrive to the
      * agent, even if they are not the intended recipient of the message.<br/>
      * Behavoirs on normal (non-promiscuous) mode drop all messages that have
      * an intended recipient set and it is different than themselves.
-     * 
-     * @see Message#getRecipient() 
+     *
+     * @see Message#getRecipient()
      * @return True if this is a promiscuous behavior, or False otherwise.
      */
     public boolean isPromiscuous();
-    
+
     /**
      * Implements actions to be performed by this behavior *before* receiving
      * any messages from the current iteration.
      */
     public void beforeMessages();
-    
+
     /**
      * Implements action to be performed *after* receiving all the messages
      * from the current iteration.
      */
     public void afterMessages();
-    
+
 }

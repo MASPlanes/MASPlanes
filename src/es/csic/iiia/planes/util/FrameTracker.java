@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,30 +40,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Delays execution of a thread to achieve the desired frames per second.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class FrameTracker {
-    
+
     private long lastTime = System.nanoTime();
-    private int counter = 0;
-    private String identifier;
     public final Object lock = new Object();
-    
-    public FrameTracker(String identifier) {
-        this.identifier = identifier;
-    }
-    
-    public void tick() {
-        counter += 1;
-        final long time = System.nanoTime();
-        if (time-lastTime > 10e9) {
-            Logger.getLogger(FrameTracker.class.getName()).log(Level.INFO, "{0} rate: {1}fps.", new Object[]{identifier, counter});
-            counter = 0;
-            lastTime = time;
-        }
-    }
-    
+
+    public FrameTracker() {}
+
     private long calibrateIter() {
         long t1 = System.nanoTime();
         try {
@@ -74,7 +61,11 @@ public class FrameTracker {
         long t2 = System.nanoTime();
         return t2 - t1;
     }
-    
+
+    /**
+     * Calibrates this frame tracker, computing the minimum number of
+     * nanoseconds taken by a <em>sleep()<em> call.
+     */
     public void calibrate() {
         double avg = calibrateIter();
         long min = (long)avg;
@@ -87,15 +78,21 @@ public class FrameTracker {
         }
         System.err.println("Sleep nanoseconds: " + min + "/" + avg + "/" + max);
     }
-    
+
     private double avg = 1;
+
+    /**
+     * Delays the execution of this thread, trying to achieve the given ratio
+     * of executions per second.
+     *
+     * @param ratio of executions per second that we want to accomplish.
+     */
     public void delay(int ratio) {
         final long time = System.nanoTime();
         final long remainder = (long)Math.max(0,1e9/ratio - (time - lastTime));
-        
+
         avg = remainder*0.1 + avg*0.9;
-        counter += 1;
-        
+
         try {
             final long milis = (long)(remainder/1e6);
             final int  nanos = (int)(remainder%1e6);
@@ -119,9 +116,9 @@ public class FrameTracker {
         } catch (InterruptedException ex) {
             Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        
+
+
         lastTime = System.nanoTime();
     }
-    
+
 }

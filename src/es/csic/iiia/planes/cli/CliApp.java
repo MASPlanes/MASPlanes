@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -41,27 +41,25 @@ import es.csic.iiia.planes.DefaultFactory;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.gui.GUIFactory;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Actual object in charge of executing the simulation.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class CliApp {
-    
+
     private final Configuration config;
-    
+
     /**
      * Default constructor.
-     * 
+     *
      * @param configuration with which the simulator will run.
      */
     public CliApp(Configuration configuration) {
         this.config = configuration;
     }
-   
+
     /**
      * Runs a simulation.
      * <p/>
@@ -70,7 +68,7 @@ public class CliApp {
      *   <li>Create either a {@link DefaultFactory} (no gui option set) or a
      *       {@link GUIFactory} (gui option set).</li>
      *   <li>Create a new {@link World} using that factory.</li>
-     *   <li>Initialize the world by calling 
+     *   <li>Initialize the world by calling
      *       {@link World#init(es.csic.iiia.planes.definition.DProblem) }</li>
      *   <li>Launching the world in its own thread</li>
      * </ol>
@@ -82,11 +80,11 @@ public class CliApp {
         } else {
             f = new DefaultFactory(config);
         }
-        
+
         World world = f.buildWorld();
-        
+
         world.init(config.problemDefinition);
         new Thread(world).start();
     }
-    
+
 }

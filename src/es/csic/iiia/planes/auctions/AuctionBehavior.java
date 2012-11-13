@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -51,51 +51,51 @@ import java.util.logging.Logger;
 
 /**
  * Implements the auctioning and replying behavior for AuctionPlanes.
- * 
+ *
  * <strong>TODO:</strong> Study how could we improve the situation for recharging planes.
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class AuctionBehavior extends AbstractBehavior {
-    
+
     private static final Logger LOG = Logger.getLogger(AuctionBehavior.class.getName());
-    
+
     private Map<Task, List<BidMessage>> bids = new TreeMap<Task, List<BidMessage>>();
-    
+
     private NeighborTracking neighborTracker;
-    
+
     private boolean taskChanges;
 
     /**
      * Builds an auctioning behavior for the given agent.
-     * 
+     *
      * @param agent that will display this behavior.
      */
     public AuctionBehavior(AuctionPlane agent) {
         super(agent);
     }
-    
+
     @Override
     public Class[] getDependencies() {
         return new Class[]{NeighborTracking.class};
     }
-    
+
     @Override
     public void initialize() {
         super.initialize();
         neighborTracker = getAgent().getBehavior(NeighborTracking.class);
     }
-    
+
     /**
      * Return False because this behaviour is <em>not</em> promiscuous (we do
      * not want to receive any messages that are intended for others).
-     * 
+     *
      * @return False.
      */
     @Override
     public boolean isPromiscuous() {
         return false;
     }
-    
+
     @Override
     public AuctionPlane getAgent() {
         return (AuctionPlane)super.getAgent();
@@ -106,19 +106,19 @@ public class AuctionBehavior extends AbstractBehavior {
         bids.clear();
         taskChanges = false;
     }
-    
+
     /**
      * React to a bid message.
      * <p/>
      * Bids are stored to be processed at the end of this step, so that all
      * bids are accounted for before picking the winner.
-     * 
-     * @see #afterMessages() 
+     *
+     * @see #afterMessages()
      * @param bid being received.
      */
     public void on(BidMessage bid) {
         final Task task = bid.getTask();
-        
+
         // Ignore this bid if the bidder may be out of communications range
         if (!neighborTracker.isNeighbor(bid.getSender())) {
             if (LOG.isLoggable(Level.FINEST)) {
@@ -127,12 +127,12 @@ public class AuctionBehavior extends AbstractBehavior {
             }
             return;
         }
-        
+
         if (LOG.isLoggable(Level.FINEST)) {
             LOG.log(Level.FINEST, "{0} accepted bid for {1} from {2}, offer: {3}",
                     new Object[]{getAgent(), task.getId(), getSenderID(bid), bid.getPrice()});
         }
-        
+
         List<BidMessage> tbids = bids.get(task);
         if (tbids == null) {
             tbids = new ArrayList<BidMessage>();
@@ -140,40 +140,40 @@ public class AuctionBehavior extends AbstractBehavior {
         }
         tbids.add(bid);
     }
-    
+
     public void on(WinnerMessage win) {
         getAgent().addTask(win.getTask());
-        
+
         if (LOG.isLoggable(Level.FINER)) {
             LOG.log(Level.FINER, "{0} wins task {1}", new Object[]{getAgent(), win.getTask().getId()});
         }
     }
-    
+
     public void on(AskMessage ask) {
         final AuctionPlane agent = getAgent();
         double offer = agent.getOffer(ask.getTask());
-        
+
         if (LOG.isLoggable(Level.FINEST)) {
             LOG.log(Level.FINEST, "Plane {0} bid for {1}: {2}", new Object[]{agent.getId(), ask.getTask().getId(), offer});
         }
-        
+
         Message bid = new BidMessage(ask.getTask(), offer);
         bid.setRecipient(ask.getSender());
         agent.send(bid);
     }
-    
+
     @Override
     public void afterMessages() {
         processBids();
         beginAuctions();
     }
-    
-    private void processBids() {    
+
+    private void processBids() {
         for (Task t : bids.keySet()) {
             doAuction(t);
         }
     }
-    
+
     private void doAuction(Task t) {
         final AuctionPlane agent = getAgent();
         double baseCost = agent.getLocation().distance(t.getLocation());
@@ -182,7 +182,7 @@ public class AuctionBehavior extends AbstractBehavior {
         if (winner != null) {
 
             if (LOG.isLoggable(Level.FINER)) {
-                LOG.log(Level.FINER, "{0} loses task {1} to {2} ({3} vs {4})", 
+                LOG.log(Level.FINER, "{0} loses task {1} to {2} ({3} vs {4})",
                         new Object[]{agent, t.getId(), getSenderID(winner),
                         baseCost, winner.getPrice()});
             }
@@ -194,7 +194,7 @@ public class AuctionBehavior extends AbstractBehavior {
 
         }
     }
-    
+
     private static BidMessage computeWinner(double baseCost, List<BidMessage> bids) {
         BidMessage winner = null;
         double minCost = baseCost;
@@ -209,27 +209,27 @@ public class AuctionBehavior extends AbstractBehavior {
 
     private void beginAuctions() {
         final Plane agent = getAgent();
-        
+
         // Auction our tasks every minute
         if (agent.getWorld().getTime() % 100 == 1) {
             for(Task t : agent.getTasks()) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.log(Level.FINEST, "{0} auctioning task {1}", new Object[]{agent, t.getId()});
                 }
-                
+
                 AskMessage ask = new AskMessage(t);
                 agent.send(ask);
             }
         }
-    }   
-    
+    }
+
     private static int getSenderID(AuctionMessage m) {
         MessagingAgent sender = m.getSender();
         if (!(sender instanceof AuctionPlane)) {
             throw new ClassCastException();
         }
-        
+
         return ((AuctionPlane)sender).getId();
     }
-    
+
 }

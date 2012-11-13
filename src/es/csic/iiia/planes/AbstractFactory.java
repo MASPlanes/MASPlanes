@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -45,28 +45,28 @@ import java.util.logging.Logger;
 /**
  * Skeletal implementation of a Factory to minimize the effort required to build
  * an actual factory.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractFactory implements Factory {
     private static final Logger LOG = Logger.getLogger(AbstractFactory.class.getName());
-    
+
     private final Configuration config;
-    
+
     /**
      * World being used in the current simulation.
-     * 
+     *
      * This *must* be set by the concrete Factory class when implementing the
      * {@link Factory#buildWorld() } method.
-     * 
-     * @see Factory#buildWorld() 
+     *
+     * @see Factory#buildWorld()
      */
     protected World world;
-    
+
     public AbstractFactory(Configuration config) {
         this.config = config;
     }
-    
+
     @Override
     public Configuration getConfiguration() {
         return config;
@@ -109,12 +109,12 @@ public abstract class AbstractFactory implements Factory {
 
     /**
      * Initializes an element.
-     * 
+     *
      * @param element to initialize.
      */
     protected void initialize(Element element) {
         element.setWorld(world);
         element.initialize();
     }
-    
+
 }

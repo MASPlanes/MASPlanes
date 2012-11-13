@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -46,19 +46,19 @@ import es.csic.iiia.planes.messaging.Message;
  * Auction messages always carry the (single) task that they are referring to,
  * so the burden of keeping track of that is handled at this base level, instead
  * of repeating that code on each message.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AuctionMessage extends AbstractMessage {
-    
+
     /**
      * Task that this message refers to.
      */
     private final Task task;
-        
+
     /**
      * Build a new winner message.
-     * 
+     *
      * @see Message#getRecipient()
      * @param task that this message refers to.
      */
@@ -68,11 +68,11 @@ public abstract class AuctionMessage extends AbstractMessage {
 
     /**
      * Get the task that this message refers to.
-     * 
+     *
      * @return task that this message refers to.
      */
     public Task getTask() {
         return task;
     }
-    
+
 }

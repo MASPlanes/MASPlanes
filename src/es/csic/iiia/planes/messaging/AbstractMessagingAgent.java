@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -56,53 +56,53 @@ import org.apache.commons.collections.map.MultiKeyMap;
  * <p/>
  * Agents using this implementation must react to received messages by using
  * {@link Behavior}s.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractMessagingAgent extends AbstractPositionedElement
     implements MessagingAgent
 {
     private static final Logger LOG = Logger.getLogger(AbstractMessagingAgent.class.getName());
-    
+
     /**
      * Agent speed in meters per second
      */
     private double speed = 0;
-    
+
     /**
      * The communication radius.
      */
     private double communicationRange;
-    
+
     /**
      * Messages received in the previous iteration, available at the current
      * time.
      */
     private List<Message> currentMessages;
-    
+
     /**
      * Messages received in this iteration, that will not be available until
      * the next one.
      */
     private List<Message> futureMessages;
-    
+
     /**
      * The list of behaviors of this agent.
      */
     private List<Behavior> behaviors;
-    
+
     /**
      * Flag to prevent nodes from adding behaviors after being initialized.
      */
     private boolean initialized = false;
-    
+
     public AbstractMessagingAgent(Location location) {
         super(location);
         currentMessages = new ArrayList<Message>();
         futureMessages = new ArrayList<Message>();
         behaviors = new ArrayList<Behavior>();
     }
-    
+
     @Override
     public void initialize() {
         // Compute the behavior ordering from the declared dependencies
@@ -110,7 +110,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         for (Behavior v : behaviors) {
             d.add(v.getClass(), v.getDependencies());
         }
-        
+
         // Get an ordered list of behavior classes, and construct a new
         // (ordered) list of behavior objects.
         List<Behavior> newBehaviors = new ArrayList<Behavior>(behaviors.size());
@@ -119,17 +119,17 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
             b.initialize();
             newBehaviors.add(b);
         }
-        
+
         behaviors = newBehaviors;
     }
-    
+
     /**
      * Add a new behavior to the agent.
-     * 
+     *
      * Every time a message is being received (which always happens during the
      * {@link #step() } execution), any behavior that implements a handler
      * of the specific type of the message will be triggered.
-     * 
+     *
      * @param behavior to be added.
      */
     protected void addBehavior(Behavior behavior) {
@@ -138,7 +138,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         }
         behaviors.add(behavior);
     }
-    
+
     /**
      * Get the list of behaviors.
      * @return list of behaviors of this agent.
@@ -146,10 +146,10 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
     protected List<Behavior> getBehaviors() {
         return Collections.unmodifiableList(behaviors);
     }
-    
+
     /**
      * Get the behavior that implements a specific class.
-     * 
+     *
      * @return behavior that implements the given class.
      */
     public <T extends Behavior> T getBehavior(Class<T> behaviorClass) {
@@ -160,7 +160,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         }
         return null;
     }
-    
+
     @Override
     public double getSpeed() {
         return speed;
@@ -175,7 +175,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
     public double getCommunicationRange() {
         return communicationRange;
     }
-    
+
     @Override
     public void setCommunicationRange(double range) {
         this.communicationRange = range;
@@ -199,32 +199,32 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         currentMessages = futureMessages;
         futureMessages = tmp;
     }
-    
+
     /**
      * Call the message handler for each message received in the previous
      * iteration.
      */
     @Override
     public void step() {
-        
+
         for (Behavior b : behaviors) {
             b.beforeMessages();
         }
-        
+
         dispatchMessages();
-        
+
         for (Behavior b : behaviors) {
             b.afterMessages();
         }
-        
+
     }
-    
+
     @Override
     public void send(Message message) {
         message.setSender(this);
         getWorld().sendMessage(message);
     }
-    
+
     private void dispatchMessages() {
         for (Behavior b : behaviors) {
             for (Message m : currentMessages) {
@@ -232,20 +232,20 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
             }
         }
     }
-    
+
     private static MultiKeyMap cache = new MultiKeyMap();
-    
+
     private void handle(Behavior b, Message m) {
         final Class bClass = b.getClass();
         final Class mClass = m.getClass();
-        
-        // Skip messages intended for other agents if the behavior is not 
+
+        // Skip messages intended for other agents if the behavior is not
         // promiscuous (@see Behavior#isPromiscuous())
         if (!b.isPromiscuous() && m.getRecipient() != null
                 && m.getRecipient() != this) {
             return;
         }
-        
+
         // Memoize the method
         Method method = null;
         if (cache.containsKey(bClass, mClass)) {
@@ -257,32 +257,32 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
             }
             cache.put(bClass, mClass, method);
         }
-        
+
         if (method == null) {
             return;
         }
-        
+
         // Invoke it
         try {
             method.invoke(b, m);
         } catch (IllegalAccessException ex) {
             LOG.log(Level.SEVERE, null, ex);
         } catch (IllegalArgumentException ex) {
-            LOG.log(Level.SEVERE, "Error invoking " + method.toGenericString() 
+            LOG.log(Level.SEVERE, "Error invoking " + method.toGenericString()
                     + " on " + b + " with argument " + m, ex);
         } catch (InvocationTargetException ex) {
             Throwable throwable = ex.getTargetException();
-            if (throwable instanceof Error) { 
-                throw (Error) throwable; 
-            } else if(throwable instanceof RuntimeException) { 
-                throw (RuntimeException) throwable; 
+            if (throwable instanceof Error) {
+                throw (Error) throwable;
+            } else if(throwable instanceof RuntimeException) {
+                throw (RuntimeException) throwable;
             }
             LOG.log(Level.SEVERE, null, throwable);
         }
     }
-    
-    private static Method getMethod(Class<? extends Behavior> bclass, 
-            Class<? extends Message> mclass) 
+
+    private static Method getMethod(Class<? extends Behavior> bclass,
+            Class<? extends Message> mclass)
     {
         Method m = null;
         try {
@@ -297,5 +297,5 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         }
         return m;
     }
-    
+
 }

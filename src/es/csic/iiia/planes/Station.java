@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -47,28 +47,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Recharging station, where planes can go to refill their batteries.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class Station extends AbstractPositionedElement implements Drawable {
-    
+
     final private static AtomicInteger idGenerator = new AtomicInteger();
     final int id = idGenerator.incrementAndGet();
-   
+
     /**
      * Default constructor.
-     * 
+     *
      * Builds a recharge station at the given position.
-     * 
+     *
      * @param position where this station is placed.
      */
     public Station(Location position) {
         super(position);
     }
-    
+
     @Override
     public void initialize() {}
-    
+
     @Override
     public void draw(Graphics2D g) {
         int x = getLocation().getXInt();
@@ -76,26 +76,26 @@ public class Station extends AbstractPositionedElement implements Drawable {
         Color previousColor = g.getColor();
         Stroke previousStroke = g.getStroke();
         AffineTransform previousTransform = g.getTransform();
-        
+
         // The background circle
         g.setColor(Color.DARK_GRAY);
         g.setStroke(new BasicStroke(40f));
         g.fillOval(x-250,y-250,500,500);
-        
+
         // The inner circle
         g.setColor(new Color(255,210,0));
         g.drawOval(x-190, y-190, 380, 380);
-        
+
         // The power graphic
         AffineTransform t = new AffineTransform(previousTransform);
         t.translate(x-250, y-250);
         t.scale(500, 500);
         g.setTransform(t);
         g.fill(StationGraphic.getImage());
-        
+
         g.setTransform(previousTransform);
         g.setColor(previousColor);
         g.setStroke(previousStroke);
     }
-    
+
 }

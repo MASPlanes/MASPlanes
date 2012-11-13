@@ -1,28 +1,28 @@
 /*
  * Software License Agreement (BSD License)
- * 
+ *
  * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
  * All rights reserved.
- * 
+ *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
  * are met:
- * 
+ *
  *   Redistributions of source code must retain the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer.
- * 
+ *
  *   Redistributions in binary form must reproduce the above
  *   copyright notice, this list of conditions and the
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
- * 
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
  *   IIIA-CSIC, Artificial Intelligence Research Institute
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -58,31 +58,31 @@ import javax.swing.event.ChangeListener;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Display extends JFrame {
-    
+
     private static int DEFAULT_WIDTH = 500;
     private static int DEFAULT_HEIGHT = 500;
-    
+
     private int insetsVertical;
     private int insetsHorizontal;
     private GUIWorld world;
     private DisplayPane displayPane;
     private JLabel time;
-    
+
     public Display(GUIWorld w) {
         this.world = w;
         Dimension d = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
-        
+
         displayPane = new DisplayPane(world);
         displayPane.setPreferredSize(d);
         JPanel root = new JPanel(new BorderLayout());
         root.add(displayPane, BorderLayout.CENTER);
         this.setContentPane(root);
-        
+
         JPanel top = new JPanel(new FlowLayout());
         JLabel l = new JLabel("Speed: ");
         top.add(l);
         JSlider s = new JSlider(1, 50, 25);
-        
+
         s.addChangeListener(new ChangeListener() {
 
             @Override
@@ -95,17 +95,17 @@ public class Display extends JFrame {
                     world.setSpeed(speed);
                 }
             }
-            
+
         });
-        
+
         top.add(s);
         time = new JLabel("Time: ");
         top.add(time);
         root.add(top, BorderLayout.NORTH);
-        
+
         this.pack();
         this.setVisible(true);
-        
+
         System.err.println("Insets: " + this.getInsets());
         Insets insets = this.getInsets();
         insetsVertical = insets.bottom + insets.top;
@@ -119,12 +119,12 @@ public class Display extends JFrame {
             System.exit(0);
           }
         });
-        
+
         this.addComponentListener(new ComponentAdapter() {
 
             @Override
             public void componentResized(ComponentEvent ce) {
-        
+
                 // Bloquegem l'aspect ratio
                 Dimension d  = Display.this.getSize();
                 int width = d.width;
@@ -137,16 +137,16 @@ public class Display extends JFrame {
                 } else if (ratio < 1) {
                   Display.this.setSize(width, (int)(height*ratio));
                 }
-                
+
                 super.componentResized(ce);
                 Dimension dim = Display.this.getContentPane().getSize();
                 System.err.println(dim);
             }
-            
+
         });
-        
+
     }
-    
+
     public Dimension getDisplayDimension() {
         return displayPane.getSize();
     }

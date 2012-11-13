@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,35 +40,35 @@ import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**
  * Skeletal implementation of a behavior.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractBehavior implements Behavior {
-    
+
     private MessagingAgent agent;
 
     /**
      * Builds a new behavior.
-     * 
+     *
      * @param agent that will exhibit this behavior.
      */
     public AbstractBehavior(MessagingAgent agent) {
         this.agent = agent;
     }
-    
+
     @Override
     public Class[] getDependencies() {
         return new Class[0];
     }
-    
+
     @Override
     public void initialize() {
-        
+
     }
 
     @Override
     public MessagingAgent getAgent() {
         return agent;
     }
-    
+
 }

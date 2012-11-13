@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -52,28 +52,28 @@ import javax.swing.SwingUtilities;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class DisplayPane extends JPanel {
-    
+
     private GUIWorld world;
     private Image lastImage;
 
     public DisplayPane(GUIWorld w) {
         world = w;
-        
+
         this.addMouseListener(new MouseListener() {
 
             @Override
             public void mouseClicked(final MouseEvent me) {
-                
+
             }
 
             @Override
             public void mousePressed(MouseEvent me) {
-                
+
             }
 
             @Override
             public void mouseReleased(final MouseEvent me) {
-                
+
                 SwingUtilities.invokeLater(new Runnable() {
 
                     @Override
@@ -86,7 +86,7 @@ class DisplayPane extends JPanel {
                         synchronized(world.ftracker.lock) {
                             world.ftracker.lock.notify();
                         }
-                        
+
                         // If no plane is selected, try to find a task to give its information
                         if (p == null) {
                             Task t = world.getTaskAt(l);
@@ -94,36 +94,36 @@ class DisplayPane extends JPanel {
                                 System.err.println(t);
                             }
                         }
-                        
+
 //                        System.err.println(me);
 //                        System.err.println("Click at " + l.getXInt() + "," + l.getYInt());
                     }
                 });
-                
+
             }
 
             @Override
             public void mouseEntered(MouseEvent me) {
-                
+
             }
 
             @Override
             public void mouseExited(MouseEvent me) {
-                
+
             }
         });
     }
-    
+
     @Override
     public void paint(Graphics grphcs) {
         Image img = world.graphicsQueue.poll();
         if (img != null) {
             lastImage = img;
         }
-        
+
         if (lastImage != null) {
             grphcs.drawImage(lastImage, 0, 0, null);
         }
     }
-    
+
 }

@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -43,15 +43,15 @@ import java.util.List;
  * Dummy plane that simply heads toward the nearest task among the ones it has
  * been assigned. This plane never communicates with its teammates, so they
  * never exchange tasks.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DefaultPlane extends AbstractPlane {
-    
+
     public DefaultPlane(Location location) {
         super(location);
     }
-    
+
     @Override
     public void initialize() {}
 
@@ -61,22 +61,22 @@ public class DefaultPlane extends AbstractPlane {
      * In this case, next task selection is handled by the task deletion
      * trigger that is also fired whenever a task is completed (and thus
      * removed from the agent).
-     * 
+     *
      * @param t task being completed.
      */
     @Override
     protected void taskCompleted(Task t) {}
-    
+
     @Override
     protected void taskAdded(Task t) {
         setNextTask(getNearestTask());
     }
-    
+
     @Override
     protected void taskRemoved(Task t) {
         setNextTask(getNearestTask());
     }
-    
+
     @Override
     public List<Location> getPlannedLocations() {
         List<Location> plannedLocations = new ArrayList<Location>();
@@ -89,26 +89,26 @@ public class DefaultPlane extends AbstractPlane {
             nextLocation = next.getLocation();
             plannedLocations.add(nextLocation);
         }
-        
+
         return plannedLocations;
     }
-    
+
     /**
      * Retrieve the nearest task among the ones owned by this plane
-     * 
+     *
      * @return nearest task
      */
     private Task getNearestTask() {
         return getNearest(getLocation(), getTasks());
     }
-    
+
     /**
      * Retrieve the task from the candidates list that is nearest to the given
      * position
-     * 
+     *
      * @param position
      * @param candidates
-     * @return 
+     * @return
      */
     private static Task getNearest(Location position, List<Task> candidates) {
         double max = Double.MAX_VALUE;
@@ -120,8 +120,8 @@ public class DefaultPlane extends AbstractPlane {
                 result = candidate;
             }
         }
-        
+
         return result;
     }
-    
+
 }

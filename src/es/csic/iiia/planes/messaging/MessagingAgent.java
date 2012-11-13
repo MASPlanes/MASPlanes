@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -41,53 +41,53 @@ import es.csic.iiia.planes.Positioned;
 
 /**
  * An {@link Agent} that communicates with other agents using message passing.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface MessagingAgent extends Agent, Positioned {
-    
+
     /**
      * Get the communication range of this agent.
-     * 
+     *
      * The communication range of an agent defines the furthest distance (in
      * meters) at which it is able to send messages.
-     * 
+     *
      * @return communication range of this agent.
      */
     public double getCommunicationRange();
-    
+
     /**
      * Set the communication range of this agent.
-     * 
-     * @see #getCommunicationRange() 
+     *
+     * @see #getCommunicationRange()
      * @param range communication range.
      */
     public void setCommunicationRange(double range);
-    
+
     /**
      * Get the speed at which this agent moves (in meters per second).
      * @return speed at which this agent moves.
      */
     public double getSpeed();
-    
+
     /**
      * Set the speed at which this agent moves.
-     * @param speed 
+     * @param speed
      */
     public void setSpeed(double speed);
-    
+
     /**
      * Send a message.
      */
     public void send(Message message);
-    
+
     /**
      * Receive a message issued by another agent.
-     * 
+     *
      * Since this is a synchronous platform, the messages must be stored
      * so that they are <strong>not</strong> available to the agent
      * until at least the next iteration (second).
      */
     public void receive(Message message);
-    
+
 }

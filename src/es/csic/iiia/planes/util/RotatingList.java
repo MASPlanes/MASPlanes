@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -40,22 +40,22 @@ import java.util.AbstractList;
 
 /**
  * Circular buffer of fixed capacity.
- * 
+ *
  * At first, the buffer just fills as normal. Once {@link #capacity} elements
  * have been inserted, adding a new element drops the oldest one.
- * 
+ *
  * The default iterator goes through the buffer starting on the oldest element
  * and finishing on the last inserted one.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class RotatingList<T> extends AbstractList<T> {
-    
+
     private final T[] elements;
     private int capacity;
     private int size;
     private int next;
-    
+
     public RotatingList(int capacity) {
         this.capacity = capacity;
         elements = (T[])new Object[capacity];
@@ -104,5 +104,5 @@ public class RotatingList<T> extends AbstractList<T> {
         }
         return elements[idx];
     }
-    
+
 }

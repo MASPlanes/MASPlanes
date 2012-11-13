@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -38,16 +38,16 @@ package es.csic.iiia.planes.messaging;
 
 /**
  * Skeletal implementation of a message.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractMessage implements Message {
-    
+
     /**
      * Get the message's sender.
      */
     private MessagingAgent sender;
-    
+
     /**
      * Get the message's recipient.
      */
@@ -62,7 +62,7 @@ public abstract class AbstractMessage implements Message {
     public void setRecipient(MessagingAgent recipient) {
         this.recipient = recipient;
     }
-    
+
     @Override
     public MessagingAgent getSender() {
         return sender;
@@ -72,5 +72,5 @@ public abstract class AbstractMessage implements Message {
     public MessagingAgent getRecipient() {
         return recipient;
     }
-    
+
 }

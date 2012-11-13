@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -54,7 +54,7 @@ public class Nearest implements OperatorStrategy {
     public void submitTask(World w, Task t) {
         final List<Plane> planes = w.getPlanes();
         Location l = t.getLocation();
-        
+
         double mind = Double.MAX_VALUE;
         Plane nearest = null;
         for (Plane p : planes) {
@@ -66,5 +66,5 @@ public class Nearest implements OperatorStrategy {
         }
         nearest.addTask(t);
     }
-    
+
 }

@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -39,30 +39,30 @@ package es.csic.iiia.planes;
 /**
  * Default implementation of a World, to be used when running on a command
  * line (batch) interface.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DefaultWorld extends AbstractWorld {
-    
+
     /**
      * Whether we run in quiet mode or not.
-     * 
+     *
      * @see Configuration#quiet
      */
     private boolean quiet;
-    
+
     /**
      * Builds a new world, whose elements will be created by the given factory.
-     * 
-     * @param factory 
+     *
+     * @param factory
      */
     public DefaultWorld(Factory factory) {
-        super(factory); 
+        super(factory);
     }
-    
+
     /**
      * Check if this world runs in quiet mode.
-     * 
+     *
      * @see Configuration#quiet
      * @return whether quiet mode is set.
      */
@@ -72,7 +72,7 @@ public class DefaultWorld extends AbstractWorld {
 
     /**
      * Set the world in quiet/verbose mode.
-     * 
+     *
      * @see Configuration#quiet
      * @param quiet true to enable quiet mode, false to disable it.
      */
@@ -96,5 +96,5 @@ public class DefaultWorld extends AbstractWorld {
             }
         }
     }
-    
+
 }
