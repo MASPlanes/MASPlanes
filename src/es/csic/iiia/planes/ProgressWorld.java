@@ -36,24 +36,96 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.util.FrameTracker;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 /**
  * Default implementation of a World, to be used when running on a command
- * line (batch) interface.
+ * line (interactive) interface.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class DefaultWorld extends AbstractWorld {
+public class ProgressWorld extends AbstractWorld {
+
+    /**
+     * Queue used to hold percentages of completion until they are ready
+     * to be displayed.
+     */
+    private ConcurrentLinkedQueue<Double> progressQueue =
+            new ConcurrentLinkedQueue<Double>();
+
+    /**
+     * Runnable that will keep printing the progress
+     */
+    private ShowProgress progress = new ShowProgress();
+
+    private final FrameTracker ftracker = new FrameTracker();
 
     /**
      * Builds a new world, whose elements will be created by the given factory.
      *
      * @param factory
      */
-    public DefaultWorld(Factory factory) {
+    public ProgressWorld(Factory factory) {
         super(factory);
     }
 
     @Override
-    public void displayStep() {}
+    public void init(DProblem d) {
+        super.init(d);
+
+        // ftracker.calibrate(); this may be used some day...
+        new Thread(progress).start();
+    }
+
+    @Override
+    public void run() {
+        super.run();
+
+        progressQueue.clear();
+        progress.stop();
+    }
+
+    /**
+     * Shows the simulation progress.
+     * <p/>
+     * In this case, a percentage of completion is updated in stderr unless
+     * quiet mode is specified in the command line.
+     */
+    @Override
+    public void displayStep() {
+
+        if (progressQueue.isEmpty()) {
+            final Double percent = getTime()*100 / (double)duration;
+            progressQueue.add(percent);
+        }
+
+    }
+
+    private class ShowProgress implements Runnable {
+
+        private boolean stop = false;
+
+        private synchronized void stop() {
+            this.stop = true;
+        }
+
+        private synchronized boolean isStop() {
+            return stop;
+        }
+
+        @Override
+        public void run() {
+            while (!isStop()) {
+                final Double percent = progressQueue.poll();
+                if (percent != null) {
+                    System.err.print(String.format("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\bCompleted: %6.2f%%", percent));
+                }
+                ftracker.delay(24);
+            }
+        }
+
+    }
 
 }

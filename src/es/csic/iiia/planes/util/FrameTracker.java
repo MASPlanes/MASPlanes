@@ -45,6 +45,7 @@ import java.util.logging.Logger;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class FrameTracker {
+    private static final Logger LOG = Logger.getLogger(FrameTracker.class.getName());
 
     private long lastTime = System.nanoTime();
     public final Object lock = new Object();
@@ -67,16 +68,16 @@ public class FrameTracker {
      * nanoseconds taken by a <em>sleep()<em> call.
      */
     public void calibrate() {
-        double avg = calibrateIter();
-        long min = (long)avg;
-        long max = (long)avg;
+        double lavg = calibrateIter();
+        long min = (long)lavg;
+        long max = (long)lavg;
         for (int i=1; i<1000; i++) {
             final long x = calibrateIter();
-            avg += (x - avg)/i+1;
+            lavg += (x - lavg)/i+1;
             min = Math.min(min, x);
             max = Math.max(x, max);
         }
-        System.err.println("Sleep nanoseconds: " + min + "/" + avg + "/" + max);
+        LOG.log(Level.SEVERE, "Sleep nanoseconds: {0}/{1}/{2}", new Object[]{min, lavg, max});
     }
 
     private double avg = 1;

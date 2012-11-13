@@ -86,7 +86,7 @@ public class GUIWorld extends AbstractWorld {
 
     @Override public void init(DProblem d) {
         super.init(d);
-        ftracker.calibrate();
+        //ftracker.calibrate(); this may be used some day.
     }
 
     @Override

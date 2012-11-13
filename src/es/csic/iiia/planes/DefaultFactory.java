@@ -52,11 +52,14 @@ public class DefaultFactory extends AbstractFactory {
      * Builds a {@link DefaultWorld}.
      */
     @Override
-    public DefaultWorld buildWorld() {
-        DefaultWorld w = new DefaultWorld(this);
-        w.setQuiet(getConfiguration().quiet);
-        world = w;
-        return w;
+    public World buildWorld() {
+        if (getConfiguration().quiet) {
+            world = new DefaultWorld(this);
+        } else {
+            world = new ProgressWorld(this);
+        }
+
+        return world;
     }
 
 }
