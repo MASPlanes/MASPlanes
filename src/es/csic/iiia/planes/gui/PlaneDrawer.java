@@ -88,6 +88,9 @@ public class PlaneDrawer implements Drawable {
     
     private void drawFutureLocations(Graphics2D g) {
         List<Location> plannedLocations = plane.getPlannedLocations();
+        if (plannedLocations == null || plannedLocations.isEmpty()) {
+            return;
+        }
         
         /*** Future locations */
         GeneralPath p = new GeneralPath(GeneralPath.WIND_EVEN_ODD, plannedLocations.size()+1);
