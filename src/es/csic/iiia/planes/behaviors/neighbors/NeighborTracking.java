@@ -34,48 +34,75 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.behaviors;
+package es.csic.iiia.planes.behaviors.neighbors;
 
+import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.messaging.MessagingAgent;
-import java.util.LinkedHashSet;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
  * Implementation of a neighbor tracking behavior.
  * <p/>
- * This behavior guarantees that all planes considered as neighbors in the
- * current iteration will be in range in the next one.
+ * This behavior tracks neighbors when they get in and out of range.
+ * Additionally, it allows depending behaviors to require that other agents
+ * must be guaranteed to stay neighbors for a fixed number of iterations.
  *
- * @see #isNeighbor(es.csic.iiia.planes.messaging.MessagingAgent)
+ * @see #isNeighbor(es.csic.iiia.planes.messaging.MessagingAgent, int)
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class NeighborTracking extends AbstractBehavior {
     private static final Logger LOG = Logger.getLogger(NeighborTracking.class.getName());
 
-    private Set<MessagingAgent> oldNeighbors = new LinkedHashSet<MessagingAgent>();
-    private Set<MessagingAgent> neighbors = new LinkedHashSet<MessagingAgent>();
+    private NeighborsCollection neighbors = new NeighborsCollection();
 
+    /**
+     * Builds a new neighbor tracking behavior.
+     *
+     * @param agent exhibiting this behavior.
+     */
     public NeighborTracking(MessagingAgent agent) {
         super(agent);
     }
 
     /**
-     * Check if the given agent is a neighbor.
+     * Check if the given agent is a neighbor (and is guaranteed to receive
+     * any messages that we send him during this iteration)
      *
      * @param agent to check for.
      * @return True if the given agent is a neighbor, or False otherwise.
      */
     public boolean isNeighbor(MessagingAgent agent) {
+        return isNeighbor(agent, 1);
+    }
+
+    /**
+     * Check if the given agent will be a neighbor for at least
+     * <em>iterations</em> iterations.
+     *
+     * @param agent to check for.
+     * @return True if the given agent is a neighbor, or False otherwise.
+     */
+    public boolean isNeighbor(MessagingAgent agent, int iterations) {
         if (LOG.isLoggable(Level.FINEST)) {
-            LOG.log(Level.FINEST, "{2} checking if {0} is within my neighbor list: {1}",
-                    new Object[]{agent, neighbors, getAgent()});
+            LOG.log(Level.FINEST, "{2} checking if {0} will be neighbor for {1} iterations.",
+                    new Object[]{agent, getAgent(), iterations});
         }
 
-        return neighbors.contains(agent);
+        return neighbors.contains(agent, iterations);
+    }
+
+    /**
+     * Get the list of agents that are guaranteed to remain neighbors for at
+     * least <em>iterations</em> iterations.
+     *
+     * @param iterations required number of iterations.
+     * @return {@link Iterable} of agents that are guaranteed to remain neighbors.
+     */
+    public Iterable<MessagingAgent> getNeighbors(int iterations) {
+        return neighbors.get(iterations);
     }
 
     /**
@@ -91,9 +118,6 @@ public class NeighborTracking extends AbstractBehavior {
 
     @Override
     public void beforeMessages() {
-        Set<MessagingAgent> aux = oldNeighbors;
-        oldNeighbors = neighbors;
-        neighbors = aux;
         neighbors.clear();
     }
 
@@ -105,14 +129,18 @@ public class NeighborTracking extends AbstractBehavior {
     public void on(TrackingMessage m) {
         final MessagingAgent neighbor = m.getSender();
 
-        // The maximum distance on the next iteration is the current distance
-        // plus the maximum travel distance of each agent if they travelled on
-        // completely opposite directions.
+        // Compute the number of steps that the neighbor is guaranteed to still
+        // be in range.
         final double d = getAgent().getLocation().distance(neighbor.getLocation());
-        final double maxd = d + getAgent().getSpeed() + neighbor.getSpeed();
+        final double d_step = getAgent().getSpeed() + neighbor.getSpeed();
 
-        if (maxd < getAgent().getCommunicationRange()) {
-            neighbors.add(neighbor);
+        // The objective is max(n) s.t. d + d_step * n < comm_range
+        // we compute that as n=int(s) where s = (comm_range - d)/d_step
+        final double s = (getAgent().getCommunicationRange() - d) / d_step;
+        final int n = (int)s;
+
+        if (n > 0) {
+            neighbors.add(neighbor, n);
         }
     }
 
@@ -129,35 +157,8 @@ public class NeighborTracking extends AbstractBehavior {
     }
 
     /**
-     * Get the set of neighbors that have been added in the current iteration.
-     *
-     * @return set of recently added neighbors.
+     * Beacon message sent by agents that keep track of their neighbors.
      */
-    public Set<MessagingAgent> getAddedNeighbors() {
-        Set<MessagingAgent> result = new LinkedHashSet<MessagingAgent>();
-        for (MessagingAgent neighbor : neighbors) {
-            if (!oldNeighbors.contains(neighbor)) {
-                result.add(neighbor);
-            }
-        }
-        return result;
-    }
-
-    /**
-     * Get the set of neighbors that have just gone out of range.
-     *
-     * @return set of recently lost neighbors.
-     */
-    public Set<MessagingAgent> getRemovedNeighbors() {
-        Set<MessagingAgent> result = new LinkedHashSet<MessagingAgent>();
-        for (MessagingAgent neighbor : oldNeighbors) {
-            if (!neighbors.contains(neighbor)) {
-                result.add(neighbor);
-            }
-        }
-        return result;
-    }
-
     public class TrackingMessage extends AbstractMessage {}
 
 }

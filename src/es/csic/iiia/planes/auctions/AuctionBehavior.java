@@ -39,7 +39,7 @@ package es.csic.iiia.planes.auctions;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
-import es.csic.iiia.planes.behaviors.NeighborTracking;
+import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.util.ArrayList;
