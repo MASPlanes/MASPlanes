@@ -36,62 +36,50 @@
  */
 package es.csic.iiia.planes.maxsum;
 
-import es.csic.iiia.planes.Task;
-import java.util.Map;
-import java.util.TreeMap;
-
 /**
+ * Message sent from a function node to a variable node in the MS grpah.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSVariable {
+class Minimizer<T> {
+    private final double[] values;
+    private final Object[] objects;
 
-    private MSPlane plane;
-
-    private Map<Task, MSPlane> domain;
-    
-    private Minimizer<Task> minimizer;
-
-    private Map<Task, MSFunction2VariableMessage> lastMessages =
-            new TreeMap<Task, MSFunction2VariableMessage>();
-
-    public MSVariable(MSPlane plane) {
-        this.plane = plane;
+    public Minimizer() {
+        values = new double[2];
+        objects = new Object[2];
     }
 
-    public void update(Map<Task, MSPlane> domain) {
-       this.domain = domain;
-       
-       // Cleanup old messages
-       for (Task t : lastMessages.keySet()) {
-           if (!domain.containsKey(t)) {
-               lastMessages.remove(t);
-           }
-       }
+    public void reset() {
+        values[0] = Double.MIN_VALUE; values[1] = Double.MIN_VALUE;
+        objects[0] = null; objects[1] = null;
     }
 
-    public void gather() {
-        minimizer.reset();
-        
-        for (Task t : domain.keySet()) {
-            MSFunction2VariableMessage msg = lastMessages.get(t);
-            final double belief = plane.getCost(t) + msg.getValue();
-            minimizer.track(t, belief);
-        }
-    }
-
-    public void scatter() {
-        for (Task t : domain.keySet()) {
-            final double value = plane.getCost(t) - minimizer.getComplementary(t);
-            MSVariable2FunctionMessage msg = new MSVariable2FunctionMessage(t, value);
-            msg.setRecipient(domain.get(t));
-            plane.send(msg);
+    public double getComplementary(T t) {
+        if (t == objects[0]) {
+            return values[1];
         }
 
+        return values[0];
     }
 
-    public Task makeDecision() {
-        return minimizer.getBest();
+    public T getBest() {
+        return (T)objects[0];
+    }
+
+    public void track(T t, double value) {
+        if (value < values[0]) {
+            values[1]  = values[0];     values[0]  = value;
+            objects[1]   = objects[0];      objects[0]   = t;
+            return;
+        }
+
+        if (value < values[1]) {
+            values[1]  = value;
+            objects[1]   = t;
+            return;
+        }
+
     }
 
 }

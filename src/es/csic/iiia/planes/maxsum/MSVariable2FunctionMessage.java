@@ -46,13 +46,19 @@ import es.csic.iiia.planes.messaging.AbstractMessage;
 class MSVariable2FunctionMessage extends AbstractMessage {
 
     private final Task task;
+    private final double value;
 
-    MSVariable2FunctionMessage(Task t) {
+    MSVariable2FunctionMessage(Task t, double value) {
         task = t;
+        this.value = value;
     }
 
     public Task getTask() {
         return task;
+    }
+    
+    public double getValue() {
+        return value;
     }
 
 }

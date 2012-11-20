@@ -68,20 +68,22 @@ public class MSPlane extends AbstractPlane {
 
     public MSPlane(Location location) {
         super(location);
-//        addBehavior(new NeighborTracking(this));
-//        addBehavior(new MSGraphUpdating(this), NeighborTracking.class);
+        addBehavior(new NeighborTracking(this));
+        addBehavior(new MSUpdateGraphBehavior(this));
     }
 
     @Override
-    protected void taskCompleted(Task t) {
-    }
+    protected void taskCompleted(Task t) {}
 
     @Override
     protected void taskAdded(Task t) {
+        // These tasks should *not* show to others until the agreed iteration,
+        // should they?
     }
 
     @Override
     protected void taskRemoved(Task t) {
+        // Cleanup any actions done at taskAdded...
     }
 
     @Override

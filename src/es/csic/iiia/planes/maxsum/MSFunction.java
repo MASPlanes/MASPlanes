@@ -36,10 +36,49 @@
  */
 package es.csic.iiia.planes.maxsum;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class MSFunction {
+    
+    private MSPlane plane;
+    
+    public MSFunction(MSPlane plane) {
+        this.plane = plane;
+    }
 
+    private Map<MSPlane, MSVariable2FunctionMessage> lastMessages =
+            new HashMap<MSPlane, MSVariable2FunctionMessage>();
+    
+    private Minimizer<MSPlane> minimizer;
+    
+    public void gather() {
+        Set<MSPlane> neighbors = plane.getNeighbors();
+        for (MSPlane p : lastMessages.keySet()) {
+            
+            // Cleanup old messages
+            if (!neighbors.contains(p)) {
+                lastMessages.remove(p);
+                continue;
+            }
+            
+            final MSVariable2FunctionMessage msg = lastMessages.get(p);
+            minimizer.track(p, msg.getValue());
+        }
+    }
+    
+    public void scatter() {
+        for (MSPlane p : plane.getNeighbors()) {
+            double value = - minimizer.getComplementary(p);
+            final MSFunction2VariableMessage msg = new MSFunction2VariableMessage(value);
+            msg.setRecipient(p);
+            plane.send(msg);
+        }
+    }
+    
 }

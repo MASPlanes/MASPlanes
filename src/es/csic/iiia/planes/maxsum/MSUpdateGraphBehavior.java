@@ -40,18 +40,15 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.MessagingAgent;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class MSUpdateGraph extends AbstractBehavior {
+class MSUpdateGraphBehavior extends AbstractBehavior {
 
     private NeighborTracking tracker;
 
@@ -65,7 +62,7 @@ class MSUpdateGraph extends AbstractBehavior {
 
     final private MSPlane plane;
 
-    public MSUpdateGraph(MSPlane plane) {
+    public MSUpdateGraphBehavior(MSPlane plane) {
         super(plane);
         this.plane = plane;
         this.neighbors = plane.getNeighbors();
@@ -74,6 +71,11 @@ class MSUpdateGraph extends AbstractBehavior {
     @Override
     public boolean isPromiscuous() {
         return false;
+    }
+    
+    @Override
+    public Class[] getDependencies() {
+        return new Class[]{NeighborTracking.class};
     }
 
     @Override
