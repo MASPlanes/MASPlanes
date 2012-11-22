@@ -103,8 +103,8 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder();
-        buf.append("Task[").append(id).append("](").append(getLocation().getXInt())
-                .append(",").append(getLocation().getYInt()).append(")");
+        buf.append("Task[").append(id).append("](").append(getLocation().getX())
+                .append(",").append(getLocation().getY()).append(")");
         return buf.toString();
     }
 

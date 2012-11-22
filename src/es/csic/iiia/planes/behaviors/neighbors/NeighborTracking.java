@@ -67,6 +67,11 @@ public class NeighborTracking extends AbstractBehavior {
         super(agent);
     }
 
+    @Override
+    public Class[] getDependencies() {
+        return new Class[0];
+    }
+
     /**
      * Check if the given agent is a neighbor (and is guaranteed to receive
      * any messages that we send him during this iteration)
@@ -119,6 +124,7 @@ public class NeighborTracking extends AbstractBehavior {
     @Override
     public void beforeMessages() {
         neighbors.clear();
+        neighbors.add(getAgent(), Integer.MAX_VALUE);
     }
 
     /**
@@ -140,7 +146,12 @@ public class NeighborTracking extends AbstractBehavior {
         final int n = (int)s;
 
         if (n > 0) {
+            LOG.log(Level.FINE, "Adding {0} as a neighbor for {1} iterations.",
+                    new Object[]{neighbor, n});
             neighbors.add(neighbor, n);
+        } else {
+            LOG.log(Level.FINE, "Ignoring {0} as a neighbor.",
+                    new Object[]{neighbor});
         }
     }
 
@@ -159,6 +170,12 @@ public class NeighborTracking extends AbstractBehavior {
     /**
      * Beacon message sent by agents that keep track of their neighbors.
      */
-    public class TrackingMessage extends AbstractMessage {}
+    public class TrackingMessage extends AbstractMessage {
+
+        @Override
+        public String toString() {
+            return "TrackingMessage(" + getAgent() + ")";
+        }
+    }
 
 }

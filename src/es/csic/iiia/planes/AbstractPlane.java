@@ -52,7 +52,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public abstract class AbstractPlane extends AbstractMessagingAgent implements Plane {
+public abstract class AbstractPlane extends AbstractMessagingAgent
+    implements Plane, Comparable<Plane> {
 
     /**
      * ID Generator
@@ -313,6 +314,32 @@ public abstract class AbstractPlane extends AbstractMessagingAgent implements Pl
     @Override
     public String toString() {
         return "Plane " + getId();
+    }
+
+    @Override
+    public int compareTo(Plane o) {
+        if (o == null) {
+            return -1;
+        }
+
+        return id - o.getId();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Plane)) {
+            return false;
+        }
+        final Plane p = (Plane)o;
+
+        return id == p.getId();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + this.id;
+        return hash;
     }
 
 }

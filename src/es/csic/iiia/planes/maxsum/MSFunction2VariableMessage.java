@@ -36,23 +36,35 @@
  */
 package es.csic.iiia.planes.maxsum;
 
+import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- * Message sent from a function node to a variable node in the MS grpah.
+ * Message sent from a function node to a variable node in the MS graph.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class MSFunction2VariableMessage extends AbstractMessage {
+public class MSFunction2VariableMessage extends AbstractMessage {
 
     private final double value;
+    private final Task task;
 
-    public MSFunction2VariableMessage(double value) {
+    public MSFunction2VariableMessage(Task t, double value) {
         this.value = value;
+        this.task = t;
     }
 
     public double getValue() {
         return value;
+    }
+
+    public Task getTask() {
+        return task;
+    }
+
+    @Override
+    public String toString() {
+        return "F(" + task + ") -> V(" + getRecipient() + ") : " + value;
     }
 
 }

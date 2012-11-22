@@ -60,6 +60,13 @@ public interface World extends Runnable {
     Factory getFactory();
 
     /**
+     * Add a new plane to this world.
+     *
+     * @param p plane to add.
+     */
+    public void addPlane(Plane p);
+
+    /**
      * Get the list of planes in this simulation.
      *
      * @return list of the simulation's planes.
@@ -72,6 +79,13 @@ public interface World extends Runnable {
      * @return the {@link Space} of this simulation.
      */
     Space getSpace();
+
+    /**
+     * Add a chargin station.
+     *
+     * @param station to be added.
+     */
+    void addStation(Station station);
 
     /**
      * Get the charging station that is closest to the given location.

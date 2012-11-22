@@ -41,6 +41,7 @@ import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.Random;
 import java.io.File;
@@ -83,7 +84,7 @@ public class Cli {
         options.addOption(OptionBuilder.withArgName("planestype")
                 .hasArg()
                 .withDescription("set the type of planes in this simulation.")
-                .withArgName("default|auction")
+                .withArgName("default|auction|ms")
                 .withLongOpt("planes-type")
                 .create('p'));
         options.addOption("q", "quiet", false, "disable all output except for results and errors.");
@@ -138,6 +139,8 @@ public class Cli {
                 config.planesClass = AuctionPlane.class;
             } else if (value.equalsIgnoreCase("default")) {
                 config.planesClass = DefaultPlane.class;
+            } else if (value.equalsIgnoreCase("ms")) {
+                config.planesClass = MSPlane.class;
             } else {
                 throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
             }

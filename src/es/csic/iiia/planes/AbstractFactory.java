@@ -90,6 +90,7 @@ public abstract class AbstractFactory implements Factory {
             LOG.log(Level.SEVERE, null, ex);
         }
         initialize(p);
+        world.addPlane(p);
         return p;
     }
 
@@ -97,6 +98,7 @@ public abstract class AbstractFactory implements Factory {
     public Station buildStation(Location l) {
         Station s = new Station(l);
         initialize(s);
+        world.addStation(s);
         return s;
     }
 
@@ -104,6 +106,7 @@ public abstract class AbstractFactory implements Factory {
     public Task buildTask(Location location) {
         Task t = new Task(location);
         initialize(t);
+        world.addTask(t);
         return t;
     }
 

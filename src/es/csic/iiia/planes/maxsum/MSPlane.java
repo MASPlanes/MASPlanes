@@ -40,10 +40,14 @@ import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
+import es.csic.iiia.planes.messaging.Message;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Plane that coordinates with others by using max-sum.
@@ -51,6 +55,7 @@ import java.util.TreeSet;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSPlane extends AbstractPlane {
+    private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
     final private MSVariable variable = new MSVariable(this);
 
@@ -64,12 +69,14 @@ public class MSPlane extends AbstractPlane {
         return neighbors;
     }
 
-    private Map<Task, MSFunction> functions;
+    private Map<Task, MSFunction> functions = new TreeMap<Task, MSFunction>();
 
     public MSPlane(Location location) {
         super(location);
         addBehavior(new NeighborTracking(this));
         addBehavior(new MSUpdateGraphBehavior(this));
+        addBehavior(new MSExecutionBehavior(this));
+        addBehavior(new MSDecisionBehavior(this));
     }
 
     @Override
@@ -77,13 +84,14 @@ public class MSPlane extends AbstractPlane {
 
     @Override
     protected void taskAdded(Task t) {
-        // These tasks should *not* show to others until the agreed iteration,
-        // should they?
+        // Create a function node for this task
+        functions.put(t, new MSFunction(this, t));
     }
 
     @Override
     protected void taskRemoved(Task t) {
         // Cleanup any actions done at taskAdded...
+        functions.remove(t);
     }
 
     @Override
@@ -93,6 +101,23 @@ public class MSPlane extends AbstractPlane {
 
     double getCost(Task t) {
         return getLocation().distance(t.getLocation());
+    }
+
+    MSFunction getFunction(Task task) {
+        return functions.get(task);
+    }
+
+    Map<Task, MSFunction> getFunctions() {
+        return functions;
+    }
+
+    @Override
+    public void send(Message message) {
+        super.send(message);
+    }
+
+    void select(Task decision) {
+        setNextTask(decision);
     }
 
 }

@@ -36,14 +36,20 @@
  */
 package es.csic.iiia.planes.maxsum;
 
+import java.util.logging.Logger;
+
 /**
- * Message sent from a function node to a variable node in the MS grpah.
+ * Utitlity class to compute the two objects with minimum value among a couple
+ * of them.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class Minimizer<T> {
+    private static final Logger LOG = Logger.getLogger(Minimizer.class.getName());
+
     private final double[] values;
     private final Object[] objects;
+    private int count = 0;
 
     public Minimizer() {
         values = new double[2];
@@ -51,16 +57,22 @@ class Minimizer<T> {
     }
 
     public void reset() {
-        values[0] = Double.MIN_VALUE; values[1] = Double.MIN_VALUE;
+        LOG.finest("Minimizing start");
+        values[0] = Double.MAX_VALUE; values[1] = Double.MAX_VALUE;
         objects[0] = null; objects[1] = null;
+        count = 0;
     }
 
     public double getComplementary(T t) {
-        if (t == objects[0]) {
-            return values[1];
+        if (count == 0) {
+            return 0;
         }
 
-        return values[0];
+        if (t == objects[0]) {
+            return count == 1 ? 0 : values[1];
+        }
+
+        return count > 0 ? values[0] : 0;
     }
 
     public T getBest() {
@@ -68,15 +80,19 @@ class Minimizer<T> {
     }
 
     public void track(T t, double value) {
+        count++;
+
+        LOG.finest("Minimizer tracking " + value);
+
         if (value < values[0]) {
             values[1]  = values[0];     values[0]  = value;
-            objects[1]   = objects[0];      objects[0]   = t;
+            objects[1] = objects[0];    objects[0] = t;
             return;
         }
 
         if (value < values[1]) {
             values[1]  = value;
-            objects[1]   = t;
+            objects[1] = t;
             return;
         }
 

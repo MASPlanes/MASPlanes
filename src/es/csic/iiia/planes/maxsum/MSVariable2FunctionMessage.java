@@ -38,12 +38,13 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
+import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class MSVariable2FunctionMessage extends AbstractMessage {
+public class MSVariable2FunctionMessage extends AbstractMessage {
 
     private final Task task;
     private final double value;
@@ -56,9 +57,28 @@ class MSVariable2FunctionMessage extends AbstractMessage {
     public Task getTask() {
         return task;
     }
-    
+
     public double getValue() {
         return value;
+    }
+
+    @Override
+    public MSPlane getSender() {
+        return (MSPlane)super.getSender();
+    }
+
+    @Override
+    public void setSender(MessagingAgent sender) {
+        if (!(sender instanceof MSPlane)) {
+            throw new IllegalArgumentException("MSVariable2Function messages can only be sent by MSPlanes.");
+        }
+
+        super.setSender(sender);
+    }
+
+    @Override
+    public String toString() {
+        return "V(" + getSender() + ") -> F(" + task + ") : " + value;
     }
 
 }

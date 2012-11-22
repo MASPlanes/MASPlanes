@@ -95,6 +95,11 @@ public abstract class AbstractWorld implements World {
         return factory;
     }
 
+    @Override
+    public void addStation(Station station) {
+        stations.add(station);
+    }
+
     /**
      * Get the list of charging stations.
      * @return list of charging stations.
@@ -118,13 +123,11 @@ public abstract class AbstractWorld implements World {
             p.setBatteryCapacity(pd.getBatteryCapacity());
             p.setCommunicationRange(pd.getCommunicationRange());
             p.setColor(pd.getColor());
-            planes.add(p);
         }
 
         for (DStation sd : d.getStations()) {
             Location l = new Location(sd.getX(), sd.getY());
             Station s = factory.buildStation(l);
-            stations.add(s);
         }
     }
 
@@ -186,6 +189,11 @@ public abstract class AbstractWorld implements World {
     protected abstract void displayStep();
 
     @Override
+    public void addPlane(Plane p) {
+        planes.add(p);
+    }
+
+    @Override
     public List<Plane> getPlanes() {
         return planes;
     }
@@ -235,7 +243,7 @@ public abstract class AbstractWorld implements World {
 
         for (Plane p : planes) {
             if (  origin.distance(p.getLocation()) <= range
-               && p != message.getSender()) {
+               && (p != message.getSender() || p == message.getRecipient())) {
                 p.receive(message);
             }
         }

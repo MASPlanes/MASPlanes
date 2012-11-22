@@ -44,9 +44,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -226,6 +224,9 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
     }
 
     private void dispatchMessages() {
+        LOG.log(Level.FINER, "{0} dispatching {1} messages.",
+                new Object[]{this, currentMessages.size()});
+
         for (Behavior b : behaviors) {
             for (Message m : currentMessages) {
                 handle(b, m);
@@ -247,7 +248,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         }
 
         // Memoize the method
-        Method method = null;
+        Method method;
         if (cache.containsKey(bClass, mClass)) {
             method = (Method)cache.get(bClass, mClass);
         } else {

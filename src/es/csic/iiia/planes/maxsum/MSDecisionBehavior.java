@@ -38,36 +38,21 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
-import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.MessagingAgent;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class MSUpdateGraphBehavior extends AbstractBehavior {
-    private static final Logger LOG = Logger.getLogger(MSUpdateGraphBehavior.class.getName());
+public class MSDecisionBehavior extends AbstractBehavior {
 
-    private NeighborTracking tracker;
+    public MSDecisionBehavior(MessagingAgent agent) {
+        super(agent);
+    }
 
-    /**
-     * This list of neighbors is necessary because we only consider changes
-     * every some iterations. Therefore, we can not use the most up-to-date
-     * information from the NeighborTracking module, having to maintain
-     * a point-in-time set of neighbors instead.
-     */
-    final private Set<MSPlane> neighbors;
-
-    final private MSPlane plane;
-
-    public MSUpdateGraphBehavior(MSPlane plane) {
-        super(plane);
-        this.plane = plane;
-        this.neighbors = plane.getNeighbors();
+    @Override
+    public Class[] getDependencies() {
+        return new Class[]{MSExecutionBehavior.class};
     }
 
     @Override
@@ -76,13 +61,8 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
     }
 
     @Override
-    public Class[] getDependencies() {
-        return new Class[]{NeighborTracking.class};
-    }
-
-    @Override
-    public void initialize() {
-        tracker = plane.getBehavior(NeighborTracking.class);
+    public MSPlane getAgent() {
+        return (MSPlane)super.getAgent();
     }
 
     @Override
@@ -90,38 +70,41 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
     }
 
-    /*
-     * @TODO: This function is cheating. We should *not* be able to directly
-     * fetch the tasks from other agents.
-     */
+    public void on(RequestTaskMessage msg) {
+        final Task t = msg.getTask();
+        final MSPlane p = getAgent();
+        if (p.getTasks().contains(t)) {
+            // Remove & dispatch this task to the asking plane
+            p.removeTask(t);
+            HandTaskMessage outmsg = new HandTaskMessage(t);
+            outmsg.setRecipient(msg.getSender());
+            p.send(outmsg);
+        }
+    }
+
+    public void on(HandTaskMessage msg) {
+        getAgent().addTask(msg.getTask());
+    }
+
     @Override
     public void afterMessages() {
-        Map<Task, MSPlane> domain = new TreeMap<Task, MSPlane>();
+        final MSPlane p = getAgent();
 
-        // Track our tasks
-        for (Task t : plane.getTasks()) {
-            domain.put(t, plane);
+        Task decision = p.getVariable().makeDecision();
+        if (decision == null) {
+            return;
         }
 
-        // And the tasks from our neighbors
-        neighbors.clear();
-        boolean found = false;
-        for (MessagingAgent a : tracker.getNeighbors(2)) {
-            found = true;
-            MSPlane p = (MSPlane)a;
-            neighbors.add(p);
-
-            for (Task t : p.getTasks()) {
-                domain.put(t, p);
-            }
+        if (p.getTasks().contains(decision)) {
+            p.select(decision);
+        } else {
+            // Request the task elsewere
+            RequestTaskMessage msg = new RequestTaskMessage(decision);
+            msg.setRecipient(p.getVariable().getDomain().get(decision));
+            p.send(msg);
         }
-
-        if (!found) {
-            LOG.info(getAgent() + " does not see any neighbors! :S");
-        }
-
-        LOG.finest("Domain: " + domain);
-        plane.getVariable().update(domain);
     }
+
+
 
 }

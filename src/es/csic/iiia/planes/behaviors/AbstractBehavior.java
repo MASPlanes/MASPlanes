@@ -57,11 +57,6 @@ public abstract class AbstractBehavior implements Behavior {
     }
 
     @Override
-    public Class[] getDependencies() {
-        return new Class[0];
-    }
-
-    @Override
     public void initialize() {
 
     }
