@@ -219,6 +219,7 @@ public abstract class AbstractWorld implements World {
         // reality another plane has already completed it before (split brain).
         if (tasks.remove(t)) {
             stats.collect(t);
+            System.err.println("Task removed");
         }
     }
 

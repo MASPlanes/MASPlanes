@@ -45,6 +45,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Logger;
 
 /**
  * Skeletal implementation of a Plane, that implements very basic lower-level
@@ -54,6 +55,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractPlane extends AbstractMessagingAgent
     implements Plane, Comparable<Plane> {
+    private static final Logger LOG = Logger.getLogger(AbstractPlane.class.getName());
 
     /**
      * ID Generator

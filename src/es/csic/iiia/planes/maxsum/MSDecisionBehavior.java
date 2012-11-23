@@ -39,12 +39,14 @@ package es.csic.iiia.planes.maxsum;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.MessagingAgent;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSDecisionBehavior extends AbstractBehavior {
+    private static final Logger LOG = Logger.getLogger(MSDecisionBehavior.class.getName());
 
     public MSDecisionBehavior(MessagingAgent agent) {
         super(agent);
@@ -73,17 +75,19 @@ public class MSDecisionBehavior extends AbstractBehavior {
     public void on(RequestTaskMessage msg) {
         final Task t = msg.getTask();
         final MSPlane p = getAgent();
-        if (p.getTasks().contains(t)) {
+        if (p.getTasks().contains(t) && p.getLocation().distance(t.getLocation()) > p.getSpeed()) {
             // Remove & dispatch this task to the asking plane
             p.removeTask(t);
             HandTaskMessage outmsg = new HandTaskMessage(t);
             outmsg.setRecipient(msg.getSender());
             p.send(outmsg);
+            LOG.severe("Handing " + t + " to " + msg.getSender());
         }
     }
 
     public void on(HandTaskMessage msg) {
         getAgent().addTask(msg.getTask());
+        LOG.severe(getAgent() + " incorporates " + msg.getTask());
     }
 
     @Override
@@ -98,10 +102,13 @@ public class MSDecisionBehavior extends AbstractBehavior {
         if (p.getTasks().contains(decision)) {
             p.select(decision);
         } else {
-            // Request the task elsewere
-            RequestTaskMessage msg = new RequestTaskMessage(decision);
-            msg.setRecipient(p.getVariable().getDomain().get(decision));
-            p.send(msg);
+            // Request the task elsewere with a probability
+            if (Math.random() > 0.9) {
+                RequestTaskMessage msg = new RequestTaskMessage(decision);
+                msg.setRecipient(p.getVariable().getDomain().get(decision));
+                p.send(msg);
+                LOG.severe(getAgent() + " requesting " + decision);
+            }
         }
     }
 
