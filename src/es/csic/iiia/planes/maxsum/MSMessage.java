@@ -40,31 +40,30 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- * Message sent from a function node to a variable node in the MS graph.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSFunction2VariableMessage extends AbstractMessage {
+public abstract class MSMessage extends AbstractMessage {
 
-    private final double value;
     private final Task task;
+    private final double value;
 
-    public MSFunction2VariableMessage(Task t, double value) {
+    public MSMessage(Task task, double value) {
+        this.task = task;
         this.value = value;
-        this.task = t;
-    }
-
-    public double getValue() {
-        return value;
     }
 
     public Task getTask() {
         return task;
     }
 
+    public double getValue() {
+        return value;
+    }
+
     @Override
-    public String toString() {
-        return "F(" + task + ") -> V(" + getRecipient() + ") : " + value;
+    public MSPlane getSender() {
+        return (MSPlane)super.getSender();
     }
 
 }

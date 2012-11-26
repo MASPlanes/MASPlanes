@@ -37,69 +37,56 @@
 package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class MSFunction {
-    private static final Logger LOG = Logger.getLogger(MSFunction.class.getName());
+public class MSFunction extends MSNode<MSPlane, Task> {
 
-    private MSPlane plane;
-
-    private final Task task;
+    private Task task;
 
     public MSFunction(MSPlane plane, Task t) {
-        this.plane = plane;
+        super(plane);
         this.task = t;
     }
 
-    protected final Map<MSPlane, MSVariable2FunctionMessage> lastMessages =
-            new TreeMap<MSPlane, MSVariable2FunctionMessage>();
-
-    private final Minimizer<MSPlane> minimizer = new Minimizer<MSPlane>();
-
-    public void gather() {
-        minimizer.reset();
-
-        Set<MSPlane> neighbors = plane.getNeighbors();
-
-        Iterator<Entry<MSPlane, MSVariable2FunctionMessage>> it =
-                lastMessages.entrySet().iterator();
-        while (it.hasNext()) {
-            final MSPlane p = it.next().getKey();
-
-            // Cleanup old messages
-            if (!neighbors.contains(p)) {
-                it.remove();
-                continue;
-            }
-
-            final MSVariable2FunctionMessage msg = lastMessages.get(p);
-            minimizer.track(p, msg.getValue());
-        }
+    @Override
+    public double getPotential(MSPlane p) {
+        return 0;
     }
 
-    public void scatter() {
-        for (MSPlane p : plane.getNeighbors()) {
-            double value = - minimizer.getComplementary(p);
-            final MSFunction2VariableMessage msg = new MSFunction2VariableMessage(task, value);
-            msg.setRecipient(p);
-
-            plane.send(msg);
-            LOG.log(Level.FINE, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
-        }
+    @Override
+    public MSFunction2Variable buildOutgoingMessage(MSPlane plane, double value) {
+        return new MSFunction2Variable(task, value);
     }
 
-    void receive(MSVariable2FunctionMessage msg) {
-        lastMessages.put(msg.getSender(), msg);
+    @Override
+    protected MSPlane getKey(MSMessage msg) {
+        return msg.getSender();
+    }
+
+    @Override
+    protected MSPlane getRecipient(MSPlane key) {
+        return key;
+    }
+
+    @Override
+    protected String getIdentifier() {
+        return "Function(" + task + ")";
+    }
+
+    public class MSFunction2Variable extends MSMessage {
+
+        public MSFunction2Variable(Task task, double value) {
+            super(task, value);
+        }
+
+        @Override
+        public String toString() {
+            return "F(" + getTask() + ") -> V(" + getRecipient() + ") : " + getValue();
+        }
+
     }
 
 }

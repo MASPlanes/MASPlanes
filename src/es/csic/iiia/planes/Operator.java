@@ -142,7 +142,6 @@ public class Operator extends AbstractElement implements Agent {
     private Task createTask(DTask nt) {
         Location l = new Location(nt.getX(), nt.getY());
         Task t = getWorld().getFactory().buildTask(l);
-        getWorld().addTask(t);
         return t;
     }
 

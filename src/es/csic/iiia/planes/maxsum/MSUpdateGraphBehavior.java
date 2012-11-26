@@ -54,20 +54,11 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
     private NeighborTracking tracker;
 
-    /**
-     * This list of neighbors is necessary because we only consider changes
-     * every some iterations. Therefore, we can not use the most up-to-date
-     * information from the NeighborTracking module, having to maintain
-     * a point-in-time set of neighbors instead.
-     */
-    final private Set<MSPlane> neighbors;
-
     final private MSPlane plane;
 
     public MSUpdateGraphBehavior(MSPlane plane) {
         super(plane);
         this.plane = plane;
-        this.neighbors = plane.getNeighbors();
     }
 
     @Override
@@ -104,23 +95,15 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
         }
 
         // And the tasks from our neighbors
-        neighbors.clear();
-        boolean found = false;
         for (MessagingAgent a : tracker.getNeighbors(2)) {
-            found = true;
             MSPlane p = (MSPlane)a;
-            neighbors.add(p);
 
             for (Task t : p.getTasks()) {
                 domain.put(t, p);
             }
         }
 
-        if (!found) {
-            LOG.info(getAgent() + " does not see any neighbors! :S");
-        }
-
-        LOG.finest("Domain: " + domain);
+        LOG.finest(plane + " domain: " + domain);
         plane.getVariable().update(domain);
     }
 

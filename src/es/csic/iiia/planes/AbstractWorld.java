@@ -209,6 +209,9 @@ public abstract class AbstractWorld implements World {
 
     @Override
     public void addTask(Task task) {
+        if (tasks.contains(task)) {
+            throw new RuntimeException("This task already exists!");
+        }
         tasks.add(task);
     }
 
@@ -217,9 +220,8 @@ public abstract class AbstractWorld implements World {
         // Check if it has been removed before tracking the stats. Sometimes two
         // planes may think that they complete a pending task, whereas in
         // reality another plane has already completed it before (split brain).
-        if (tasks.remove(t)) {
+        while (tasks.remove(t)) {
             stats.collect(t);
-            System.err.println("Task removed");
         }
     }
 

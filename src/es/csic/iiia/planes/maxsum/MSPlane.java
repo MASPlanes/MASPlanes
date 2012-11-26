@@ -63,12 +63,6 @@ public class MSPlane extends AbstractPlane {
         return variable;
     }
 
-    final private Set<MSPlane> neighbors = new TreeSet<MSPlane>();
-
-    public Set<MSPlane> getNeighbors() {
-        return neighbors;
-    }
-
     private Map<Task, MSFunction> functions = new TreeMap<Task, MSFunction>();
 
     public MSPlane(Location location) {

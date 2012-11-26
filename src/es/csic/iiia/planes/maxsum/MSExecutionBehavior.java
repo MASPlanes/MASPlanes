@@ -74,14 +74,14 @@ public class MSExecutionBehavior extends AbstractBehavior {
 
     }
 
-    public void on(MSVariable2FunctionMessage msg) {
+    public void on(MSVariable.MSVariable2Function msg) {
         MSFunction recipient = getAgent().getFunction(msg.getTask());
         if (recipient != null) {
             recipient.receive(msg);
         }
     }
 
-    public void on(MSFunction2VariableMessage msg) {
+    public void on(MSFunction.MSFunction2Variable msg) {
         getAgent().getVariable().receive(msg);
     }
 

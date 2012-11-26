@@ -37,85 +37,51 @@
 package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSVariable {
-    private static final Logger LOG = Logger.getLogger(MSVariable.class.getName());
-
-    private MSPlane plane;
-
-    private Map<Task, MSPlane> domain;
-
-    private final Minimizer<Task> minimizer = new Minimizer<Task>();
-
-    protected final Map<Task, MSFunction2VariableMessage> lastMessages =
-            new TreeMap<Task, MSFunction2VariableMessage>();
+public class MSVariable extends MSNode<Task, MSPlane> {
 
     public MSVariable(MSPlane plane) {
-        this.plane = plane;
+        super(plane);
     }
 
-    public void update(Map<Task, MSPlane> domain) {
-       this.domain = domain;
-
-       // Cleanup old messages
-       Iterator<Entry<Task, MSFunction2VariableMessage>> it =
-               lastMessages.entrySet().iterator();
-       while (it.hasNext()) {
-           final Entry<Task, MSFunction2VariableMessage> e = it.next();
-           if (!domain.containsKey(e.getKey())) {
-               it.remove();
-           }
-       }
+    @Override
+    public double getPotential(Task t) {
+        return getPlane().getCost(t);
     }
 
-    public void gather() {
-        minimizer.reset();
-
-        double[] vs = new double[domain.size()];
-        int i = 0;
-        for (Task t : domain.keySet()) {
-            MSFunction2VariableMessage msg = lastMessages.get(t);
-            final double value = msg != null ? msg.getValue() : 0;
-            final double belief = plane.getCost(t) + value;
-            minimizer.track(t, belief);
-            vs[i++] = belief;
-        }
-        LOG.log(Level.FINE, "{0}''s belief: {1}", new Object[]{plane, Arrays.toString(vs)});
+    @Override
+    public MSVariable2Function buildOutgoingMessage(Task t, double value) {
+        return new MSVariable2Function(t, value);
     }
 
-    public void scatter() {
-        for (Task t : domain.keySet()) {
-            final double value = plane.getCost(t) - minimizer.getComplementary(t);
-            MSVariable2FunctionMessage msg = new MSVariable2FunctionMessage(t, value);
-            msg.setRecipient(domain.get(t));
+    @Override
+    protected Task getKey(MSMessage msg) {
+        return msg.getTask();
+    }
 
-            plane.send(msg);
-            LOG.log(Level.FINE, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
+    @Override
+    protected MSPlane getRecipient(Task key) {
+        return getDomain().get(key);
+    }
+
+    @Override
+    protected String getIdentifier() {
+        return "Variable(" + getPlane() + ")";
+    }
+
+    public class MSVariable2Function extends MSMessage {
+
+        public MSVariable2Function(Task task, double value) {
+            super(task, value);
         }
 
+        @Override
+        public String toString() {
+            return "V(" + getSender() + ") -> F(" + getTask() + ") : " + getValue();
+        }
     }
-
-    public Task makeDecision() {
-        return minimizer.getBest();
-    }
-
-    void receive(MSFunction2VariableMessage msg) {
-        lastMessages.put(msg.getTask(), msg);
-    }
-
-    protected Map<Task, MSPlane> getDomain() {
-        return domain;
-    }
-
 }

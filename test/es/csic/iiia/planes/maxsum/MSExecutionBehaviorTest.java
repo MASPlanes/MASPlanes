@@ -80,6 +80,12 @@ public class MSExecutionBehaviorTest {
 
     @AfterClass
     public static void tearDownClass() {
+        try {
+            LOG.severe("Done.");
+            Thread.sleep(5000);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     @Before
@@ -138,8 +144,9 @@ public class MSExecutionBehaviorTest {
     public void testOn_MSVariable2FunctionMessage() {
         System.err.println("on(MSVariable2FunctionMessage)");
         MSFunction f = new MSFunction(p1, t);
+        MSVariable v = new MSVariable(p1);
         p1.getFunctions().put(t, f);
-        MSVariable2FunctionMessage msg = new MSVariable2FunctionMessage(t, 0);
+        MSVariable.MSVariable2Function msg = v.buildOutgoingMessage(t, 0);
         msg.setSender(p2);
         msg.setRecipient(p1);
         MSExecutionBehavior instance = new MSExecutionBehavior(p1);
@@ -155,7 +162,8 @@ public class MSExecutionBehaviorTest {
         System.err.println("on(MSFunction2VariableMessage)");
 
         // Prepare the message
-        MSFunction2VariableMessage msg = new MSFunction2VariableMessage(t, 0);
+        MSFunction f = new MSFunction(p1, t);
+        MSFunction.MSFunction2Variable msg = f.buildOutgoingMessage(p1, 0);
         msg.setSender(p2);
         msg.setRecipient(p1);
 
@@ -188,14 +196,6 @@ public class MSExecutionBehaviorTest {
             p1.step();
             p2.step();
         }
-
-
-        try {
-            LOG.severe("Done.");
-            Thread.sleep(500);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 
     /**
@@ -203,10 +203,10 @@ public class MSExecutionBehaviorTest {
      */
     @Test
     public void testAfterMessages2() {
-        System.err.println("afterMessages");
+        System.err.println("afterMessages2");
         MSPlane p3 = buildPlane(0.75, 0);
         Task t2 = factory.buildTask(new Location(1,0));
-        Task t3 = factory.buildTask(new Location(0,0));
+        Task t3 = factory.buildTask(new Location(0.1,0));
         p1.addTask(t2);
         p1.addTask(t3);
 
@@ -223,12 +223,5 @@ public class MSExecutionBehaviorTest {
         assertSame(t3, p1.getVariable().makeDecision());
         assertSame(t2, p2.getVariable().makeDecision());
         assertSame(t, p3.getVariable().makeDecision());
-
-        try {
-            LOG.severe("Done.");
-            Thread.sleep(500);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
-        }
     }
 }

@@ -39,6 +39,7 @@ package es.csic.iiia.planes.maxsum;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.MessagingAgent;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -81,33 +82,39 @@ public class MSDecisionBehavior extends AbstractBehavior {
             HandTaskMessage outmsg = new HandTaskMessage(t);
             outmsg.setRecipient(msg.getSender());
             p.send(outmsg);
-            LOG.severe("Handing " + t + " to " + msg.getSender());
+            LOG.log(Level.FINER, "Handing {0} to {1}",
+                    new Object[]{t, msg.getSender()});
         }
     }
 
     public void on(HandTaskMessage msg) {
         getAgent().addTask(msg.getTask());
-        LOG.severe(getAgent() + " incorporates " + msg.getTask());
+        LOG.log(Level.FINER, "{0} incorporates {1}",
+                new Object[]{getAgent(), msg.getTask()});
     }
 
     @Override
     public void afterMessages() {
         final MSPlane p = getAgent();
+        final MSVariable v = p.getVariable();
 
-        Task decision = p.getVariable().makeDecision();
+        Task decision = v.makeDecision();
         if (decision == null) {
             return;
         }
 
-        if (p.getTasks().contains(decision)) {
+        MSPlane owner = v.getDomain().get(decision);
+
+        if (owner == p) {
             p.select(decision);
         } else {
             // Request the task elsewere with a probability
             if (Math.random() > 0.9) {
                 RequestTaskMessage msg = new RequestTaskMessage(decision);
-                msg.setRecipient(p.getVariable().getDomain().get(decision));
+                msg.setRecipient(owner);
                 p.send(msg);
-                LOG.severe(getAgent() + " requesting " + decision);
+                LOG.log(Level.FINE, "{0} requesting {1}",
+                        new Object[]{getAgent(), decision});
             }
         }
     }
