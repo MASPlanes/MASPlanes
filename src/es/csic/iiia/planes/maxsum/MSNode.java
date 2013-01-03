@@ -97,7 +97,9 @@ public abstract class MSNode<DK, DV> {
             minimizer.track(p, belief);
             vs[i++] = belief;
         }
-        LOG.log(Level.FINE, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
+        }
     }
 
     public void scatter() {
@@ -107,12 +109,15 @@ public abstract class MSNode<DK, DV> {
             msg.setRecipient(getRecipient(p));
 
             plane.send(msg);
-            LOG.log(Level.FINE, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.log(Level.FINE, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
+            }
         }
 
     }
 
     public DK makeDecision() {
+        //LOG.log(Level.SEVERE, "M: {0}", minimizer.toString());
         return minimizer.getBest();
     }
 
@@ -137,7 +142,7 @@ public abstract class MSNode<DK, DV> {
         lastMessages.put(getKey(msg), msg);
     }
 
-    protected Map<DK, DV> getDomain() {
+    public Map<DK, DV> getDomain() {
         return domain;
     }
 }

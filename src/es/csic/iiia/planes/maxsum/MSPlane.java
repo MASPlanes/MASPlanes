@@ -38,6 +38,7 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Station;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.Message;
@@ -57,6 +58,9 @@ import java.util.logging.Logger;
 public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
+    public static final int MS_ITERS = 10;
+    public static final int MS_START_EVERY = 100;
+
     final private MSVariable variable = new MSVariable(this);
 
     public MSVariable getVariable() {
@@ -70,16 +74,20 @@ public class MSPlane extends AbstractPlane {
         addBehavior(new NeighborTracking(this));
         addBehavior(new MSUpdateGraphBehavior(this));
         addBehavior(new MSExecutionBehavior(this));
-        addBehavior(new MSDecisionBehavior(this));
+        addBehavior(new MSTasksDecideBehavior(this));
     }
 
     @Override
-    protected void taskCompleted(Task t) {}
+    protected void taskCompleted(Task t) {
+        getVariable().getDomain().remove(t);
+        replan();
+    }
 
     @Override
     protected void taskAdded(Task t) {
         // Create a function node for this task
         functions.put(t, new MSFunction(this, t));
+        replan(t);
     }
 
     @Override
@@ -94,7 +102,8 @@ public class MSPlane extends AbstractPlane {
     }
 
     double getCost(Task t) {
-        return getLocation().distance(t.getLocation());
+        final Location l = getLocation();
+        return l.distance(t.getLocation());
     }
 
     MSFunction getFunction(Task task) {
@@ -110,8 +119,61 @@ public class MSPlane extends AbstractPlane {
         super.send(message);
     }
 
-    void select(Task decision) {
-        setNextTask(decision);
+    /**
+     * Forces the plane to replan its route, possibly changing the next target
+     * to the one that is currently closer.
+     */
+    protected void replan() {
+        setNextTask(getNearest(getLocation(), getTasks()));
+    }
+
+    /**
+     * Challenges the plane to reconsider its route, but only because the given
+     * task has just been added.
+     * <p/>
+     * In other words, the plane only needs to consider the task it is already
+     * attending against the new task, because all others are already known to
+     * be worse than the current one.
+     *
+     * @param newt task to consider.
+     */
+    protected void replan(Task newt) {
+        // Directly choose the new task if the plane is currently inactive
+        final Task oldt = getNextTask();
+        if (oldt == null) {
+            setNextTask(newt);
+            return;
+        }
+
+        // Choose the closest one if it is active instead
+        final Location l = getLocation();
+        final double curd = l.distance(oldt.getLocation());
+        final double newd = l.distance(newt.getLocation());
+        if (newd < curd) {
+            setNextTask(newt);
+        }
+    }
+
+    /**
+     * Retrieve the task from the candidates list that is nearest to the given
+     * position
+     *
+     * @param position
+     * @param candidates
+     * @return
+     */
+    protected static Task getNearest(Location position, List<Task> candidates) {
+        double max = Double.MAX_VALUE;
+        Task result = null;
+        for (Task candidate : candidates) {
+            double d = position.distance(candidate.getLocation());
+            if (d < max) {
+                max = d;
+                result = candidate;
+            }
+        }
+
+        return result;
     }
 
 }

@@ -128,6 +128,16 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         return id;
     }
 
+    /**
+     * Get the state of this plane.
+     *
+     * @see State
+     * @return state of this plane.
+     */
+    public State getState() {
+        return state;
+    }
+
     @Override
     public void setBattery(long battery) {
         this.battery = battery;
@@ -153,6 +163,14 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     @Override
     public long getBatteryCapacity() {
         return batteryCapacity;
+    }
+
+    public long getRechargeRatio() {
+        return rechargeRatio;
+    }
+
+    public void setRechargeRatio(long rechargeRatio) {
+        this.rechargeRatio = rechargeRatio;
     }
 
     @Override
@@ -237,6 +255,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         completedLocations.add(t.getLocation());
         getWorld().removeTask(t);
         removeTask(t);
+        taskCompleted(t);
     }
 
     /**

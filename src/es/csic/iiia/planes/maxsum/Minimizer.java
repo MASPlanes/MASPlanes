@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.maxsum;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -82,7 +83,7 @@ class Minimizer<T> {
     public void track(T t, double value) {
         count++;
 
-        LOG.finest("Minimizer tracking " + value);
+        LOG.log(Level.FINEST, "Minimizer tracking {0}", value);
 
         if (value < values[0]) {
             values[1]  = values[0];     values[0]  = value;
@@ -96,6 +97,11 @@ class Minimizer<T> {
             return;
         }
 
+    }
+
+
+    public String toString() {
+        return "Min(" + values[0] + "," + values[1] + ")[" + count + "]";
     }
 
 }

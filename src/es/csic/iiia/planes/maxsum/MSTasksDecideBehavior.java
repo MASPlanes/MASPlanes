@@ -38,23 +38,25 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
-import java.util.Collection;
-import java.util.Map;
+import es.csic.iiia.planes.messaging.MessagingAgent;
+import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * Behavior that implements the actual max-sum algorithm.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSExecutionBehavior extends AbstractBehavior {
+public class MSTasksDecideBehavior extends AbstractBehavior {
+    private static final Logger LOG = Logger.getLogger(MSTasksDecideBehavior.class.getName());
 
-    public MSExecutionBehavior(MSPlane plane) {
-        super(plane);
+    public MSTasksDecideBehavior(MessagingAgent agent) {
+        super(agent);
     }
 
     @Override
-    public MSPlane getAgent() {
-        return (MSPlane)super.getAgent();
+    public Class[] getDependencies() {
+        return new Class[]{MSExecutionBehavior.class};
     }
 
     @Override
@@ -63,49 +65,58 @@ public class MSExecutionBehavior extends AbstractBehavior {
     }
 
     @Override
-    public Class[] getDependencies() {
-        return new Class[]{MSUpdateGraphBehavior.class};
+    public MSPlane getAgent() {
+        return (MSPlane)super.getAgent();
     }
-
-
 
     @Override
     public void beforeMessages() {
 
     }
 
-    public void on(MSVariable.MSVariable2Function msg) {
-        MSFunction recipient = getAgent().getFunction(msg.getTask());
-        if (recipient != null) {
-            recipient.receive(msg);
-        }
-    }
-
-    public void on(MSFunction.MSFunction2Variable msg) {
-        getAgent().getVariable().receive(msg);
+    public void on(HandTaskMessage msg) {
+        getAgent().addTask(msg.getTask());
+        LOG.log(Level.SEVERE, "[{2}] {0} incorporates {1}",
+                new Object[]{getAgent(), msg.getTask(), getAgent().getWorld().getTime()});
     }
 
     @Override
     public void afterMessages() {
         final long remainder = getAgent().getWorld().getTime() % MSPlane.MS_START_EVERY;
-        if (remainder <= MSPlane.MS_ITERS) {
+        if (remainder != MSPlane.MS_ITERS) {
             return;
         }
 
-        final MSVariable variable = getAgent().getVariable();
-        final Map<Task, MSFunction> functions = getAgent().getFunctions();
+        final MSPlane p = getAgent();
 
-        // Everyone gather
-        variable.gather();
-        for (MSFunction f : functions.values()) {
-            f.gather();
+        // And now the tasks choose
+        List<Task> tasks = p.getTasks();
+        for (int i=tasks.size()-1; i>=0; i--) {
+            final Task t = tasks.get(i);
+            final MSFunction f = p.getFunction(t);
+            final MSPlane choice = f.makeDecision();
+            if (choice != p && choice != null) {
+                LOG.log(Level.SEVERE, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f.getIdentifier(), choice, getAgent().getWorld().getTime(), getAgent()});
+                relocateTask(t, choice);
+            }
         }
 
-        // Everyone scatter
-        variable.scatter();
-        for (MSFunction f : functions.values()) {
-            f.scatter();
-        }
+    }
+
+    /**
+     * Send a task to a neighbor.
+     *
+     * @param t
+     * @param choice
+     */
+    private void relocateTask(Task t, MSPlane choice) {
+        System.err.println("My location: " + getAgent().getLocation());
+        System.err.println("theirs: " + choice.getLocation());
+        System.err.println("distance: " + getAgent().getLocation().distance(choice.getLocation()));
+        getAgent().removeTask(t);
+        HandTaskMessage msg = new HandTaskMessage(t);
+        msg.setRecipient(choice);
+        getAgent().send(msg);
     }
 
 }

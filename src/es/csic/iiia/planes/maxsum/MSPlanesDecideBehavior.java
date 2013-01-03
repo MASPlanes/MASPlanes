@@ -46,10 +46,10 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSDecisionBehavior extends AbstractBehavior {
-    private static final Logger LOG = Logger.getLogger(MSDecisionBehavior.class.getName());
+public class MSPlanesDecideBehavior extends AbstractBehavior {
+    private static final Logger LOG = Logger.getLogger(MSPlanesDecideBehavior.class.getName());
 
-    public MSDecisionBehavior(MessagingAgent agent) {
+    public MSPlanesDecideBehavior(MessagingAgent agent) {
         super(agent);
     }
 
@@ -84,6 +84,10 @@ public class MSDecisionBehavior extends AbstractBehavior {
             p.send(outmsg);
             LOG.log(Level.FINER, "Handing {0} to {1}",
                     new Object[]{t, msg.getSender()});
+
+            if (t == p.getNextTask()) {
+                p.replan();
+            }
         }
     }
 
@@ -95,6 +99,11 @@ public class MSDecisionBehavior extends AbstractBehavior {
 
     @Override
     public void afterMessages() {
+        final long remainder = getAgent().getWorld().getTime() % MSPlane.MS_START_EVERY;
+        if (remainder != MSPlane.MS_ITERS) {
+            return;
+        }
+
         final MSPlane p = getAgent();
         final MSVariable v = p.getVariable();
 
@@ -105,17 +114,12 @@ public class MSDecisionBehavior extends AbstractBehavior {
 
         MSPlane owner = v.getDomain().get(decision);
 
-        if (owner == p) {
-            p.select(decision);
-        } else {
-            // Request the task elsewere with a probability
-            if (Math.random() > 0.9) {
-                RequestTaskMessage msg = new RequestTaskMessage(decision);
-                msg.setRecipient(owner);
-                p.send(msg);
-                LOG.log(Level.FINE, "{0} requesting {1}",
-                        new Object[]{getAgent(), decision});
-            }
+        if (owner != p) {
+            RequestTaskMessage msg = new RequestTaskMessage(decision);
+            msg.setRecipient(owner);
+            p.send(msg);
+            LOG.log(Level.FINE, "{0} requesting {1}",
+                    new Object[]{getAgent(), decision});
         }
     }
 

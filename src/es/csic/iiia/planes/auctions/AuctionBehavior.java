@@ -63,8 +63,6 @@ public class AuctionBehavior extends AbstractBehavior {
 
     private NeighborTracking neighborTracker;
 
-    private boolean taskChanges;
-
     /**
      * Builds an auctioning behavior for the given agent.
      *
@@ -103,8 +101,6 @@ public class AuctionBehavior extends AbstractBehavior {
 
     @Override
     public void beforeMessages() {
-        bids.clear();
-        taskChanges = false;
     }
 
     /**
@@ -169,9 +165,14 @@ public class AuctionBehavior extends AbstractBehavior {
     }
 
     private void processBids() {
-        for (Task t : bids.keySet()) {
-            doAuction(t);
+
+        if (!bids.isEmpty()) {
+            for (Task t : bids.keySet()) {
+                doAuction(t);
+            }
+            bids.clear();
         }
+        
     }
 
     private void doAuction(Task t) {
@@ -191,7 +192,6 @@ public class AuctionBehavior extends AbstractBehavior {
             WinnerMessage win = new WinnerMessage(t);
             win.setRecipient(winner.getSender());
             agent.send(win);
-
         }
     }
 
@@ -211,7 +211,7 @@ public class AuctionBehavior extends AbstractBehavior {
         final Plane agent = getAgent();
 
         // Auction our tasks every minute
-        if (agent.getWorld().getTime() % 100 == 1) {
+        if (agent.getWorld().getTime() % AuctionPlane.AUCTION_EVERY == 0) {
             for(Task t : agent.getTasks()) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.log(Level.FINEST, "{0} auctioning task {1}", new Object[]{agent, t.getId()});

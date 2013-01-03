@@ -41,8 +41,8 @@ import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -87,23 +87,42 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
      */
     @Override
     public void afterMessages() {
-        Map<Task, MSPlane> domain = new TreeMap<Task, MSPlane>();
-
-        // Track our tasks
-        for (Task t : plane.getTasks()) {
-            domain.put(t, plane);
+        final long remainder = getAgent().getWorld().getTime() % MSPlane.MS_START_EVERY;
+        if (remainder != 0) {
+            return;
         }
 
-        // And the tasks from our neighbors
-        for (MessagingAgent a : tracker.getNeighbors(2)) {
+        Map<Task, MSPlane> domain = plane.getVariable().getDomain();
+        domain.clear();
+        for (Task t : plane.getTasks()) {
+            MSFunction f = plane.getFunction(t);
+            f.getDomain().clear();
+        }
+
+        // Track tasks from our neighbors
+        for (MessagingAgent a : tracker.getNeighbors(MSPlane.MS_ITERS+11)) {
             MSPlane p = (MSPlane)a;
 
             for (Task t : p.getTasks()) {
                 domain.put(t, p);
             }
+
+            for (Task t : plane.getTasks()) {
+                MSFunction f = plane.getFunction(t);
+                f.getDomain().put(p, t);
+            }
+
+            LOG.log(Level.SEVERE, "{0} has neighbor {1}", new Object[]{getAgent(), a});
         }
 
-        LOG.finest(plane + " domain: " + domain);
+        if (LOG.isLoggable(Level.SEVERE)) {
+            for (Task t : plane.getTasks()) {
+                MSFunction f = plane.getFunction(t);
+                LOG.severe(f.getIdentifier() + " domain: " + f.getDomain());
+            }
+        }
+
+        LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, domain});
         plane.getVariable().update(domain);
     }
 
