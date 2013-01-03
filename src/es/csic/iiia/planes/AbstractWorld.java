@@ -111,7 +111,7 @@ public abstract class AbstractWorld implements World {
     @Override
     public void init(DProblem d) {
         space = new Space(d.getWidth(), d.getHeight());
-        duration = d.getDuration();
+        setDuration(d.getDuration());
 
         operator = factory.buildOperator(d.getTasks());
 
@@ -129,6 +129,11 @@ public abstract class AbstractWorld implements World {
             Location l = new Location(sd.getX(), sd.getY());
             Station s = factory.buildStation(l);
         }
+    }
+
+    @Override
+    public void setDuration(long duration) {
+        this.duration = duration;
     }
 
     @Override
@@ -172,12 +177,12 @@ public abstract class AbstractWorld implements World {
         for (Plane p : planes) {
             p.preStep();
         }
-        operator.preStep();
+        if (operator != null) operator.preStep();
 
         for (Plane p : planes) {
             p.step();
         }
-        operator.step();
+        if (operator != null) operator.step();
     }
 
     /**

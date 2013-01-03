@@ -58,8 +58,8 @@ import java.util.logging.Logger;
 public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
-    public static final int MS_ITERS = 10;
-    public static final int MS_START_EVERY = 100;
+    public static final int MS_ITERS = 5;
+    public static final int MS_START_EVERY = 5;
 
     final private MSVariable variable = new MSVariable(this);
 

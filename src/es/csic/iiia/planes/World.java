@@ -142,4 +142,11 @@ public interface World extends Runnable {
      */
     public void sendMessage(Message message);
 
+    /**
+     * Set the duration of this scenario (in seconds).
+     *
+     * @param duration of this scenario in seconds.
+     */
+    public void setDuration(long duration);
+
 }

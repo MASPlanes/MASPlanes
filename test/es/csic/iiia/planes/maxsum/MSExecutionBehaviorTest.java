@@ -210,15 +210,9 @@ public class MSExecutionBehaviorTest {
         p1.addTask(t2);
         p1.addTask(t3);
 
-        for (int i=0; i<2; i++) {
-            LOG.log(Level.FINE, "======== Iter {0}", i);
-            p1.preStep();
-            p2.preStep();
-            p3.preStep();
-            p1.step();
-            p2.step();
-            p3.step();
-        }
+        world.setDuration(2);
+
+        world.run();
 
         assertSame(t3, p1.getVariable().makeDecision());
         assertSame(t2, p2.getVariable().makeDecision());

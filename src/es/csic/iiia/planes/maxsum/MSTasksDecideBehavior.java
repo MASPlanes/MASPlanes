@@ -76,7 +76,7 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
 
     public void on(HandTaskMessage msg) {
         getAgent().addTask(msg.getTask());
-        LOG.log(Level.SEVERE, "[{2}] {0} incorporates {1}",
+        LOG.log(Level.FINEST, "[{2}] {0} incorporates {1}",
                 new Object[]{getAgent(), msg.getTask(), getAgent().getWorld().getTime()});
     }
 
@@ -96,7 +96,7 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
             final MSFunction f = p.getFunction(t);
             final MSPlane choice = f.makeDecision();
             if (choice != p && choice != null) {
-                LOG.log(Level.SEVERE, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f.getIdentifier(), choice, getAgent().getWorld().getTime(), getAgent()});
+                LOG.log(Level.FINEST, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f.getIdentifier(), choice, getAgent().getWorld().getTime(), getAgent()});
                 relocateTask(t, choice);
             }
         }
@@ -110,9 +110,6 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
      * @param choice
      */
     private void relocateTask(Task t, MSPlane choice) {
-        System.err.println("My location: " + getAgent().getLocation());
-        System.err.println("theirs: " + choice.getLocation());
-        System.err.println("distance: " + getAgent().getLocation().distance(choice.getLocation()));
         getAgent().removeTask(t);
         HandTaskMessage msg = new HandTaskMessage(t);
         msg.setRecipient(choice);

@@ -88,7 +88,7 @@ public class MSExecutionBehavior extends AbstractBehavior {
     @Override
     public void afterMessages() {
         final long remainder = getAgent().getWorld().getTime() % MSPlane.MS_START_EVERY;
-        if (remainder <= MSPlane.MS_ITERS) {
+        if (remainder < 1 || remainder > MSPlane.MS_ITERS) {
             return;
         }
 

@@ -36,6 +36,8 @@
  */
 package es.csic.iiia.planes.behaviors.neighbors;
 
+import es.csic.iiia.planes.AbstractPlane;
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.messaging.MessagingAgent;
@@ -163,8 +165,17 @@ public class NeighborTracking extends AbstractBehavior {
      */
     @Override
     public void afterMessages() {
-        // Send a tracking message for the next iteration
-        getAgent().send(new TrackingMessage());
+        MessagingAgent a = getAgent();
+
+        // Skip the tracking message if it's a non-charged plane
+        if (a instanceof AbstractPlane) {
+            AbstractPlane p = (AbstractPlane)this.getAgent();
+            if (p.getState() != AbstractPlane.State.NORMAL) {
+                return;
+            }
+        }
+
+        a.send(new TrackingMessage());
     }
 
     /**

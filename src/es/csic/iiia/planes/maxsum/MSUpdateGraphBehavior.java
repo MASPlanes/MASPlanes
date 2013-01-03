@@ -88,7 +88,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
     @Override
     public void afterMessages() {
         final long remainder = getAgent().getWorld().getTime() % MSPlane.MS_START_EVERY;
-        if (remainder != 0) {
+        if (remainder != 1) {
             return;
         }
 
@@ -100,7 +100,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
         }
 
         // Track tasks from our neighbors
-        for (MessagingAgent a : tracker.getNeighbors(MSPlane.MS_ITERS+11)) {
+        for (MessagingAgent a : tracker.getNeighbors(MSPlane.MS_ITERS)) {
             MSPlane p = (MSPlane)a;
 
             for (Task t : p.getTasks()) {
@@ -112,17 +112,19 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
                 f.getDomain().put(p, t);
             }
 
-            LOG.log(Level.SEVERE, "{0} has neighbor {1}", new Object[]{getAgent(), a});
-        }
-
-        if (LOG.isLoggable(Level.SEVERE)) {
-            for (Task t : plane.getTasks()) {
-                MSFunction f = plane.getFunction(t);
-                LOG.severe(f.getIdentifier() + " domain: " + f.getDomain());
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST, "{0} has neighbor {1}", new Object[]{getAgent(), a});
             }
         }
 
-        LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, domain});
+        if (LOG.isLoggable(Level.FINEST)) {
+            for (Task t : plane.getTasks()) {
+                MSFunction f = plane.getFunction(t);
+                LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{f.getIdentifier(), f.getDomain()});
+            }
+            LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, domain});
+        }
+
         plane.getVariable().update(domain);
     }
 
