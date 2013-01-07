@@ -44,8 +44,17 @@ import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.Random;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -58,6 +67,8 @@ import org.codehaus.jackson.map.ObjectMapper;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class Cli {
+    private static final String SETTINGS_FILE = "/es/csic/iiia/planes/cli/settings.properties";
+
     private static final Logger LOG = Logger.getLogger(Cli.class.getName());
 
     /**
@@ -73,30 +84,35 @@ public class Cli {
     public static void main(String[] args) {
         initializeLogging();
 
+        options.addOption("d", "dump-settings", false, "dump the default settings to standard output. This can be used to prepare a settings file.");;
         options.addOption("g", "gui", false, "graphically display the simulation.");
         options.addOption("h", "help", false, "show this help message.");
-        options.addOption(OptionBuilder.withArgName("operator")
-                .hasArg()
-                .withDescription("set the strategy used by the operator to submit tasks to UAVs.")
-                .withArgName("random|nearest")
-                .withLongOpt("operator")
+        options.addOption(OptionBuilder.withArgName("setting=value")
+                .hasArgs(2)
+                .withValueSeparator()
+                .withDescription("override \"setting\" with \"value\".")
+                //.withLongOpt("override")
                 .create('o'));
-        options.addOption(OptionBuilder.withArgName("planestype")
-                .hasArg()
-                .withDescription("set the type of planes in this simulation.")
-                .withArgName("default|auction|ms")
-                .withLongOpt("planes-type")
-                .create('p'));
         options.addOption("q", "quiet", false, "disable all output except for results and errors.");
+        options.addOption(OptionBuilder.withArgName("file")
+                .hasArg()
+                .withDescription("Load settings from <file>.")
+                .withLongOpt("settings")
+                .create('s'));
 
-        Configuration config = parseOptions(args);
-        CliApp app = new CliApp(config);
-        app.run();
+        try {
+            Configuration config = parseOptions(args);
+            CliApp app = new CliApp(config);
+            app.run();
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+            System.exit(1);
+        }
     }
 
     private static void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("planes [OPTIONS] <PROBLEM>", options);
+        formatter.printHelp("planes [options] <problem>", options);
         System.exit(1);
     }
 
@@ -107,9 +123,10 @@ public class Cli {
      * @return a configuration object set according to the input options.
      */
     private static Configuration parseOptions(String[] in_args) {
-        Configuration config = new Configuration();
         CommandLineParser parser = new PosixParser();
         CommandLine line = null;
+        Properties settings = loadDefaultSettings();
+
         try {
             line = parser.parse(options, in_args);
         } catch (ParseException ex) {
@@ -117,54 +134,39 @@ public class Cli {
             showHelp();
         }
 
-        if (line.hasOption('g')) {
-            config.gui = true;
-        }
         if (line.hasOption('h')) {
             showHelp();
         }
-        if (line.hasOption('o')) {
-            String value = line.getOptionValue('o');
-            if (value.equalsIgnoreCase("nearest")) {
-                config.operatorStrategy = new Nearest();
-            } else if (value.equalsIgnoreCase("random")) {
-                config.operatorStrategy = new Random();
-            } else {
-                throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
+
+        if (line.hasOption('d')) {
+            dumpSettings();
+        }
+
+        if (line.hasOption('s')) {
+            String fname = line.getOptionValue('s');
+            try {
+                settings.load(new FileReader(fname));
+            }  catch (IOException ex) {
+                throw new IllegalArgumentException("Unable to load the settings file \"" + fname + "\"");
             }
         }
-        if (line.hasOption('p')) {
-            String value = line.getOptionValue('p');
-            if (value.equalsIgnoreCase("auction")) {
-                config.planesClass = AuctionPlane.class;
-            } else if (value.equalsIgnoreCase("default")) {
-                config.planesClass = DefaultPlane.class;
-            } else if (value.equalsIgnoreCase("ms")) {
-                config.planesClass = MSPlane.class;
-            } else {
-                throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
-            }
-        }
-        if (line.hasOption('q')) {
-            config.quiet = true;
-        }
+
+        // Apply overrides
+        settings.setProperty("gui", String.valueOf(line.hasOption('g')));
+        settings.setProperty("quiet", String.valueOf(line.hasOption('q')));
+        Properties overrides = line.getOptionProperties("o");
+        settings.putAll(overrides);
+
+        LOG.info(settings.toString());
 
         String[] args = line.getArgs();
         if (args.length < 1) {
             showHelp();
         }
+        settings.setProperty("problem", args[0]);
 
-        DProblem d = new DProblem();
-        ObjectMapper mapper = new ObjectMapper();
-        try {
-            d = mapper.readValue(new File(args[0]), DProblem.class);
-        } catch (IOException ex) {
-            System.err.println("Error reading file: " + ex.getLocalizedMessage());
-            System.exit(1);
-        }
-        config.problemDefinition = d;
-
-        return config;
+        Configuration c = new Configuration(settings);
+        return c;
     }
 
     /**
@@ -180,5 +182,40 @@ public class Cli {
         } catch (SecurityException ex) {
             LOG.log(Level.SEVERE, null, ex);
         }
+    }
+
+    /**
+     * Loads the default settings.
+     */
+    private static Properties loadDefaultSettings() {
+        Properties settings = new Properties();
+        try {
+            InputStream is = Cli.class.getResourceAsStream(SETTINGS_FILE);
+            if (is == null) {
+                throw new RuntimeException("Unable to locate default settings file.");
+            }
+            settings.load(is);
+        } catch (IOException ex) {
+            Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return settings;
+    }
+
+    /**
+     * Dumps the default settings to standard output and exits.
+     */
+    private static void dumpSettings() {
+        BufferedReader is = new BufferedReader(new InputStreamReader(
+            Cli.class.getResourceAsStream(SETTINGS_FILE)
+        ));
+        try {
+            for (String line=is.readLine(); line != null; line=is.readLine()) {
+                System.out.println(line);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(Cli.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        System.exit(0);
     }
 }

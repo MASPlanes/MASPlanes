@@ -42,7 +42,9 @@ import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
+import java.io.IOException;
 import java.util.Map;
+import java.util.Properties;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -73,9 +75,14 @@ public class MSExecutionBehaviorTest {
 
     @BeforeClass
     public static void setUpClass() {
-        c = new Configuration();
-        c.quiet = true;
-        c.planesClass = MSPlane.class;
+        Properties p = new Properties();
+        try {
+            p.load(MSExecutionBehaviorTest.class.getResourceAsStream("settings.properties"));
+        } catch (IOException ex) {
+            Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        c = new Configuration(p);
     }
 
     @AfterClass

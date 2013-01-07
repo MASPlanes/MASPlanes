@@ -36,9 +36,16 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.maxsum.MSPlane;
+import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import es.csic.iiia.planes.operator_behavior.Random;
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Holds the configuration settings of the simulator.
@@ -50,25 +57,30 @@ public class Configuration {
     /**
      * True if running with a graphical display, false otherwise.
      */
-    public boolean gui = false;
+    public final boolean gui;
 
     /**
      * True if running in "quiet" mode (no output except for final
      * statistics & errors)
      */
-    public boolean quiet = false;
+    public final boolean quiet;
+
+    /**
+     * Problem's file name.
+     */
+    public final String problemFile;
 
     /**
      * Pointer to the problem definition of the problem (scenario definition)
      * being simulated.
      */
-    public DProblem problemDefinition = null;
+    public final DProblem problemDefinition;
 
     /**
      * Strategy used by the {@link Operator} to decide to which plane it will
      * submit the task.
      */
-    public OperatorStrategy operatorStrategy = new Random();
+    public final OperatorStrategy operatorStrategy;
 
     /**
      * Class of planes used by this simulation.
@@ -76,6 +88,67 @@ public class Configuration {
      * Because different planes use different solving strategies, changing their
      * class is how the simulator runs one solving algorithm or another.
      */
-    public Class<? extends Plane> planesClass = DefaultPlane.class;
+    public final Class<? extends Plane> planesClass;
+
+    public Configuration(Properties settings) {
+
+        String value = settings.getProperty("operator-strategy");
+        if (value.equalsIgnoreCase("nearest")) {
+            operatorStrategy = new Nearest();
+        } else if (value.equalsIgnoreCase("random")) {
+            operatorStrategy = new Random();
+        } else {
+            throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
+        }
+
+        value = settings.getProperty("planes");
+        if (value.equalsIgnoreCase("auction")) {
+            planesClass = AuctionPlane.class;
+        } else if (value.equalsIgnoreCase("none")) {
+            planesClass = DefaultPlane.class;
+        } else if (value.equalsIgnoreCase("maxsum")) {
+            planesClass = MSPlane.class;
+        } else {
+            throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
+        }
+
+        value = settings.getProperty("gui");
+        if (value.equalsIgnoreCase("true") || value.equals("1")) {
+            gui = true;
+        } else {
+            gui = false;
+        }
+
+        value = settings.getProperty("quiet");
+        if (value.equalsIgnoreCase("true") || value.equals("1")) {
+            quiet = true;
+        } else {
+            quiet = false;
+        }
+
+        DProblem d = new DProblem();
+        ObjectMapper mapper = new ObjectMapper();
+        problemFile = settings.getProperty("problem");
+        try {
+            d = mapper.readValue(new File(problemFile), DProblem.class);
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("Error reading problem file \"" + problemFile + "\"");
+        }
+        problemDefinition = d;
+
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder buf = new StringBuilder("{\n")
+            .append("\tGUI:      ").append(gui).append("\n")
+            .append("\tQuiet:    ").append(quiet).append("\n")
+            .append("\tProblem:  ").append(problemFile).append("\n")
+            .append("\tOperator: ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
+            .append("\tPlanes:   ").append(planesClass.getSimpleName()).append("\n")
+        .append("}");
+
+        return buf.toString();
+    }
 
 }

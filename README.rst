@@ -51,5 +51,40 @@ options by launching it with the `-h` option::
 Choose your settings and launch the simulator, specifying which scenario
 description must be tested::
 
-  java -jar dist/planes.jar -o nearest problem
+  java -jar dist/planes.jar problem
 
+
+Settings
+========
+
+There are many parts of the simulator that can be customized for each run. These
+settings include from the mechanism used by the planes to coordinate betweem 
+themselves (the algorithms we are testing!), to how the operator(s) choose to
+which plane to submit each task.
+
+To ease in making experiments of many runs with similar configurations, the
+simulator allows you to specify a settings file using the command line. That is,
+you can instruct the simulator to use the settings described by <file> by running
+it with a special parameter::
+
+  java -jar dist/planes.jar problem -s <file>
+
+or the longer form::
+  java -jar dist/planes.jar problem --settings <file>
+
+To learn about all available settings and prepare your own settings file, the
+simulator includes a special "dump" option. Using this option, you can dump the
+default settings (including their description) to a file. Later on, you just have
+to specify that settings file when solving the instances::
+
+  java -jar dist/planes.jar -d > custom.settings
+  java -jar dist/planes.jar problem --setings=custom.settings
+
+Customizing a settings file is very useful when running batches of simulations.
+However, when trying things out you may want to override a setting without having
+to modify it in the settings file (or without having to create a settings file at
+all). In this situations, you can _override_ a default setting by specifying it
+directly in the command line. For instance, you could change the operator's
+strategy by running the simulator as follows::
+
+  java -jar dist/planes.jar problem -o operator-strategy=nearest
