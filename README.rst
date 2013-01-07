@@ -70,6 +70,7 @@ it with a special parameter::
   java -jar dist/planes.jar problem -s <file>
 
 or the longer form::
+
   java -jar dist/planes.jar problem --settings <file>
 
 To learn about all available settings and prepare your own settings file, the
