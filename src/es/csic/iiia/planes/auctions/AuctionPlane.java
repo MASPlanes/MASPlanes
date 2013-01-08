@@ -53,8 +53,6 @@ import java.util.List;
  */
 public class AuctionPlane extends AbstractPlane {
 
-    public static int AUCTION_EVERY = 1;
-
     private ArrayList<Task> localTasks = new ArrayList<Task>();
 
     public AuctionPlane(Location location) {

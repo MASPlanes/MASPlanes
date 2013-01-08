@@ -90,6 +90,13 @@ public class Configuration {
      */
     public final Class<? extends Plane> planesClass;
 
+    /* AUCTIONS specific stuff */
+    public final int aucEvery;
+
+    /* MAXSUM specific stuff */
+    public final int msIterations;
+    public final int msStartEvery;
+
     public Configuration(Properties settings) {
 
         String value = settings.getProperty("operator-strategy");
@@ -136,6 +143,9 @@ public class Configuration {
         }
         problemDefinition = d;
 
+        msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
+        msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
+        aucEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
     }
 
     @Override

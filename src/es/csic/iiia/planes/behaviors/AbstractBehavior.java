@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.behaviors;
 
+import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**
@@ -64,6 +65,10 @@ public abstract class AbstractBehavior implements Behavior {
     @Override
     public MessagingAgent getAgent() {
         return agent;
+    }
+
+    protected Configuration getConfiguration() {
+        return agent.getWorld().getFactory().getConfiguration();
     }
 
 }

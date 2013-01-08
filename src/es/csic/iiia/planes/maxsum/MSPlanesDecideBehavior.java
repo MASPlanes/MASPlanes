@@ -99,8 +99,8 @@ public class MSPlanesDecideBehavior extends AbstractBehavior {
 
     @Override
     public void afterMessages() {
-        final long remainder = getAgent().getWorld().getTime() % MSPlane.MS_START_EVERY;
-        if (remainder != MSPlane.MS_ITERS) {
+        final long remainder = getAgent().getWorld().getTime() % getConfiguration().msStartEvery;
+        if (remainder != getConfiguration().msIterations) {
             return;
         }
 
