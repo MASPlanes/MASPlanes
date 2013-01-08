@@ -157,8 +157,6 @@ public class Cli {
         Properties overrides = line.getOptionProperties("o");
         settings.putAll(overrides);
 
-        LOG.info(settings.toString());
-
         String[] args = line.getArgs();
         if (args.length < 1) {
             showHelp();
@@ -166,6 +164,7 @@ public class Cli {
         settings.setProperty("problem", args[0]);
 
         Configuration c = new Configuration(settings);
+        System.out.println(c.toString());
         return c;
     }
 

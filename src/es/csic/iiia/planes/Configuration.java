@@ -145,18 +145,21 @@ public class Configuration {
 
         msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
         msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
-        aucEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
+        aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
     }
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder("{\n")
-            .append("\tGUI:      ").append(gui).append("\n")
-            .append("\tQuiet:    ").append(quiet).append("\n")
-            .append("\tProblem:  ").append(problemFile).append("\n")
-            .append("\tOperator: ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
-            .append("\tPlanes:   ").append(planesClass.getSimpleName()).append("\n")
-        .append("}");
+        StringBuilder buf = new StringBuilder("###### Settings:\n")
+            .append("# gui = ").append(gui).append("\n")
+            .append("# quiet = ").append(quiet).append("\n")
+            .append("# problem = ").append(problemFile).append("\n")
+            .append("# operator = ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
+            .append("# planes = ").append(planesClass.getSimpleName()).append("\n")
+            .append("# auction-every = ").append(aucEvery).append("\n")
+            .append("# maxsum-start-every = ").append(msStartEvery).append("\n")
+            .append("# maxsum-iterations = ").append(msIterations).append("\n")
+        ;
 
         return buf.toString();
     }
