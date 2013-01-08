@@ -45,7 +45,8 @@ import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 class StatsCollector {
 
     private AbstractWorld world;
-    private DescriptiveStatistics stats = new DescriptiveStatistics();
+    private DescriptiveStatistics taskStats = new DescriptiveStatistics();
+    private DescriptiveStatistics planeStats = new DescriptiveStatistics();
 
     public StatsCollector(AbstractWorld w) {
         world = w;
@@ -53,20 +54,31 @@ class StatsCollector {
 
     public void collect(Task t) {
         final long time = world.getTime() - t.getSubmissionTime();
-        stats.addValue(time);
+        taskStats.addValue(time);
+    }
+
+    public void collect(Plane p) {
+        planeStats.addValue(p.getTotalDistance());
     }
 
     public void display() {
         // Final stats
         StringBuilder buf = new StringBuilder();
-        buf.append("\n").append("min/avg/max: ");
-        buf.append((int)stats.getMin()).append("/")
-           .append((int)stats.getMean()).append("/")
-           .append((int)stats.getMax()).append("\t")
-           .append("quartiles: " )
-           .append((int)stats.getPercentile(25)).append("/")
-           .append((int)stats.getPercentile(50)).append("/")
-           .append((int)stats.getPercentile(75)).append("\n");
+        buf.append("task_min=").append((int)taskStats.getMin()).append("\n")
+           .append("task_mean=").append((int)taskStats.getMean()).append("\n")
+           .append("task_max=").append((int)taskStats.getMax()).append("\n")
+           .append("task_p25=").append((int)taskStats.getPercentile(25)).append("\n")
+           .append("task_median=").append((int)taskStats.getPercentile(50)).append("\n")
+           .append("task_p75=").append((int)taskStats.getPercentile(75)).append("\n")
+        .append("\n");
+
+        buf.append("plane_min=").append((long)(planeStats.getMin()/1000)).append("\n")
+           .append("plane_mean=").append((long)(planeStats.getMean()/1000)).append("\n")
+           .append("plane_max=").append((long)(planeStats.getMax()/1000)).append("\n")
+           .append("plane_p25=").append((long)(planeStats.getPercentile(25)/1000)).append("\n")
+           .append("plane_median=").append((long)(planeStats.getPercentile(50)/1000)).append("\n")
+           .append("plane_p75=").append((long)(planeStats.getPercentile(75)/1000)).append("\n");
+
         System.err.println(buf);
     }
 

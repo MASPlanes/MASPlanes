@@ -165,4 +165,11 @@ public interface Plane extends MessagingAgent {
      */
     public void setColor(int[] color);
 
+    /**
+     * Get the total flight distance of this plane, for evaluation purposes.
+     *
+     * @return the total flight distance of this plane.
+     */
+    public double getTotalDistance();
+
 }

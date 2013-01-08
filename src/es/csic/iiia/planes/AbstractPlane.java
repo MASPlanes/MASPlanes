@@ -113,6 +113,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     private int[] color;
 
     /**
+     * Total flight distance of this plane.
+     */
+    private double flightDistance;
+
+    /**
      * Default constructor
      *
      * @param location initial location of the plane
@@ -206,6 +211,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
                 triggerTaskCompleted(completed);
             }
             updateBattery();
+            flightDistance += getSpeed();
         }
     }
 
@@ -218,6 +224,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     private void goCharge(Station st) {
         state = State.TO_CHARGE;
         angle = getLocation().getAngle(st.getLocation());
+        flightDistance += getSpeed();
         if (this.getLocation().move(st.getLocation(), getSpeed())) {
             state = State.CHARGING;
             this.completedLocations.add(st.getLocation());
@@ -320,6 +327,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     @Override
     public void setColor(int[] color) {
         this.color = color;
+    }
+
+    @Override
+    public double getTotalDistance() {
+        return flightDistance;
     }
 
     @Override
