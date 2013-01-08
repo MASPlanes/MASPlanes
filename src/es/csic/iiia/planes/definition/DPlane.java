@@ -47,6 +47,7 @@ import es.csic.iiia.planes.Plane;
 public class DPlane extends DLocation {
     private double speed;
     private long batteryCapacity;
+    private long initialBattery;
     private int[] color;
     private double communicationRange;
 
@@ -128,5 +129,23 @@ public class DPlane extends DLocation {
      */
     public void setCommunicationRange(double communicationRange) {
         this.communicationRange = communicationRange;
+    }
+
+    /**
+     * Get the initial amount of battery of this plane.
+     *
+     * @return intial amount of battery of this plane.
+     */
+    public long getInitialBattery() {
+        return initialBattery;
+    }
+
+    /**
+     * Set the initial amount of battery of this plane.
+     *
+     * @param initialBattery initial amount of battery of this plane.
+     */
+    public void setInitialBattery(long initialBattery) {
+        this.initialBattery = initialBattery;
     }
 }
