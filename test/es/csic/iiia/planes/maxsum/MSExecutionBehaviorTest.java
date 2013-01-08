@@ -82,7 +82,9 @@ public class MSExecutionBehaviorTest {
             Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-        c = new Configuration(p);
+        try {
+            c = new Configuration(p);
+        } catch (IllegalArgumentException e) {}
     }
 
     @AfterClass

@@ -37,6 +37,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
@@ -62,9 +63,9 @@ public abstract class AbstractWorld implements World {
     private StatsCollector stats = new StatsCollector(this);
 
     /**
-     * Operator in charge of supplying tasks to the UAVs.
+     * Operators in charge of supplying tasks to the UAVs.
      */
-    private Operator operator;
+    private ArrayList<Operator> operators = new ArrayList<Operator>();
 
     /**
      * Current simulation time.
@@ -95,6 +96,14 @@ public abstract class AbstractWorld implements World {
         return factory;
     }
 
+    /**
+     * Get the list of operators.
+     * @return list of operators.
+     */
+    protected List<Operator> getOperators() {
+        return operators;
+    }
+
     @Override
     public void addStation(Station station) {
         stations.add(station);
@@ -113,7 +122,12 @@ public abstract class AbstractWorld implements World {
         space = new Space(d.getWidth(), d.getHeight());
         setDuration(d.getDuration());
 
-        operator = factory.buildOperator(d.getTasks());
+        for (DOperator o : d.getOperators()) {
+            Location l = new Location(o.getX(), o.getY());
+            Operator operator = factory.buildOperator(l, o.getTasks());
+            operator.setCommunicationRange(o.getCommunicationRange());
+            operators.add(operator);
+        }
 
         for (DPlane pd : d.getPlanes()) {
             Location l = new Location(pd.getX(), pd.getY());
@@ -180,12 +194,16 @@ public abstract class AbstractWorld implements World {
         for (Plane p : planes) {
             p.preStep();
         }
-        if (operator != null) operator.preStep();
+        for (Operator o : operators) {
+            o.preStep();
+        }
 
         for (Plane p : planes) {
             p.step();
         }
-        if (operator != null) operator.step();
+        for (Operator o : operators) {
+            o.step();
+        }
     }
 
     /**
@@ -241,6 +259,20 @@ public abstract class AbstractWorld implements World {
             final double d = location.getDistance(s.getLocation());
             if (d < mind) {
                 best = s;
+                mind = d;
+            }
+        }
+        return best;
+    }
+
+    @Override
+    public Operator getNearestOperator(Location location) {
+        double mind = Double.MAX_VALUE;
+        Operator best = null;
+        for (Operator o : operators) {
+            final double d = location.getDistance(o.getLocation());
+            if (d < mind) {
+                best = o;
                 mind = d;
             }
         }

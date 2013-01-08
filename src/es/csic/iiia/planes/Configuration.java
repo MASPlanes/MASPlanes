@@ -40,8 +40,10 @@ import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
+import es.csic.iiia.planes.operator_behavior.NearestInRange;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import es.csic.iiia.planes.operator_behavior.Random;
+import es.csic.iiia.planes.operator_behavior.RandomInRange;
 import java.io.File;
 import java.io.IOException;
 import java.util.Properties;
@@ -104,6 +106,10 @@ public class Configuration {
             operatorStrategy = new Nearest();
         } else if (value.equalsIgnoreCase("random")) {
             operatorStrategy = new Random();
+        } else if (value.equalsIgnoreCase("nearest-inrange")) {
+            operatorStrategy = new NearestInRange();
+        } else if (value.equalsIgnoreCase("random-inrange")) {
+            operatorStrategy = new RandomInRange();
         } else {
             throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
         }

@@ -70,7 +70,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     /**
      * Current plane state
      */
-    private State state;
+    private State state = State.NORMAL;
 
     /**
      * Recharge ratio (flight seconds per charning second)
@@ -212,6 +212,18 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
             }
             updateBattery();
             flightDistance += getSpeed();
+
+        // Try to get in range of an operator, because the plane is idle
+        } else {
+
+            Operator o = getWorld().getNearestOperator(getLocation());
+            if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
+                angle = getLocation().getAngle(o.getLocation());
+                getLocation().move(o.getLocation(), getSpeed());
+            } else {
+                angle += 0.01;
+            }
+
         }
     }
 

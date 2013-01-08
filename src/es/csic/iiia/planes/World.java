@@ -96,6 +96,14 @@ public interface World extends Runnable {
     Station getNearestStation(Location location);
 
     /**
+     * Get the operator that is closest to the given location.
+     *
+     * @param location where an element is querying from.
+     * @return the operator that is closest to the given location.
+     */
+    Operator getNearestOperator(Location location);
+
+    /**
      * Add a new task to the world.
      *
      * The world keeps track of the tasks just for counting purposes.

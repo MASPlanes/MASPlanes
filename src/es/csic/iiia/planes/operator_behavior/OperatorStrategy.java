@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.operator_behavior;
 
+import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 
@@ -51,5 +52,5 @@ import es.csic.iiia.planes.World;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface OperatorStrategy {
-    public void submitTask(World w, Task t);
+    public boolean submitTask(World w, Operator o, Task t);
 }

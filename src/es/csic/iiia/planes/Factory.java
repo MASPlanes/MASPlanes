@@ -62,10 +62,11 @@ public interface Factory {
      * The created operator will create and submit tasks according to the given
      * list of task definitions.
      *
-     * @param taskDefinitions list of task definitions
+     * @param location location where this operator is positioned.
+     * @param taskDefinitions list of task definitions,
      * @return Operator newly build Operator.
      */
-    public Operator buildOperator(List<DTask> taskDefinitions);
+    public Operator buildOperator(Location location, List<DTask> taskDefinitions);
 
     /**
      * Builds a {@link Plane}.

@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.generator;
 
+import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
@@ -63,6 +64,7 @@ public class Generator {
     private int width = 10000;
     private int height = 10000;
     private int num_planes = 10;
+    private int num_operators = 1;
     private int num_tasks = 60*24*30;
     private int num_stations = 1;
     private int num_crisis = 4;
@@ -93,6 +95,7 @@ public class Generator {
     public void run() {
         DProblem p = createProblemDefinition();
         addPlanes(p);
+        addOperators(p);
         addTasks(p);
         addStations(p);
 
@@ -133,15 +136,27 @@ public class Generator {
         }
     }
 
+    private void addOperators(DProblem p) {
+        ArrayList<DOperator> operators = p.getOperators();
+        for (int i=0;i<num_operators;i++) {
+            DOperator o = new DOperator();
+            o.setX(r.nextInt(p.getWidth()));
+            o.setY(r.nextInt(p.getHeight()));
+            o.setCommunicationRange(2000);
+            operators.add(o);
+        }
+    }
+
     private void addTasks(DProblem p) {
+        ArrayList<DTask> tasks = new ArrayList<DTask>();
 
         // Create the tasks, randomly located
-        ArrayList<DTask> tasks = p.getTasks();
         for (int i=0;i<num_tasks;i++) {
             DTask t = new DTask();
             t.setX(r.nextInt(p.getWidth()));
             t.setY(r.nextInt(p.getHeight()));
             tasks.add(t);
+            p.getOperators().get(r.nextInt(num_operators)).getTasks().add(t);
         }
 
         // Set task times. Use the crisis model for now.

@@ -124,6 +124,9 @@ public class GUIWorld extends AbstractWorld {
         for (Station s : getStations()) {
             s.draw(surface);
         }
+        for (Operator o : getOperators()) {
+            o.draw(surface);
+        }
         for (Plane p : getPlanes()) {
             p.getDrawer().draw(surface);
         }

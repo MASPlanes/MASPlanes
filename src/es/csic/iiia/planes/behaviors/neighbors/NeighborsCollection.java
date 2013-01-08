@@ -233,6 +233,11 @@ class NeighborsCollection implements Collection<NeighborEntry>
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
+    public String toString() {
+        return map.toString();
+    }
+
     private class NeighborIterator implements Iterator<MessagingAgent> {
 
         private final int iterations;

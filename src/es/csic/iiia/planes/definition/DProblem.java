@@ -56,8 +56,8 @@ public class DProblem {
     private int width = 1000;
     private int height = 1000;
     private long duration = 3600*24*30;
+    private ArrayList<DOperator> operators = new ArrayList<DOperator>();
     private ArrayList<DPlane> planes = new ArrayList<DPlane>();
-    private ArrayList<DTask> tasks = new ArrayList<DTask>();
     private ArrayList<DStation> stations = new ArrayList<DStation>();
 
     /**
@@ -115,6 +115,25 @@ public class DProblem {
     }
 
     /**
+     * Get a list of the operators in this scenario.
+     *
+     * @return list of operators in this scenario.
+     */
+    public ArrayList<DOperator> getOperators() {
+        return operators;
+    }
+
+    /**
+     * Set the list of operators in this scenario.
+     *
+     * @param operators list of operators to set.
+     */
+    public void setOperators(ArrayList<DOperator> operators) {
+        this.operators = operators;
+    }
+
+
+    /**
      * Get a list of the planes in this scenario.
      *
      * @return list of planes in this scenario.
@@ -130,24 +149,6 @@ public class DProblem {
      */
     public void setPlanes(ArrayList<DPlane> planes) {
         this.planes = planes;
-    }
-
-    /**
-     * Get the list of tasks in this scenario.
-     *
-     * @return list of tasks in this scenario.
-     */
-    public ArrayList<DTask> getTasks() {
-        return tasks;
-    }
-
-    /**
-     * Set the list of tasks in this scenario.
-     *
-     * @param tasks list of tasks to set.
-     */
-    public void setTasks(ArrayList<DTask> tasks) {
-        this.tasks = tasks;
     }
 
     /**

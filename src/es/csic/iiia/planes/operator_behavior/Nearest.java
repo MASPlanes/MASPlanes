@@ -37,6 +37,7 @@
 package es.csic.iiia.planes.operator_behavior;
 
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
@@ -51,7 +52,7 @@ import java.util.List;
 public class Nearest implements OperatorStrategy {
 
     @Override
-    public void submitTask(World w, Task t) {
+    public boolean submitTask(World w, Operator o, Task t) {
         final List<Plane> planes = w.getPlanes();
         Location l = t.getLocation();
 
@@ -65,6 +66,7 @@ public class Nearest implements OperatorStrategy {
             }
         }
         nearest.addTask(t);
+        return true;
     }
 
 }

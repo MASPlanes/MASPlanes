@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.operator_behavior;
 
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
@@ -43,19 +44,40 @@ import es.csic.iiia.planes.World;
 import java.util.List;
 
 /**
- * An OperatorStrategy that submits the tasks to a random plane.
+ * An OperatorStrategy that submits the tasks to the plane that is currently
+ * nearest to the task location.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Random implements OperatorStrategy {
-
-    private java.util.Random r = new java.util.Random(0);
+public class NearestInRange implements OperatorStrategy {
 
     @Override
     public boolean submitTask(World w, Operator o, Task t) {
         final List<Plane> planes = w.getPlanes();
-        int pnum = r.nextInt(planes.size());
-        planes.get(pnum).addTask(t);
+        final Location tl = t.getLocation();
+        final Location ol = o.getLocation();
+        final double or = o.getCommunicationRange();
+
+        double mind = Double.MAX_VALUE;
+        Plane nearest = null;
+        for (Plane p : planes) {
+            if (ol.distance(p.getLocation()) > or) {
+                continue;
+            }
+
+            final double d = p.getLocation().getDistance(tl);
+            if (d < mind) {
+                mind = d;
+                nearest = p;
+            }
+        }
+
+        if (nearest == null) {
+            // No plane where to submit the task!
+            return false;
+        }
+
+        nearest.addTask(t);
         return true;
     }
 

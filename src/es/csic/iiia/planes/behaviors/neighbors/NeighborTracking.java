@@ -94,8 +94,9 @@ public class NeighborTracking extends AbstractBehavior {
      */
     public boolean isNeighbor(MessagingAgent agent, int iterations) {
         if (LOG.isLoggable(Level.FINEST)) {
-            LOG.log(Level.FINEST, "{2} checking if {0} will be neighbor for {1} iterations.",
+            LOG.log(Level.FINEST, "{1} checking if {0} will be neighbor for {2} iterations.",
                     new Object[]{agent, getAgent(), iterations});
+            LOG.finest("Neighbors: " + neighbors);
         }
 
         return neighbors.contains(agent, iterations);
@@ -171,10 +172,12 @@ public class NeighborTracking extends AbstractBehavior {
         if (a instanceof AbstractPlane) {
             AbstractPlane p = (AbstractPlane)this.getAgent();
             if (p.getState() != AbstractPlane.State.NORMAL) {
+                LOG.log(Level.FINE, "Skipping beacon because " + a + " is in " + p.getState()  + " state.");
                 return;
             }
         }
 
+        LOG.log(Level.FINE, "Sending beacon.");
         a.send(new TrackingMessage());
     }
 

@@ -73,8 +73,8 @@ public abstract class AbstractFactory implements Factory {
     }
 
     @Override
-    public Operator buildOperator(List<DTask> tasks) {
-        Operator o = new Operator(tasks);
+    public Operator buildOperator(Location location, List<DTask> tasks) {
+        Operator o = new Operator(location, tasks);
         o.setStrategy(config.operatorStrategy);
         initialize(o);
         return o;

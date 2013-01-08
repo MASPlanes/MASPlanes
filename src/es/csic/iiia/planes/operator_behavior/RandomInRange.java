@@ -40,6 +40,7 @@ import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -47,15 +48,24 @@ import java.util.List;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Random implements OperatorStrategy {
+public class RandomInRange implements OperatorStrategy {
 
     private java.util.Random r = new java.util.Random(0);
 
     @Override
     public boolean submitTask(World w, Operator o, Task t) {
         final List<Plane> planes = w.getPlanes();
-        int pnum = r.nextInt(planes.size());
-        planes.get(pnum).addTask(t);
+        final double orange = o.getCommunicationRange();
+
+        final List<Plane> planesInRange = new ArrayList<Plane>();
+        for (Plane p : planes) {
+            if (o.getLocation().distance(p.getLocation()) <= orange) {
+                planesInRange.add(p);
+            }
+        }
+
+        int pnum = r.nextInt(planesInRange.size());
+        planesInRange.get(pnum).addTask(t);
         return true;
     }
 

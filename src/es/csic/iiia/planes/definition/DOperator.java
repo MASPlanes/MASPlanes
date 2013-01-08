@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,29 +34,53 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.operator_behavior;
+package es.csic.iiia.planes.definition;
 
-import es.csic.iiia.planes.Operator;
-import es.csic.iiia.planes.Plane;
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.World;
-import java.util.List;
+import java.util.ArrayList;
 
 /**
- * An OperatorStrategy that submits the tasks to a random plane.
+ * Definition of an operator.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Random implements OperatorStrategy {
+public class DOperator extends DLocation {
+    private double communicationRange;
+    private ArrayList<DTask> tasks = new ArrayList<DTask>();
 
-    private java.util.Random r = new java.util.Random(0);
+    /**
+     * Get the list of tasks in this scenario.
+     *
+     * @return list of tasks in this scenario.
+     */
+    public ArrayList<DTask> getTasks() {
+        return tasks;
+    }
 
-    @Override
-    public boolean submitTask(World w, Operator o, Task t) {
-        final List<Plane> planes = w.getPlanes();
-        int pnum = r.nextInt(planes.size());
-        planes.get(pnum).addTask(t);
-        return true;
+    /**
+     * Set the list of tasks in this scenario.
+     *
+     * @param tasks list of tasks to set.
+     */
+    public void setTasks(ArrayList<DTask> tasks) {
+        this.tasks = tasks;
+    }
+
+    /**
+     * Get the communication range of this operator.
+     *
+     * @return the communication range of this operator.
+     */
+    public double getCommunicationRange() {
+        return communicationRange;
+    }
+
+    /**
+     * Set the communication range of this operator.
+     *
+     * @param communicationRange new communication range.
+     */
+    public void setCommunicationRange(double communicationRange) {
+        this.communicationRange = communicationRange;
     }
 
 }
