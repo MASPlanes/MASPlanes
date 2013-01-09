@@ -97,8 +97,8 @@ public abstract class MSNode<DK, DV> {
             minimizer.track(p, belief);
             vs[i++] = belief;
         }
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
         }
     }
 
@@ -109,8 +109,8 @@ public abstract class MSNode<DK, DV> {
             msg.setRecipient(getRecipient(p));
 
             plane.send(msg);
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
             }
         }
 

@@ -40,6 +40,7 @@ import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultFactory;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 import java.io.IOException;
@@ -79,19 +80,17 @@ public class MSExecutionBehaviorTest {
         try {
             p.load(MSExecutionBehaviorTest.class.getResourceAsStream("settings.properties"));
         } catch (IOException ex) {
-            Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
 
-        try {
-            c = new Configuration(p);
-        } catch (IllegalArgumentException e) {}
+        c = new Configuration(p);
     }
 
     @AfterClass
     public static void tearDownClass() {
         try {
             LOG.severe("Done.");
-            Thread.sleep(5000);
+            Thread.sleep(1000);
         } catch (InterruptedException ex) {
             Logger.getLogger(MSExecutionBehaviorTest.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -102,11 +101,8 @@ public class MSExecutionBehaviorTest {
         // Create a small problem:
         factory = new DefaultFactory(c);
         world = factory.buildWorld();
-        world.addStation(factory.buildStation(new Location(0,0)));
-        p1 = buildPlane(0, 0);
-        p2 = buildPlane(1, 0);
-        t = factory.buildTask(new Location(0.75,0));
-        p1.addTask(t);
+        world.init(c.problemDefinition);
+
     }
 
     @After
@@ -197,34 +193,10 @@ public class MSExecutionBehaviorTest {
     @Test
     public void testAfterMessages() {
         System.err.println("afterMessages");
-
-        for (int i=0; i<10; i++) {
-            LOG.log(Level.FINE, "======== Iter {0}", i);
-            p1.preStep();
-            p2.preStep();
-            p1.step();
-            p2.step();
-        }
-    }
-
-    /**
-     * Test of afterMessages method, of class MSExecutionBehavior.
-     */
-    @Test
-    public void testAfterMessages2() {
-        System.err.println("afterMessages2");
-        MSPlane p3 = buildPlane(0.75, 0);
-        Task t2 = factory.buildTask(new Location(1,0));
-        Task t3 = factory.buildTask(new Location(0.1,0));
-        p1.addTask(t2);
-        p1.addTask(t3);
-
-        world.setDuration(2);
-
         world.run();
 
-        assertSame(t3, p1.getVariable().makeDecision());
-        assertSame(t2, p2.getVariable().makeDecision());
-        assertSame(t, p3.getVariable().makeDecision());
+        for (Plane p : world.getPlanes()) {
+            System.err.println(p + ": " + p.getTasks());
+        }
     }
 }

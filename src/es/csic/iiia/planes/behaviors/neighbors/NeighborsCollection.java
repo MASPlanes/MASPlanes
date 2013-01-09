@@ -41,6 +41,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.NavigableMap;
+import java.util.NavigableSet;
 import java.util.TreeSet;
 
 /**
@@ -99,6 +101,17 @@ class NeighborsCollection implements Collection<NeighborEntry>
             }
 
         };
+    }
+
+    /**
+     * Check if there are any neighbors for at least the given number of
+     * iterations.
+     *
+     * @param iterations
+     * @return
+     */
+    public boolean hasNeighbors(final int iterations) {
+        return set.lower(new NeighborEntry(null, iterations-1)) != null;
     }
 
     /**

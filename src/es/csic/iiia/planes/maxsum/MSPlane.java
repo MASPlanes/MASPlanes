@@ -59,6 +59,7 @@ public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
     final private MSVariable variable = new MSVariable(this);
+    private boolean inactive;
 
     public MSVariable getVariable() {
         return variable;
@@ -171,6 +172,14 @@ public class MSPlane extends AbstractPlane {
         }
 
         return result;
+    }
+
+    public void setInactive(boolean inactive) {
+        this.inactive = inactive;
+    }
+
+    public boolean isInactive() {
+        return inactive;
     }
 
 }

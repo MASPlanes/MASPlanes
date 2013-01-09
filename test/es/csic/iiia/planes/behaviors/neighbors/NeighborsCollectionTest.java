@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,76 +34,59 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum;
+package es.csic.iiia.planes.behaviors.neighbors;
 
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.DefaultPlane;
+import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.util.Collection;
-import java.util.Map;
+import java.util.Iterator;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
- * Behavior that implements the actual max-sum algorithm.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSExecutionBehavior extends AbstractBehavior {
+public class NeighborsCollectionTest {
 
-    public MSExecutionBehavior(MSPlane plane) {
-        super(plane);
+    public NeighborsCollectionTest() {
     }
 
-    @Override
-    public MSPlane getAgent() {
-        return (MSPlane)super.getAgent();
+    @BeforeClass
+    public static void setUpClass() {
     }
 
-    @Override
-    public boolean isPromiscuous() {
-        return false;
+    @AfterClass
+    public static void tearDownClass() {
     }
 
-    @Override
-    public Class[] getDependencies() {
-        return new Class[]{MSUpdateGraphBehavior.class};
+    @Before
+    public void setUp() {
     }
 
-    @Override
-    public void beforeMessages() {
-
+    @After
+    public void tearDown() {
     }
 
-    public void on(MSVariable.MSVariable2Function msg) {
-        MSFunction recipient = getAgent().getFunction(msg.getTask());
-        if (recipient != null) {
-            recipient.receive(msg);
-        }
-    }
+    /**
+     * Test of hasNeighbors method, of class NeighborsCollection.
+     */
+    @Test
+    public void testHasNeighbors() {
+        System.out.println("hasNeighbors");
+        NeighborsCollection instance = new NeighborsCollection();
+        MessagingAgent a = new DefaultPlane(null);
 
-    public void on(MSFunction.MSFunction2Variable msg) {
-        getAgent().getVariable().receive(msg);
-    }
-
-    @Override
-    public void afterMessages() {
-        final long remainder = getAgent().getWorld().getTime() % getConfiguration().msStartEvery;
-        if (getAgent().isInactive() || remainder < 1 || remainder > getConfiguration().msIterations) {
-            return;
-        }
-
-        final MSVariable variable = getAgent().getVariable();
-        final Map<Task, MSFunction> functions = getAgent().getFunctions();
-
-        // Everyone gather
-        variable.gather();
-        for (MSFunction f : functions.values()) {
-            f.gather();
-        }
-
-        // Everyone scatter
-        variable.scatter();
-        for (MSFunction f : functions.values()) {
-            f.scatter();
-        }
+        assertEquals(false, instance.hasNeighbors(0));
+        instance.add(a, 10);
+        assertEquals(true, instance.hasNeighbors(0));
+        assertEquals(false, instance.hasNeighbors(11));
+        assertEquals(true, instance.hasNeighbors(9));
+        assertEquals(true, instance.hasNeighbors(10));
     }
 
 }

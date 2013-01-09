@@ -56,7 +56,7 @@ class NeighborEntry implements Comparable<NeighborEntry> {
     @Override
     public int compareTo(NeighborEntry o) {
         int r = o.iters - iters;
-        if (r == 0) {
+        if (r == 0 && agent != null && o.agent != null) {
             r = agent.hashCode() - o.agent.hashCode();
         }
         return r;

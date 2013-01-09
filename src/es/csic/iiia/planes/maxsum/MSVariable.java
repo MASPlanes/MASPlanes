@@ -53,9 +53,15 @@ public class MSVariable extends MSNode<Task, MSPlane> {
         return getPlane().getCost(t);
     }
 
+    /**
+     * Horrible horrible hack!
+     * @param t
+     * @param value
+     * @return
+     */
     @Override
     public MSVariable2Function buildOutgoingMessage(Task t, double value) {
-        return new MSVariable2Function(t, value);
+        return new MSVariable2Function(t, getPotential(t));
     }
 
     @Override

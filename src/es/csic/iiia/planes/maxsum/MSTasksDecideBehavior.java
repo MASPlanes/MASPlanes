@@ -76,14 +76,14 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
 
     public void on(HandTaskMessage msg) {
         getAgent().addTask(msg.getTask());
-        LOG.log(Level.FINEST, "[{2}] {0} incorporates {1}",
+        LOG.log(Level.FINER, "[{2}] {0} incorporates {1}",
                 new Object[]{getAgent(), msg.getTask(), getAgent().getWorld().getTime()});
     }
 
     @Override
     public void afterMessages() {
         final long remainder = getAgent().getWorld().getTime() % getConfiguration().msStartEvery;
-        if (remainder != getConfiguration().msIterations) {
+        if (getAgent().isInactive() || remainder != getConfiguration().msIterations) {
             return;
         }
 
@@ -95,8 +95,8 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
             final Task t = tasks.get(i);
             final MSFunction f = p.getFunction(t);
             final MSPlane choice = f.makeDecision();
+            LOG.log(Level.FINE, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f.getIdentifier(), choice, getAgent().getWorld().getTime(), getAgent()});
             if (choice != p && choice != null) {
-                LOG.log(Level.FINEST, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f.getIdentifier(), choice, getAgent().getWorld().getTime(), getAgent()});
                 relocateTask(t, choice);
             }
         }

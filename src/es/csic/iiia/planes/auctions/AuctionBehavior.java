@@ -192,6 +192,11 @@ public class AuctionBehavior extends AbstractBehavior {
             WinnerMessage win = new WinnerMessage(t);
             win.setRecipient(winner.getSender());
             agent.send(win);
+        } else {
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "{0} keeps task {1} (baseCost: {2})",
+                        new Object[]{agent, t.getId(), baseCost});
+            }
         }
     }
 

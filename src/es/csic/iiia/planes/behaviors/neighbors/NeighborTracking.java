@@ -114,6 +114,17 @@ public class NeighborTracking extends AbstractBehavior {
     }
 
     /**
+     * Check if there is any neighbor for at least the given number of
+     * iterations.
+     *
+     * @param iterations required number of iterations.
+     * @return True if there are neighbors, or false otherwise.
+     */
+    public boolean hasNeighbors(int iterations) {
+        return neighbors.hasNeighbors(iterations);
+    }
+
+    /**
      * Return True because this behaviour is promiscuous (we want to receive
      * all messages that we can hear, even if they are not intended for us).
      *
@@ -153,8 +164,8 @@ public class NeighborTracking extends AbstractBehavior {
                     new Object[]{neighbor, n});
             neighbors.add(neighbor, n);
         } else {
-            LOG.log(Level.FINE, "Ignoring {0} as a neighbor.",
-                    new Object[]{neighbor});
+            LOG.log(Level.FINE, "Ignoring {0} as a neighbor (s={1}, d_step={2}).",
+                    new Object[]{neighbor, s, d_step});
         }
     }
 

@@ -99,7 +99,11 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             f.getDomain().clear();
         }
 
+        // Don't do anything if there are no neighbors
+        plane.setInactive(!tracker.hasNeighbors(getConfiguration().msIterations));
+
         // Track tasks from our neighbors
+        tracker.getNeighbors(getConfiguration().msIterations);
         for (MessagingAgent a : tracker.getNeighbors(getConfiguration().msIterations)) {
             MSPlane p = (MSPlane)a;
 
