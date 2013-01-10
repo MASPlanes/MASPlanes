@@ -242,6 +242,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
             if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
                 angle = getLocation().getAngle(o.getLocation());
                 getLocation().move(o.getLocation(), getSpeed());
+                flightDistance += getSpeed();
             } else {
                 angle += 0.01;
             }
@@ -263,6 +264,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
             state = State.CHARGING;
             this.completedLocations.add(st.getLocation());
         }
+        flightDistance += getSpeed();
     }
 
     /**
