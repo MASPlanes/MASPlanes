@@ -42,52 +42,51 @@ import es.csic.iiia.planes.Task;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSVariable extends MSNode<Task, MSPlane> {
+public class MSOldTaskNode extends MSSelectionNode<MSPlane, Task> {
 
-    public MSVariable(MSPlane plane) {
+    private Task task;
+
+    public MSOldTaskNode(MSPlane plane, Task t) {
         super(plane);
+        this.task = t;
     }
 
     @Override
-    public double getPotential(Task t) {
-        return getPlane().getCost(t);
-    }
-
-    /**
-     * Horrible horrible hack!
-     * @param t
-     * @param value
-     * @return
-     */
-    @Override
-    public MSVariable2Function buildOutgoingMessage(Task t, double value) {
-        return new MSVariable2Function(t, getPotential(t));
+    public double getPotential(MSPlane p) {
+        return 0;
     }
 
     @Override
-    protected Task getKey(MSMessage msg) {
-        return msg.getTask();
+    public MSTask2Plane buildOutgoingMessage(MSPlane plane, double value) {
+        return new MSTask2Plane(task, value);
     }
 
     @Override
-    protected MSPlane getRecipient(Task key) {
-        return getDomain().get(key);
+    protected MSPlane getKey(MSMessage msg) {
+        return msg.getSender();
+    }
+
+    @Override
+    protected MSPlane getRecipient(MSPlane key) {
+        return key;
     }
 
     @Override
     protected String getIdentifier() {
-        return "Variable(" + getPlane() + ")";
+        return "T(" + task + ")";
     }
 
-    public class MSVariable2Function extends MSMessage {
+    public class MSTask2Plane extends MSMessage {
 
-        public MSVariable2Function(Task task, double value) {
+        public MSTask2Plane(Task task, double value) {
             super(task, value);
         }
 
         @Override
         public String toString() {
-            return "V(" + getSender() + ") -> F(" + getTask() + ") : " + getValue();
+            return "T(" + getTask() + ") -> P(" + getRecipient() + ") : " + getValue();
         }
+
     }
+
 }

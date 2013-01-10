@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -36,57 +36,38 @@
  */
 package es.csic.iiia.planes.maxsum;
 
-import es.csic.iiia.planes.Task;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSFunction extends MSNode<MSPlane, Task> {
+public abstract class AbstractMSNode<DomainType extends Object> implements MSNode<DomainType> {
 
-    private Task task;
+    private MSPlane plane;
 
-    public MSFunction(MSPlane plane, Task t) {
-        super(plane);
-        this.task = t;
+    private ArrayList<MSEdge> neighbors = new ArrayList<MSEdge>();
+
+    private ArrayList<DomainType> domain = new ArrayList<DomainType>();
+
+    public AbstractMSNode(MSPlane plane) {
+        this.plane = plane;
     }
 
     @Override
-    public double getPotential(MSPlane p) {
-        return 0;
+    public MSPlane getPlane() {
+        return plane;
     }
 
     @Override
-    public MSFunction2Variable buildOutgoingMessage(MSPlane plane, double value) {
-        return new MSFunction2Variable(task, value);
+    public List<MSEdge> getNeighbors() {
+        return neighbors;
     }
 
     @Override
-    protected MSPlane getKey(MSMessage msg) {
-        return msg.getSender();
-    }
-
-    @Override
-    protected MSPlane getRecipient(MSPlane key) {
-        return key;
-    }
-
-    @Override
-    protected String getIdentifier() {
-        return "Function(" + task + ")";
-    }
-
-    public class MSFunction2Variable extends MSMessage {
-
-        public MSFunction2Variable(Task task, double value) {
-            super(task, value);
-        }
-
-        @Override
-        public String toString() {
-            return "F(" + getTask() + ") -> V(" + getRecipient() + ") : " + getValue();
-        }
-
+    public List<DomainType> getDomain() {
+        return domain;
     }
 
 }

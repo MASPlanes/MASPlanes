@@ -93,7 +93,7 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
         List<Task> tasks = p.getTasks();
         for (int i=tasks.size()-1; i>=0; i--) {
             final Task t = tasks.get(i);
-            final MSFunction f = p.getFunction(t);
+            final MSOldTaskNode f = p.getFunction(t);
             final MSPlane choice = f.makeDecision();
             LOG.log(Level.FINE, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f.getIdentifier(), choice, getAgent().getWorld().getTime(), getAgent()});
             if (choice != p && choice != null) {

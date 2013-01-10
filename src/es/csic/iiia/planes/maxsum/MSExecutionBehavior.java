@@ -72,14 +72,14 @@ public class MSExecutionBehavior extends AbstractBehavior {
 
     }
 
-    public void on(MSVariable.MSVariable2Function msg) {
-        MSFunction recipient = getAgent().getFunction(msg.getTask());
+    public void on(MSPlaneNode.MSPlane2Task msg) {
+        MSOldTaskNode recipient = getAgent().getFunction(msg.getTask());
         if (recipient != null) {
             recipient.receive(msg);
         }
     }
 
-    public void on(MSFunction.MSFunction2Variable msg) {
+    public void on(MSOldTaskNode.MSTask2Plane msg) {
         getAgent().getVariable().receive(msg);
     }
 
@@ -90,18 +90,18 @@ public class MSExecutionBehavior extends AbstractBehavior {
             return;
         }
 
-        final MSVariable variable = getAgent().getVariable();
-        final Map<Task, MSFunction> functions = getAgent().getFunctions();
+        final MSPlaneNode variable = getAgent().getVariable();
+        final Map<Task, MSOldTaskNode> functions = getAgent().getFunctions();
 
         // Everyone gather
         variable.gather();
-        for (MSFunction f : functions.values()) {
+        for (MSOldTaskNode f : functions.values()) {
             f.gather();
         }
 
         // Everyone scatter
         variable.scatter();
-        for (MSFunction f : functions.values()) {
+        for (MSOldTaskNode f : functions.values()) {
             f.scatter();
         }
     }

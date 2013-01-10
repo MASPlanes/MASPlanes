@@ -95,7 +95,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
         Map<Task, MSPlane> domain = plane.getVariable().getDomain();
         domain.clear();
         for (Task t : plane.getTasks()) {
-            MSFunction f = plane.getFunction(t);
+            MSOldTaskNode f = plane.getFunction(t);
             f.getDomain().clear();
         }
 
@@ -112,7 +112,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             }
 
             for (Task t : plane.getTasks()) {
-                MSFunction f = plane.getFunction(t);
+                MSOldTaskNode f = plane.getFunction(t);
                 f.getDomain().put(p, t);
             }
 
@@ -123,7 +123,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
         if (LOG.isLoggable(Level.FINEST)) {
             for (Task t : plane.getTasks()) {
-                MSFunction f = plane.getFunction(t);
+                MSOldTaskNode f = plane.getFunction(t);
                 LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{f.getIdentifier(), f.getDomain()});
             }
             LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, domain});

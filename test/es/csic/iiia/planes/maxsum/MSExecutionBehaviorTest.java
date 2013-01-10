@@ -148,10 +148,10 @@ public class MSExecutionBehaviorTest {
     @Test
     public void testOn_MSVariable2FunctionMessage() {
         System.err.println("on(MSVariable2FunctionMessage)");
-        MSFunction f = new MSFunction(p1, t);
-        MSVariable v = new MSVariable(p1);
+        MSOldTaskNode f = new MSOldTaskNode(p1, t);
+        MSPlaneNode v = new MSPlaneNode(p1);
         p1.getFunctions().put(t, f);
-        MSVariable.MSVariable2Function msg = v.buildOutgoingMessage(t, 0);
+        MSPlaneNode.MSPlane2Task msg = v.buildOutgoingMessage(t, 0);
         msg.setSender(p2);
         msg.setRecipient(p1);
         MSExecutionBehavior instance = new MSExecutionBehavior(p1);
@@ -167,15 +167,15 @@ public class MSExecutionBehaviorTest {
         System.err.println("on(MSFunction2VariableMessage)");
 
         // Prepare the message
-        MSFunction f = new MSFunction(p1, t);
-        MSFunction.MSFunction2Variable msg = f.buildOutgoingMessage(p1, 0);
+        MSOldTaskNode f = new MSOldTaskNode(p1, t);
+        MSOldTaskNode.MSTask2Plane msg = f.buildOutgoingMessage(p1, 0);
         msg.setSender(p2);
         msg.setRecipient(p1);
 
         // Set the domain of the recipient plane's variable
         Map<Task, MSPlane> domain = new TreeMap<Task, MSPlane>();
         domain.put(t, p2);
-        final MSVariable var = p1.getVariable();
+        final MSPlaneNode var = p1.getVariable();
         var.update(domain);
 
         // Dispatch the message

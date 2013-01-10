@@ -105,7 +105,7 @@ public class MSPlanesDecideBehavior extends AbstractBehavior {
         }
 
         final MSPlane p = getAgent();
-        final MSVariable v = p.getVariable();
+        final MSPlaneNode v = p.getVariable();
 
         Task decision = v.makeDecision();
         if (decision == null) {

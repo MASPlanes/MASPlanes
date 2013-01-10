@@ -37,39 +37,47 @@
 package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class MSMessage extends AbstractMessage {
+public class MSPlaneNode extends AbstractMSNode<Task> {
 
-    private final Task task;
-    private final MSPlane plane;
-    private final double value;
-
-    public MSMessage(MSPlane plane, Task task, double value) {
-        this.plane = plane;
-        this.task = task;
-        this.value = value;
-    }
-
-    public MSPlane getPlane() {
-        return plane;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public double getValue() {
-        return value;
+    public MSPlaneNode(MSPlane plane) {
+        super(plane);
     }
 
     @Override
-    public MSPlane getSender() {
-        return (MSPlane)super.getSender();
+    public void receive(MSMessage message) {}
+
+    @Override
+    public void iter() {
+
+        for (MSEdge e : getNeighbors()) {
+
+            Task t = e.getTask();
+            MSPlane2Task msg = new MSPlane2Task(t, getPotential(t));
+            getPlane().send(msg);
+
+        }
+
     }
 
+    @Override
+    public double getPotential(Task task) {
+        return getPlane().getCost(task);
+    }
+
+    public class MSPlane2Task extends MSMessage {
+
+        public MSPlane2Task(Task task, double value) {
+            super(MSPlaneNode.this.getPlane(), task, value);
+        }
+
+        @Override
+        public String toString() {
+            return "P(" + getSender() + ") -> T(" + getTask() + ") : " + getValue();
+        }
+    }
 }

@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -36,40 +36,60 @@
  */
 package es.csic.iiia.planes.maxsum;
 
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.messaging.AbstractMessage;
+import java.util.Arrays;
+import java.util.List;
+import java.util.logging.Level;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class MSMessage extends AbstractMessage {
+public class MSTaskNode extends AbstractMSNode<MSPlane> {
 
-    private final Task task;
-    private final MSPlane plane;
-    private final double value;
+    private Minimizer<MSPlane> minimizer = new Minimizer<MSPlane>();
 
-    public MSMessage(MSPlane plane, Task task, double value) {
-        this.plane = plane;
-        this.task = task;
-        this.value = value;
-    }
-
-    public MSPlane getPlane() {
-        return plane;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public double getValue() {
-        return value;
+    public MSTaskNode(MSPlane plane) {
+        super(plane);
     }
 
     @Override
-    public MSPlane getSender() {
-        return (MSPlane)super.getSender();
+    public double getPotential(MSPlane domainValue) {
+        return 0;
+    }
+
+    @Override
+    public void receive(MSMessage message) {
+
+    }
+
+    @Override
+    public void iter() {
+        minimizer.reset();
+
+        List<MSPlane> domain = getDomain();
+        double[] vs = new double[domain.size()];
+        int i = 0;
+        for (DK p : domain.keySet()) {
+            MSMessage msg = lastMessages.get(p);
+            final double value = msg != null ? msg.getValue() : 0;
+            final double belief = getPotential(p) + value;
+            minimizer.track(p, belief);
+            vs[i++] = belief;
+        }
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
+        }
+
+        for (DK p : domain.keySet()) {
+            final double value = getPotential(p) - minimizer.getComplementary(p);
+            MSMessage msg = buildOutgoingMessage(p, value);
+            msg.setRecipient(getRecipient(p));
+
+            plane.send(msg);
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
+            }
+        }
     }
 
 }

@@ -58,14 +58,14 @@ import java.util.logging.Logger;
 public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
-    final private MSVariable variable = new MSVariable(this);
+    final private MSPlaneNode variable = new MSPlaneNode(this);
     private boolean inactive;
 
-    public MSVariable getVariable() {
+    public MSPlaneNode getVariable() {
         return variable;
     }
 
-    private Map<Task, MSFunction> functions = new TreeMap<Task, MSFunction>();
+    private Map<Task, MSOldTaskNode> functions = new TreeMap<Task, MSOldTaskNode>();
 
     public MSPlane(Location location) {
         super(location);
@@ -84,7 +84,7 @@ public class MSPlane extends AbstractPlane {
     @Override
     protected void taskAdded(Task t) {
         // Create a function node for this task
-        functions.put(t, new MSFunction(this, t));
+        functions.put(t, new MSOldTaskNode(this, t));
         replan(t);
     }
 
@@ -99,11 +99,11 @@ public class MSPlane extends AbstractPlane {
         return null;
     }
 
-    MSFunction getFunction(Task task) {
+    MSOldTaskNode getFunction(Task task) {
         return functions.get(task);
     }
 
-    Map<Task, MSFunction> getFunctions() {
+    Map<Task, MSOldTaskNode> getFunctions() {
         return functions;
     }
 
