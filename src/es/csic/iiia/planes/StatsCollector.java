@@ -79,7 +79,7 @@ class StatsCollector {
            .append("plane_median=").append((long)(planeStats.getPercentile(50)/1000)).append("\n")
            .append("plane_p75=").append((long)(planeStats.getPercentile(75)/1000)).append("\n");
 
-        System.err.println(buf);
+        System.out.println(buf);
     }
 
 }

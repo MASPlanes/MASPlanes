@@ -126,30 +126,4 @@ public class AuctionPlane extends AbstractPlane {
         return result;
     }
 
-    /**
-     * Get the offer of this plane for the given task.
-     *
-     * @param task to bid for.
-     * @return offer.
-     */
-    protected double getOffer(Task task) {
-        final Location pl = getLocation();
-        final Location tl = task.getLocation();
-        final Location sl = getWorld().getNearestStation(tl).getLocation();
-
-        final double plane2task   = pl.distance(tl);
-        final double task2station = tl.distance(sl);
-
-        // Battery required to fulfill the task before recharging
-        double reqBattery = (long)((plane2task + task2station) / getSpeed());
-        if (this.getBattery() > reqBattery) {
-            return plane2task;
-        }
-
-        // The plane can't fulfill the task without recharging, so the offer
-        // considers charging first
-        final Location nsl = getWorld().getNearestStation(pl).getLocation();
-        return pl.distance(nsl) + nsl.distance(tl);
-    }
-
 }

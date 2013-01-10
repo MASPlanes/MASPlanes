@@ -37,6 +37,8 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.evaluation.EvaluationStrategy;
+import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.messaging.AbstractMessagingAgent;
@@ -101,6 +103,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      * Next task to be completed by the plane
      */
     private Task nextTask = null;
+
+    /**
+     * Evaluation strategy used by the plane
+     */
+    private EvaluationStrategy evaluationStrategy = new IndependentDistanceEvaluation();
 
     /**
      * Current plane angle, used only for drawing purposes
@@ -170,12 +177,27 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         return batteryCapacity;
     }
 
+    @Override
+    public EvaluationStrategy getEvaluationStrategy() {
+        return evaluationStrategy;
+    }
+
+    @Override
+    public void setEvaluationStrategy(EvaluationStrategy evaluationStrategy) {
+        this.evaluationStrategy = evaluationStrategy;
+    }
+
     public long getRechargeRatio() {
         return rechargeRatio;
     }
 
     public void setRechargeRatio(long rechargeRatio) {
         this.rechargeRatio = rechargeRatio;
+    }
+
+    @Override
+    public final double getCost(Task task) {
+        return evaluationStrategy.getCost(this, task);
     }
 
     @Override

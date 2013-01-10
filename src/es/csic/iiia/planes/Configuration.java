@@ -38,6 +38,9 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.evaluation.EvaluationStrategy;
+import es.csic.iiia.planes.evaluation.IndependentDistanceBatteryEvaluation;
+import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
@@ -92,6 +95,11 @@ public class Configuration {
      */
     public final Class<? extends Plane> planesClass;
 
+    /**
+     * Class of the evaluation strategy used by the planes in this simulation.
+     */
+    public final Class<? extends EvaluationStrategy> evaluationClass;
+
     /* AUCTIONS specific stuff */
     public final int aucEvery;
 
@@ -123,6 +131,15 @@ public class Configuration {
             planesClass = MSPlane.class;
         } else {
             throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
+        }
+
+        value = settings.getProperty("task-evaluation");
+        if (value.equalsIgnoreCase("independent-distance")) {
+            evaluationClass = IndependentDistanceEvaluation.class;
+        } else if (value.equalsIgnoreCase("independent-distance-battery")) {
+            evaluationClass = IndependentDistanceBatteryEvaluation.class;
+        } else {
+            throw new IllegalArgumentException("Illegal task evaluation strategy \"" + value + "\".");
         }
 
         value = settings.getProperty("gui");
@@ -162,6 +179,7 @@ public class Configuration {
             .append("# problem = ").append(problemFile).append("\n")
             .append("# operator = ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
             .append("# planes = ").append(planesClass.getSimpleName()).append("\n")
+            .append("# task-evaluation = ").append(evaluationClass.getSimpleName()).append("\n")
             .append("# auction-every = ").append(aucEvery).append("\n")
             .append("# maxsum-start-every = ").append(msStartEvery).append("\n")
             .append("# maxsum-iterations = ").append(msIterations).append("\n")

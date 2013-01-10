@@ -37,6 +37,7 @@
 package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
+import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.logging.Level;
@@ -86,8 +87,10 @@ public abstract class AbstractFactory implements Factory {
         try {
             Constructor<? extends Plane> c = config.planesClass.getConstructor(Location.class);
             p = c.newInstance(location);
+            EvaluationStrategy strategy = config.evaluationClass.newInstance();
+            p.setEvaluationStrategy(strategy);
         } catch (Exception ex) {
-            LOG.log(Level.SEVERE, null, ex);
+            throw new RuntimeException(ex);
         }
         initialize(p);
         world.addPlane(p);

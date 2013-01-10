@@ -99,11 +99,6 @@ public class MSPlane extends AbstractPlane {
         return null;
     }
 
-    double getCost(Task t) {
-        final Location l = getLocation();
-        return l.distance(t.getLocation());
-    }
-
     MSFunction getFunction(Task task) {
         return functions.get(task);
     }

@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.messaging.MessagingAgent;
@@ -55,12 +56,6 @@ public interface Plane extends MessagingAgent {
     public enum State {
         NORMAL, TO_CHARGE, CHARGING
     }
-
-    /**
-     * Number of history points to store, for debugging and displaying
-     * reasons.
-     */
-    public static int NUM_COMPLETED_TASKS = 20;
 
     /**
      * Gets the plane's id.
@@ -109,13 +104,6 @@ public interface Plane extends MessagingAgent {
     long getBattery();
 
     /**
-     * Get the plane's current angle
-     *
-     * @return the angle.
-     */
-    double getAngle();
-
-    /**
      * Set the battery capacity (maximum battery charge in seconds)
      *
      * @param capacity
@@ -128,6 +116,62 @@ public interface Plane extends MessagingAgent {
      * @return the capacity of the battery of this plane.
      */
     public long getBatteryCapacity();
+
+    /**
+     * Get the evaluation strategy used by this plane.
+     *
+     * @return the evaluation strategy used by this plane.
+     */
+    public EvaluationStrategy getEvaluationStrategy();
+
+    /**
+     * Set the evaluation strategy used by this plane.
+     *
+     * @param eval new evaluation strategy used by this plane.
+     */
+    public void setEvaluationStrategy(EvaluationStrategy eval);
+
+    /**
+     * Get the estimated cost of performing <em>task</em>, according to the
+     * plane's {@link EvaluationStrategy}.
+     *
+     * @see #getEvaluationStrategy()
+     * @see #setEvaluationStrategy()
+     *
+     * @param task task to evaluate.
+     * @return cost of performing the given task.
+     */
+    public double getCost(Task task);
+
+    /***************************************************************************
+     * STATISTICS TRACKING
+     **************************************************************************/
+
+    /**
+     * Get the total flight distance of this plane, for evaluation purposes.
+     *
+     * @return the total flight distance of this plane.
+     */
+    public double getTotalDistance();
+
+
+
+    /***************************************************************************
+     * STUFF RELATED TO DRAWING
+     **************************************************************************/
+
+    /**
+     * Number of history points to store, for debugging and displaying
+     * reasons.
+     */
+    public static int NUM_COMPLETED_TASKS = 20;
+
+    /**
+     * Get the plane's current angle
+     *
+     * @return the angle.
+     */
+    double getAngle();
 
     /**
      * Get the completed locations.
@@ -164,12 +208,5 @@ public interface Plane extends MessagingAgent {
      * @param color
      */
     public void setColor(int[] color);
-
-    /**
-     * Get the total flight distance of this plane, for evaluation purposes.
-     *
-     * @return the total flight distance of this plane.
-     */
-    public double getTotalDistance();
 
 }
