@@ -36,8 +36,8 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.definition.DPlane;
+import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.awt.Color;
