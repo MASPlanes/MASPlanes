@@ -42,17 +42,17 @@ import java.util.List;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface MSNode<DomainType extends Object> {
+public interface MSNode<Domain extends Object, IncomingMessage extends MSMessage> {
 
     MSPlane getPlane();
 
     public List<MSEdge> getNeighbors();
 
-    public List<DomainType> getDomain();
+    public List<Domain> getDomain();
 
-    public double getPotential(DomainType domainValue);
+    public double getPotential(Domain domainValue);
 
-    public void receive(MSMessage message);
+    public void receive(IncomingMessage message);
 
     public void iter();
 

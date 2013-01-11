@@ -42,7 +42,7 @@ import es.csic.iiia.planes.Task;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSPlaneNode extends AbstractMSNode<Task> {
+public class MSPlaneNode extends AbstractMSNode<Task, MSMessage> {
 
     public MSPlaneNode(MSPlane plane) {
         super(plane);

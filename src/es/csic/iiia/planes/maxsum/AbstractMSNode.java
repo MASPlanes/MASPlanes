@@ -43,13 +43,14 @@ import java.util.List;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class AbstractMSNode<DomainType extends Object> implements MSNode<DomainType> {
+public abstract class AbstractMSNode<Domain extends Object, Message extends MSMessage>
+    implements MSNode<Domain, Message> {
 
     private MSPlane plane;
 
     private ArrayList<MSEdge> neighbors = new ArrayList<MSEdge>();
 
-    private ArrayList<DomainType> domain = new ArrayList<DomainType>();
+    private ArrayList<Domain> domain = new ArrayList<Domain>();
 
     public AbstractMSNode(MSPlane plane) {
         this.plane = plane;
@@ -66,7 +67,7 @@ public abstract class AbstractMSNode<DomainType extends Object> implements MSNod
     }
 
     @Override
-    public List<DomainType> getDomain() {
+    public List<Domain> getDomain() {
         return domain;
     }
 

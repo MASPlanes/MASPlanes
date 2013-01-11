@@ -38,15 +38,22 @@ package es.csic.iiia.planes.maxsum;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSTaskNode extends AbstractMSNode<MSPlane> {
+public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlaneNode.MSPlane2Task> {
+    private static final Logger LOG = Logger.getLogger(MSTaskNode.class.getName());
 
     private Minimizer<MSPlane> minimizer = new Minimizer<MSPlane>();
+
+    private Map<MSPlane, MSPlaneNode.MSPlane2Task> messages =
+            new TreeMap<MSPlane, MSPlaneNode.MSPlane2Task>();
 
     public MSTaskNode(MSPlane plane) {
         super(plane);
@@ -58,8 +65,8 @@ public class MSTaskNode extends AbstractMSNode<MSPlane> {
     }
 
     @Override
-    public void receive(MSMessage message) {
-
+    public void receive(MSPlaneNode.MSPlane2Task message) {
+        messages.put(message.getSender(), message);
     }
 
     @Override
@@ -69,8 +76,8 @@ public class MSTaskNode extends AbstractMSNode<MSPlane> {
         List<MSPlane> domain = getDomain();
         double[] vs = new double[domain.size()];
         int i = 0;
-        for (DK p : domain.keySet()) {
-            MSMessage msg = lastMessages.get(p);
+        for (MSPlane p : domain) {
+            MSMessage msg = messages.get(p);
             final double value = msg != null ? msg.getValue() : 0;
             final double belief = getPotential(p) + value;
             minimizer.track(p, belief);
