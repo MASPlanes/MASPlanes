@@ -72,13 +72,19 @@ public abstract class MSNode<DK, DV> {
     public void update(Map<DK, DV> domain) {
        this.domain = domain;
 
-       // Cleanup old messages
+       /*#######################################################################
+           @TIP:  Because there are no lost messages here, it makes no sense to
+                  maintain old messages at all.
+
        Iterator<Map.Entry<DK, MSMessage>> it = lastMessages.entrySet().iterator();
        while (it.hasNext()) {
            if (!domain.containsKey(it.next().getKey())) {
                it.remove();
            }
        }
+       */
+       lastMessages.clear();
+       //#######################################################################
     }
 
     protected abstract double getPotential(DK p);

@@ -167,11 +167,18 @@ public interface Plane extends MessagingAgent {
     public static int NUM_COMPLETED_TASKS = 20;
 
     /**
+     * Set the plane's current angle
+     *
+     * @param angle the angle.
+     */
+    public void setAngle(double angle);
+
+    /**
      * Get the plane's current angle
      *
      * @return the angle.
      */
-    double getAngle();
+    public double getAngle();
 
     /**
      * Get the completed locations.

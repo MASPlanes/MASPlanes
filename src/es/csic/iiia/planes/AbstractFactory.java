@@ -94,6 +94,7 @@ public abstract class AbstractFactory implements Factory {
         }
         initialize(p);
         world.addPlane(p);
+        p.setAngle(location.getAngle(world.getNearestOperator(location).getLocation()));
         return p;
     }
 
