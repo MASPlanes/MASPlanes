@@ -68,7 +68,7 @@ public class Location extends Point2D {
      * @param destination
      * @param speed
      * @return true if the destination has been reached, false otherwise.
-     */
+     *
     public boolean move(Location destination, double speed) {
         if (destination == null) {
             return true;
@@ -99,6 +99,38 @@ public class Location extends Point2D {
         }
 
         return false;
+    }*/
+
+    /**
+     * Continue advancing towards a destination previusly specified to
+     * {@link #move(es.csic.iiia.planes.Location, double)}.
+     * @param step
+     * @return True if the destination has been reached, or false otherwise.
+     */
+    public boolean move(MoveStep step) {
+        return step.move();
+    }
+
+    /**
+     * Returns the movestep plan to reach the desired destination.
+     * <p/>
+     * Because it is usually needed to advance during multiple steps (seconds)
+     * to reach the desired destination, this function returns a MoveStep
+     * object. Then, the subsequent steps can be made using
+     * {@link #move(es.csic.iiia.planes.Location.MoveStep)}, which is more
+     * efficient.
+     *
+     * @see MoveStep
+     * @param destination
+     * @param speed
+     * @return MoveStep to reach the given destination.
+     */
+    public MoveStep buildMoveStep(Location destination, double speed) {
+        if (destination == null) {
+            return null;
+        }
+
+        return new MoveStep(destination, speed);
     }
 
     @Override
@@ -147,5 +179,40 @@ public class Location extends Point2D {
     public void setLocation(double d, double d1) {
         x = d;
         y = d1;
+    }
+
+    public class MoveStep {
+        public final double dx;
+        public final double dy;
+        public final double alpha;
+        public final double incx;
+        public final double incy;
+        public final Location destination;
+        public int steps;
+
+        public MoveStep(Location destination, double speed) {
+            this.destination = destination;
+            dx = destination.x - x;
+            dy = destination.y - y;
+            alpha = Math.atan2(dy, dx);
+            incx = speed * Math.cos(alpha);
+            incy = speed * Math.sin(alpha);
+
+            final double distance = getDistance(destination);
+            steps = (int)Math.ceil(distance/speed);
+        }
+
+        protected boolean move() {
+            steps--;
+            if (steps <= 0) {
+                x = destination.x;
+                y = destination.y;
+                return true;
+            }
+
+            x += incx;
+            y += incy;
+            return false;
+        }
     }
 }
