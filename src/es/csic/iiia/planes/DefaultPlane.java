@@ -52,9 +52,6 @@ public class DefaultPlane extends AbstractPlane {
         super(location);
     }
 
-    @Override
-    public void initialize() {}
-
     /**
      * No action needed on task completion.
      * <p/>
