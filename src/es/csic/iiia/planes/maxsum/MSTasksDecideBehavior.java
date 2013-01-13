@@ -44,6 +44,10 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Behavior that implements the decisions of tasks.
+ * <p/>
+ * Using this behavior, the decision made by {@link MSTaskNode}s are translated
+ * into actual movements of tasks between the planes.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -74,12 +78,24 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
 
     }
 
+    /**
+     * Receive a task from a neighboring plane.
+     * 
+     * @param msg message hading a task to us.
+     */
     public void on(HandTaskMessage msg) {
         getAgent().addTask(msg.getTask());
         LOG.log(Level.FINER, "[{2}] {0} incorporates {1}",
                 new Object[]{getAgent(), msg.getTask(), getAgent().getWorld().getTime()});
     }
 
+    /**
+     * Implements the decisions made by the {@link MSTaskNode}s currently
+     * running whithin this plane.
+     * <p/>
+     * That is, it checks the plane preferred by each task, and hands them out
+     * to their preferred planes if they do not match the current one.
+     */
     @Override
     public void afterMessages() {
         final long remainder = getAgent().getWorld().getTime() % getConfiguration().msStartEvery;
@@ -106,8 +122,8 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
     /**
      * Send a task to a neighbor.
      *
-     * @param t
-     * @param choice
+     * @param t task being sent.
+     * @param choice plane that will be the new owner of the given task.
      */
     private void relocateTask(Task t, MSPlane choice) {
         getAgent().removeTask(t);

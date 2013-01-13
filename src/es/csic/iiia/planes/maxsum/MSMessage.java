@@ -40,7 +40,9 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- *
+ * Skeletal implementation of a message exchanged by the max-sum algorithm in
+ * this application domain.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class MSMessage extends AbstractMessage {
@@ -49,6 +51,13 @@ public abstract class MSMessage extends AbstractMessage {
     private final MSPlane plane;
     private final double value;
 
+    /**
+     * Build a new message.
+     * 
+     * @param plane 
+     * @param task
+     * @param value 
+     */
     public MSMessage(MSPlane plane, Task task, double value) {
         this.plane = plane;
         this.task = task;

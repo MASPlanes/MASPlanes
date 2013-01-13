@@ -43,7 +43,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * @deprecated 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSPlanesDecideBehavior extends AbstractBehavior {

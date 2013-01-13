@@ -36,13 +36,12 @@
  */
 package es.csic.iiia.planes.maxsum;
 
+import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.MessagingAgent;
-import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -82,9 +81,16 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
     }
 
-    /*
-     * @TODO: This function is cheating. We should *not* be able to directly
-     * fetch the tasks from other agents.
+    /**
+     * Updates the structure over which the max-sum algorithm is running.
+     * <p/>
+     * The structure is updated according to the neighboring planes (that are
+     * guaranteed to still be neighbors after {@link Configuration#msIterations}
+     * iterations) and their tasks.
+     * 
+     * @TODO: This function is cheating a bit. We should *not* be able to 
+     * directly fetch the tasks from other agents. Instead, we should be
+     * obtaining that information through the NeighborTracking behavior.
      */
     @Override
     public void afterMessages() {

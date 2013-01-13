@@ -40,7 +40,7 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- *
+ * @deprecated
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class RequestTaskMessage extends AbstractMessage {

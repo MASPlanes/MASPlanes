@@ -36,14 +36,13 @@
  */
 package es.csic.iiia.planes.maxsum;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 /**
- *
+ * Skeletal implementation of a max-sum node (function).
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class AbstractMSNode<Domain extends Object, Message extends MSMessage>
@@ -51,10 +50,15 @@ public abstract class AbstractMSNode<Domain extends Object, Message extends MSMe
 
     private MSPlane plane;
     
-    protected final Map<Domain, Message> messages = new TreeMap<Domain, Message>();
+    private final Map<Domain, Message> messages = new TreeMap<Domain, Message>();
     
     private Map<Domain, MSPlane> edges = new TreeMap<Domain, MSPlane>();
 
+    /**
+     * Build a new node that will run within the given plane.
+     * 
+     * @param plane where this node will be executed.
+     */
     public AbstractMSNode(MSPlane plane) {
         this.plane = plane;
     }
@@ -69,6 +73,23 @@ public abstract class AbstractMSNode<Domain extends Object, Message extends MSMe
         return edges.keySet();
     }
     
+    /**
+     * Retrieves the last message received about the specified domain value
+     * (variable).
+     * 
+     * @param value variable of interest.
+     * @return last message received from this variable.
+     */
+    public Message getMessage(Domain value) {
+        return messages.get(value);
+    }
+    
+    /**
+     * Get the map of domain values (variables) and where are their
+     * corresponding nodes running.
+     * 
+     * @return map of domain values to planes that run their nodes.
+     */
     public Map<Domain, MSPlane> getEdges() {
         return edges;
     }
@@ -86,6 +107,12 @@ public abstract class AbstractMSNode<Domain extends Object, Message extends MSMe
         messages.put(getDomain(message), message);
     }
 
+    /**
+     * Sends a message to the specified domain object (variable).
+     * 
+     * @param m message to send.
+     * @param object domain value where the message is being sent.
+     */
     public void send(MSMessage m, Domain object) {
         m.setRecipient(edges.get(object));
         getPlane().send(m);

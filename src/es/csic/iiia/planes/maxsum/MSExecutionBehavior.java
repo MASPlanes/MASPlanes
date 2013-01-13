@@ -38,7 +38,6 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
-import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -72,6 +71,12 @@ public class MSExecutionBehavior extends AbstractBehavior {
 
     }
 
+    /**
+     * Collect {@link MSPlane2Task} messages destined to a task node running
+     * whithin this plane.
+     * 
+     * @param msg message to collect.
+     */
     public void on(MSPlane2Task msg) {
         MSTaskNode recipient = getAgent().getTaskFunction(msg.getTask());
         if (recipient != null) {
@@ -79,10 +84,19 @@ public class MSExecutionBehavior extends AbstractBehavior {
         }
     }
 
+    /**
+     * Collect {@link MSTask2Plane} messages destined to this plane.
+     * 
+     * @param msg message to collect.
+     */
     public void on(MSTask2Plane msg) {
         getAgent().getPlaneFunction().receive(msg);
     }
 
+    /**
+     * Every logical node that is running within this plane executes a single 
+     * iteration of the max-sum algorithm.
+     */
     @Override
     public void afterMessages() {
         final long remainder = getAgent().getWorld().getTime() % getConfiguration().msStartEvery;

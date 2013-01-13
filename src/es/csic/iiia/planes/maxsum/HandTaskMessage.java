@@ -40,7 +40,8 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- *
+ * Message to delegate reponsibility of a task to another plane.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class HandTaskMessage extends AbstractMessage {
@@ -51,6 +52,11 @@ public class HandTaskMessage extends AbstractMessage {
         this.task = t;
     }
 
+    /**
+     * Get the task being handed.
+     * 
+     * @return task being handed.
+     */
     public Task getTask() {
         return task;
     }

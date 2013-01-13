@@ -94,12 +94,11 @@ class Minimizer<T> {
         if (value < values[1]) {
             values[1]  = value;
             objects[1] = t;
-            return;
         }
 
     }
 
-
+    @Override
     public String toString() {
         return "Min(" + values[0] + "," + values[1] + ")[" + count + "]";
     }

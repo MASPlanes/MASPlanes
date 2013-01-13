@@ -38,15 +38,17 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Max-sum node representing the interests of a task.
+ * <p/>
+ * Basically, a task tries to guarantee that it is going to be picked up by one
+ * (and only one) plane. Further, it tries to do it in a way that minimizes the
+ * travel cost of the planes.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
@@ -83,7 +85,7 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
         }
 
         for (MSPlane p : domain) {
-            MSMessage msg = messages.get(p);
+            MSMessage msg = getMessage(p);
             final double value = msg != null ? msg.getValue() : 0;
             final double belief = getPotential(p) + value;
             minimizer.track(p, belief);

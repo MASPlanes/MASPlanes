@@ -39,7 +39,8 @@ package es.csic.iiia.planes.maxsum;
 import es.csic.iiia.planes.Task;
 
 /**
- *
+ * Message sent from a {@link MSTaskNode} to a {@link MSPlaneNode}.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSPlane2Task extends MSMessage {

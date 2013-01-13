@@ -38,16 +38,12 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
-import es.csic.iiia.planes.Station;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.Message;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
