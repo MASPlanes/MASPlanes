@@ -53,6 +53,7 @@ import java.util.List;
  */
 public abstract class AbstractWorld implements World {
     private Space space = null;
+    private List<Agent> agents = new ArrayList<Agent>();
     private List<Plane> planes = new ArrayList<Plane>();
     private List<Task> tasks = new ArrayList<Task>();
     private List<Station> stations = new ArrayList<Station>();
@@ -104,6 +105,16 @@ public abstract class AbstractWorld implements World {
         return operators;
     }
 
+    /**
+     * Add an operator to the simulation.
+     *
+     * @param operator operator to add.
+     */
+    public void addOperator(Operator operator) {
+        operators.add(operator);
+        agents.add(operator);
+    }
+
     @Override
     public void addStation(Station station) {
         stations.add(station);
@@ -126,7 +137,7 @@ public abstract class AbstractWorld implements World {
             Location l = new Location(o.getX(), o.getY());
             Operator operator = factory.buildOperator(l, o.getTasks());
             operator.setCommunicationRange(o.getCommunicationRange());
-            operators.add(operator);
+            addOperator(operator);
         }
 
         for (DPlane pd : d.getPlanes()) {
@@ -163,6 +174,10 @@ public abstract class AbstractWorld implements World {
     @Override
     public void run() {
 
+        for (Agent a : agents) {
+            a.initialize();
+        }
+
         for (time=0; time<duration || tasks.size() > 0; time++) {
 
             computeStep();
@@ -191,18 +206,12 @@ public abstract class AbstractWorld implements World {
      * perform actions, by calling their {@link Agent#step()} methods.
      */
     protected void computeStep() {
-        for (Plane p : planes) {
-            p.preStep();
-        }
-        for (Operator o : operators) {
-            o.preStep();
-        }
 
-        for (Plane p : planes) {
-            p.step();
+        for (Agent a : agents) {
+            a.preStep();
         }
-        for (Operator o : operators) {
-            o.step();
+        for (Agent a : agents) {
+            a.step();
         }
     }
 
@@ -217,6 +226,7 @@ public abstract class AbstractWorld implements World {
     @Override
     public void addPlane(Plane p) {
         planes.add(p);
+        agents.add(p);
     }
 
     @Override

@@ -124,6 +124,8 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      */
     private double flightDistance;
 
+    private Location.MoveStep currentDestination;
+
     /**
      * Default constructor
      *
@@ -136,9 +138,17 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     }
 
     @Override
+    public void initialize() {
+        super.initialize();
+        final Location l = getLocation();
+        setDestination(getWorld().getNearestOperator(l).getLocation());
+    }
+
+    @Override
     public int getId() {
         return id;
     }
+
 
     /**
      * Get the state of this plane.
@@ -200,6 +210,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         return evaluationStrategy.getCost(this, task);
     }
 
+    private void setDestination(Location l) {
+        angle = getLocation().getAngle(l);
+        currentDestination = getLocation().buildMoveStep(l, getSpeed());
+    }
+
     @Override
     public void step() {
         if (state == State.CHARGING) {
@@ -207,15 +222,19 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
             if (this.battery >= this.batteryCapacity) {
                 battery = batteryCapacity;
                 state = State.NORMAL;
+                setNextTask(nextTask);
             }
             super.step();
             return;
         }
 
         Station st = getWorld().getNearestStation(getLocation());
-        if (  state == State.TO_CHARGE
-           || battery <= getLocation().getDistance(st.getLocation())/getSpeed())
-        {
+        if (state == State.TO_CHARGE) {
+            goCharge(st);
+            super.step();
+            return;
+        } else if (battery <= getLocation().getDistance(st.getLocation())/getSpeed()) {
+            setDestination(st.getLocation());
             goCharge(st);
             super.step();
             return;
@@ -226,8 +245,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
 
         // Move the plane if not charging or going to charge
         if (nextTask != null) {
-            angle = getLocation().getAngle(nextTask.getLocation());
-            if (getLocation().move(nextTask.getLocation(), getSpeed())) {
+            if (getLocation().move(currentDestination)) {
                 final Task completed = nextTask;
                 nextTask = null;
                 triggerTaskCompleted(completed);
@@ -240,8 +258,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
 
             Operator o = getWorld().getNearestOperator(getLocation());
             if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
-                angle = getLocation().getAngle(o.getLocation());
-                getLocation().move(o.getLocation(), getSpeed());
+                getLocation().move(currentDestination);
                 flightDistance += getSpeed();
             } else {
                 angle += 0.01;
@@ -258,9 +275,8 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      */
     private void goCharge(Station st) {
         state = State.TO_CHARGE;
-        angle = getLocation().getAngle(st.getLocation());
         flightDistance += getSpeed();
-        if (this.getLocation().move(st.getLocation(), getSpeed())) {
+        if (this.getLocation().move(currentDestination)) {
             state = State.CHARGING;
             this.completedLocations.add(st.getLocation());
         }
@@ -286,6 +302,9 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      * @param t task to try to fulfill.
      */
     protected void setNextTask(Task t) {
+        if (t != null && state == State.NORMAL) {
+            setDestination(t.getLocation());
+        }
         nextTask = t;
     }
 
@@ -299,6 +318,10 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         getWorld().removeTask(t);
         removeTask(t);
         taskCompleted(t);
+        if (tasks.isEmpty() || nextTask == null) {
+            Operator o = getWorld().getNearestOperator(getLocation());
+            setDestination(o.getLocation());
+        }
     }
 
     /**
@@ -373,6 +396,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     @Override
     public double getAngle() {
         return angle;
+    }
+
+    @Override
+    public void setAngle(double angle) {
+        this.angle = angle;
     }
 
     @Override

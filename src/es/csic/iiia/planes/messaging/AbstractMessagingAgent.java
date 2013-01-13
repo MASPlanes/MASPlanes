@@ -234,7 +234,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         }
     }
 
-    private static MultiKeyMap cache = new MultiKeyMap();
+    private MultiKeyMap cache = new MultiKeyMap();
 
     private void handle(Behavior b, Message m) {
         final Class bClass = b.getClass();
@@ -254,7 +254,10 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
         } else {
             method = getMethod(bClass, mClass);
             if (method != null) {
-                LOG.log(Level.FINEST, "Dispatching {0} to {1}", new Object[]{mClass.getSimpleName(), method.toGenericString()});
+                if (LOG.isLoggable(Level.FINEST)) {
+                    LOG.log(Level.FINEST, "Dispatching {0} to {1}", 
+                            new Object[]{mClass.getSimpleName(), method.toGenericString()});
+                }
             }
             cache.put(bClass, mClass, method);
         }

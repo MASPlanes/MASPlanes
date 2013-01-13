@@ -56,4 +56,86 @@ public interface MSNode<Domain extends Object, IncomingMessage extends MSMessage
 
     public void iter();
 
+    public void update(Map<DK, DV> domain) {
+       this.domain = domain;
+
+       /*#######################################################################
+           @TIP:  Because there are no lost messages here, it makes no sense to
+                  maintain old messages at all.
+
+       Iterator<Map.Entry<DK, MSMessage>> it = lastMessages.entrySet().iterator();
+       while (it.hasNext()) {
+           if (!domain.containsKey(it.next().getKey())) {
+               it.remove();
+           }
+       }
+       */
+       lastMessages.clear();
+       //#######################################################################
+    }
+
+    protected abstract double getPotential(DK p);
+    protected abstract MSMessage buildOutgoingMessage(DK t, double value);
+    protected abstract String getIdentifier();
+
+    public void gather() {
+        minimizer.reset();
+
+        double[] vs = new double[domain.size()];
+        int i = 0;
+        for (DK p : domain.keySet()) {
+            MSMessage msg = lastMessages.get(p);
+            final double value = msg != null ? msg.getValue() : 0;
+            final double belief = getPotential(p) + value;
+            minimizer.track(p, belief);
+            vs[i++] = belief;
+        }
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
+        }
+    }
+
+    public void scatter() {
+        for (DK p : domain.keySet()) {
+            final double value = getPotential(p) - minimizer.getComplementary(p);
+            MSMessage msg = buildOutgoingMessage(p, value);
+            msg.setRecipient(getRecipient(p));
+
+            plane.send(msg);
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
+            }
+        }
+
+    }
+
+    public DK makeDecision() {
+        //LOG.log(Level.SEVERE, "M: {0}", minimizer.toString());
+        return minimizer.getBest();
+    }
+
+    /**
+     * Get the key used to isert this message into the last received messages
+     * map.
+     *
+     * @param msg message being received.
+     * @return key used to insert this message into the map.
+     */
+    protected abstract DK getKey(MSMessage msg);
+
+    /**
+     * Get the recipient plane of a message that is about the given key.
+     *
+     * @param key about which message is "speaking".
+     * @return plane where the message should be sent to.
+     */
+    protected abstract MSPlane getRecipient(DK key);
+
+    void receive(MSMessage msg) {
+        lastMessages.put(getKey(msg), msg);
+    }
+
+    public Map<DK, DV> getDomain() {
+        return domain;
+    }
 }
