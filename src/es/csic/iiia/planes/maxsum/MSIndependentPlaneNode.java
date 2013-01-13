@@ -39,10 +39,8 @@ package es.csic.iiia.planes.maxsum;
 import es.csic.iiia.planes.Task;
 
 /**
- * Max-sum node that represents the interests of a plane.
- * <p/>
- * This node just introduces the cost for each task as specified by the plane's
- * {@link MSPlane#getCost(es.csic.iiia.planes.Task)}.
+ * Max-sum plane node that just introduces the cost for each task as specified 
+ * by the plane's {@link MSPlane#getCost(es.csic.iiia.planes.Task)}.
  * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */

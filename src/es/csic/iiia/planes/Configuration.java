@@ -44,6 +44,7 @@ import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.maxsum.MSPlaneNode;
+import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
@@ -178,6 +179,8 @@ public class Configuration {
         value = settings.getProperty("maxsum-planes-function");
         if (value.equalsIgnoreCase("independent")) {
             msPlaneNodeType = MSIndependentPlaneNode.class;
+        } else if (value.equalsIgnoreCase("workload")) {
+            msPlaneNodeType = MSWorkloadPlaneNode.class;
         } else {
             throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
         }
