@@ -36,9 +36,11 @@
  */
 package es.csic.iiia.planes.maxsum;
 
+import es.csic.iiia.planes.Task;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,56 +49,66 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlaneNode.MSPlane2Task> {
+public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
     private static final Logger LOG = Logger.getLogger(MSTaskNode.class.getName());
 
     private Minimizer<MSPlane> minimizer = new Minimizer<MSPlane>();
 
-    private Map<MSPlane, MSPlaneNode.MSPlane2Task> messages =
-            new TreeMap<MSPlane, MSPlaneNode.MSPlane2Task>();
-
-    public MSTaskNode(MSPlane plane) {
+    private Task task;
+    
+    public MSTaskNode(MSPlane plane, Task task) {
         super(plane);
+        this.task = task;
     }
 
     @Override
     public double getPotential(MSPlane domainValue) {
         return 0;
     }
-
+    
     @Override
-    public void receive(MSPlaneNode.MSPlane2Task message) {
-        messages.put(message.getSender(), message);
+    public MSPlane getDomain(MSPlane2Task message) {
+        return message.getPlane();
     }
 
     @Override
     public void iter() {
+        final boolean logEnabled = LOG.isLoggable(Level.FINEST);
+        final Set<MSPlane> domain = getDomain();
         minimizer.reset();
+        
+        double[] vs = null; int i = 0;
+        if (logEnabled) {
+            vs = new double[domain.size()];
+        }
 
-        List<MSPlane> domain = getDomain();
-        double[] vs = new double[domain.size()];
-        int i = 0;
         for (MSPlane p : domain) {
             MSMessage msg = messages.get(p);
             final double value = msg != null ? msg.getValue() : 0;
             final double belief = getPotential(p) + value;
             minimizer.track(p, belief);
-            vs[i++] = belief;
+            if (logEnabled) {
+                vs[i++] = belief;
+            }
         }
         if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
+            LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{this, Arrays.toString(vs)});
         }
 
-        for (DK p : domain.keySet()) {
+        for (MSPlane p : domain) {
             final double value = getPotential(p) - minimizer.getComplementary(p);
-            MSMessage msg = buildOutgoingMessage(p, value);
-            msg.setRecipient(getRecipient(p));
+            MSMessage msg = new MSTask2Plane(task, p, value);
+            send(msg, p);
 
-            plane.send(msg);
             if (LOG.isLoggable(Level.FINER)) {
                 LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
             }
         }
+    }
+
+    @Override
+    public MSPlane makeDecision() {
+        return minimizer.getBest();
     }
 
 }

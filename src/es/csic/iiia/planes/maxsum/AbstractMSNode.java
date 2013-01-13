@@ -38,6 +38,9 @@ package es.csic.iiia.planes.maxsum;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
  *
@@ -47,10 +50,10 @@ public abstract class AbstractMSNode<Domain extends Object, Message extends MSMe
     implements MSNode<Domain, Message> {
 
     private MSPlane plane;
-
-    private ArrayList<MSEdge> neighbors = new ArrayList<MSEdge>();
-
-    private ArrayList<Domain> domain = new ArrayList<Domain>();
+    
+    protected final Map<Domain, Message> messages = new TreeMap<Domain, Message>();
+    
+    private Map<Domain, MSPlane> edges = new TreeMap<Domain, MSPlane>();
 
     public AbstractMSNode(MSPlane plane) {
         this.plane = plane;
@@ -62,13 +65,29 @@ public abstract class AbstractMSNode<Domain extends Object, Message extends MSMe
     }
 
     @Override
-    public List<MSEdge> getNeighbors() {
-        return neighbors;
+    public Set<Domain> getDomain() {
+        return edges.keySet();
     }
-
+    
+    public Map<Domain, MSPlane> getEdges() {
+        return edges;
+    }
+    
+    /**
+     * Returns the domain element to which the given message refers.
+     * 
+     * @param message message where to get the domain from.
+     * @return the domain element this message is about.
+     */
+    public abstract Domain getDomain(Message message);
+    
     @Override
-    public List<Domain> getDomain() {
-        return domain;
+    public void receive(Message message) {
+        messages.put(getDomain(message), message);
     }
 
+    public void send(MSMessage m, Domain object) {
+        m.setRecipient(edges.get(object));
+        getPlane().send(m);
+    }
 }

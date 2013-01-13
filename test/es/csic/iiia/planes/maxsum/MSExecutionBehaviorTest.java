@@ -143,51 +143,6 @@ public class MSExecutionBehaviorTest {
     }
 
     /**
-     * Test of on method, of class MSExecutionBehavior.
-     */
-    @Test
-    public void testOn_MSVariable2FunctionMessage() {
-        System.err.println("on(MSVariable2FunctionMessage)");
-        MSOldTaskNode f = new MSOldTaskNode(p1, t);
-        MSPlaneNode v = new MSPlaneNode(p1);
-        p1.getFunctions().put(t, f);
-        MSPlaneNode.MSPlane2Task msg = v.buildOutgoingMessage(t, 0);
-        msg.setSender(p2);
-        msg.setRecipient(p1);
-        MSExecutionBehavior instance = new MSExecutionBehavior(p1);
-        instance.on(msg);
-        assertSame(msg, f.lastMessages.get(p2));
-    }
-
-    /**
-     * Test of on method, of class MSExecutionBehavior.
-     */
-    @Test
-    public void testOn_MSFunction2VariableMessage() {
-        System.err.println("on(MSFunction2VariableMessage)");
-
-        // Prepare the message
-        MSOldTaskNode f = new MSOldTaskNode(p1, t);
-        MSOldTaskNode.MSTask2Plane msg = f.buildOutgoingMessage(p1, 0);
-        msg.setSender(p2);
-        msg.setRecipient(p1);
-
-        // Set the domain of the recipient plane's variable
-        Map<Task, MSPlane> domain = new TreeMap<Task, MSPlane>();
-        domain.put(t, p2);
-        final MSPlaneNode var = p1.getVariable();
-        var.update(domain);
-
-        // Dispatch the message
-        assertEquals(0, var.lastMessages.size());
-        MSExecutionBehavior instance = new MSExecutionBehavior(p1);
-        instance.on(msg);
-
-        assertSame(msg, var.lastMessages.get(t));
-        assertEquals(1, var.lastMessages.size());
-    }
-
-    /**
      * Test of afterMessages method, of class MSExecutionBehavior.
      */
     @Test

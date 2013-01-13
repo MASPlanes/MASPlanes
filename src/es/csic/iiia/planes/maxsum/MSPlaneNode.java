@@ -42,24 +42,23 @@ import es.csic.iiia.planes.Task;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSPlaneNode extends AbstractMSNode<Task, MSMessage> {
+public class MSPlaneNode extends AbstractMSNode<Task, MSTask2Plane> {
 
     public MSPlaneNode(MSPlane plane) {
         super(plane);
     }
 
     @Override
-    public void receive(MSMessage message) {}
+    public Task getDomain(MSTask2Plane message) {
+        return message.getTask();
+    }
 
     @Override
     public void iter() {
 
-        for (MSEdge e : getNeighbors()) {
-
-            Task t = e.getTask();
-            MSPlane2Task msg = new MSPlane2Task(t, getPotential(t));
-            getPlane().send(msg);
-
+        for (Task t : getDomain()) {
+            MSPlane2Task msg = new MSPlane2Task(getPlane(), t, getPotential(t));
+            send(msg, t);
         }
 
     }
@@ -69,15 +68,19 @@ public class MSPlaneNode extends AbstractMSNode<Task, MSMessage> {
         return getPlane().getCost(task);
     }
 
-    public class MSPlane2Task extends MSMessage {
-
-        public MSPlane2Task(Task task, double value) {
-            super(MSPlaneNode.this.getPlane(), task, value);
+    @Override
+    public Task makeDecision() {
+        double minCost = Double.MAX_VALUE;
+        Task bestTask  = null;
+        
+        for (Task t : getDomain()) {
+            final double cost = getPotential(t);
+            if (cost < minCost) {
+                bestTask = t;
+                minCost = cost;
+            }
         }
-
-        @Override
-        public String toString() {
-            return "P(" + getSender() + ") -> T(" + getTask() + ") : " + getValue();
-        }
+        
+        return bestTask;
     }
 }

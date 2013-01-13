@@ -105,14 +105,14 @@ public class MSPlanesDecideBehavior extends AbstractBehavior {
         }
 
         final MSPlane p = getAgent();
-        final MSPlaneNode v = p.getVariable();
+        final MSPlaneNode v = p.getPlaneFunction();
 
         Task decision = v.makeDecision();
         if (decision == null) {
             return;
         }
 
-        MSPlane owner = v.getDomain().get(decision);
+        MSPlane owner = v.getEdges().get(decision);
 
         if (owner != p) {
             RequestTaskMessage msg = new RequestTaskMessage(decision);

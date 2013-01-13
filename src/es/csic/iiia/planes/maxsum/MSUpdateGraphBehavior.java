@@ -40,6 +40,7 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.MessagingAgent;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.logging.Level;
@@ -92,11 +93,11 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             return;
         }
 
-        Map<Task, MSPlane> domain = plane.getVariable().getDomain();
-        domain.clear();
+        Map<Task, MSPlane> planeEdges = plane.getPlaneFunction().getEdges();
+        planeEdges.clear();
         for (Task t : plane.getTasks()) {
-            MSOldTaskNode f = plane.getFunction(t);
-            f.getDomain().clear();
+            MSTaskNode f = plane.getTaskFunction(t);
+            f.getEdges().clear();
         }
 
         // Don't do anything if there are no neighbors
@@ -108,12 +109,12 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             MSPlane p = (MSPlane)a;
 
             for (Task t : p.getTasks()) {
-                domain.put(t, p);
+                planeEdges.put(t, p);
             }
 
             for (Task t : plane.getTasks()) {
-                MSOldTaskNode f = plane.getFunction(t);
-                f.getDomain().put(p, t);
+                MSTaskNode f = plane.getTaskFunction(t);
+                f.getEdges().put(p, p);
             }
 
             if (LOG.isLoggable(Level.FINEST)) {
@@ -123,13 +124,12 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
         if (LOG.isLoggable(Level.FINEST)) {
             for (Task t : plane.getTasks()) {
-                MSOldTaskNode f = plane.getFunction(t);
-                LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{f.getIdentifier(), f.getDomain()});
+                MSTaskNode f = plane.getTaskFunction(t);
+                LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{f, f.getDomain()});
             }
-            LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, domain});
+            LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, planeEdges});
         }
 
-        plane.getVariable().update(domain);
     }
 
 }

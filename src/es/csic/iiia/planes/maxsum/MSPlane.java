@@ -58,14 +58,14 @@ import java.util.logging.Logger;
 public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
-    final private MSPlaneNode variable = new MSPlaneNode(this);
+    final private MSPlaneNode planeFunction = new MSPlaneNode(this);
     private boolean inactive;
 
-    public MSPlaneNode getVariable() {
-        return variable;
+    public MSPlaneNode getPlaneFunction() {
+        return planeFunction;
     }
 
-    private Map<Task, MSOldTaskNode> functions = new TreeMap<Task, MSOldTaskNode>();
+    private Map<Task, MSTaskNode> taskFunctions = new TreeMap<Task, MSTaskNode>();
 
     public MSPlane(Location location) {
         super(location);
@@ -77,21 +77,21 @@ public class MSPlane extends AbstractPlane {
 
     @Override
     protected void taskCompleted(Task t) {
-        getVariable().getDomain().remove(t);
+        getPlaneFunction().getDomain().remove(t);
         replan();
     }
 
     @Override
     protected void taskAdded(Task t) {
         // Create a function node for this task
-        functions.put(t, new MSOldTaskNode(this, t));
+        taskFunctions.put(t, new MSTaskNode(this, t));
         replan(t);
     }
 
     @Override
     protected void taskRemoved(Task t) {
         // Cleanup any actions done at taskAdded...
-        functions.remove(t);
+        taskFunctions.remove(t);
     }
 
     @Override
@@ -99,12 +99,12 @@ public class MSPlane extends AbstractPlane {
         return null;
     }
 
-    MSOldTaskNode getFunction(Task task) {
-        return functions.get(task);
+    MSTaskNode getTaskFunction(Task task) {
+        return taskFunctions.get(task);
     }
 
-    Map<Task, MSOldTaskNode> getFunctions() {
-        return functions;
+    Map<Task, MSTaskNode> getTaskFunctions() {
+        return taskFunctions;
     }
 
     @Override

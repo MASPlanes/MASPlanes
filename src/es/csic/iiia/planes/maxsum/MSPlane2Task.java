@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Expression application is undefined on line 6, column 57 in Templates/Licenses/license-bsd.txt..
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -16,11 +16,11 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
+ *   Neither the name of Expression application is undefined on line 21, column 41 in Templates/Licenses/license-bsd.txt.
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
- *   IIIA-CSIC, Artificial Intelligence Research Institute
+ *   Expression application is undefined on line 25, column 21 in Templates/Licenses/license-bsd.txt.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -40,53 +40,17 @@ import es.csic.iiia.planes.Task;
 
 /**
  *
- * @author Marc Pujol <mpujol@iiia.csic.es>
+ * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public class MSOldTaskNode extends MSSelectionNode<MSPlane, Task> {
+public class MSPlane2Task extends MSMessage {
 
-    private Task task;
-
-    public MSOldTaskNode(MSPlane plane, Task t) {
-        super(plane);
-        this.task = t;
+    public MSPlane2Task(MSPlane plane, Task task, double value) {
+        super(plane, task, value);
     }
 
     @Override
-    public double getPotential(MSPlane p) {
-        return 0;
+    public String toString() {
+        return "P(" + getSender() + ") -> T(" + getTask() + ") : " + getValue();
     }
-
-    @Override
-    public MSTask2Plane buildOutgoingMessage(MSPlane plane, double value) {
-        return new MSTask2Plane(task, value);
-    }
-
-    @Override
-    protected MSPlane getKey(MSMessage msg) {
-        return msg.getSender();
-    }
-
-    @Override
-    protected MSPlane getRecipient(MSPlane key) {
-        return key;
-    }
-
-    @Override
-    protected String getIdentifier() {
-        return "T(" + task + ")";
-    }
-
-    public class MSTask2Plane extends MSMessage {
-
-        public MSTask2Plane(Task task, double value) {
-            super(task, value);
-        }
-
-        @Override
-        public String toString() {
-            return "T(" + getTask() + ") -> P(" + getRecipient() + ") : " + getValue();
-        }
-
-    }
-
+    
 }

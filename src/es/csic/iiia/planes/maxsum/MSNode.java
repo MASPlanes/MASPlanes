@@ -36,106 +36,62 @@
  */
 package es.csic.iiia.planes.maxsum;
 
-import java.util.List;
+import java.util.Set;
 
 /**
- *
+ * A node (function) in the max-sum graph.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface MSNode<Domain extends Object, IncomingMessage extends MSMessage> {
 
+    /**
+     * Get the plane where this (logical) node is running.
+     * 
+     * @return plane where this node is running.
+     */
     MSPlane getPlane();
 
-    public List<MSEdge> getNeighbors();
+    /**
+     * Get the set of possible domain values (objects) of this node.
+     * <p/>
+     * This is akin to the variables involved in this node.
+     * 
+     * @return the domain of this node.
+     */
+    public Set<Domain> getDomain();
 
-    public List<Domain> getDomain();
-
+    /**
+     * Get the potential (cost) of activating the given domain value (variable).
+     * 
+     * @param domainValue variable that would activate.
+     * @return cost incurred when activating the given domain value.
+     * @TODO this is strange and should be changed. The concept of potential
+     * given a single domain value is wrong. The potential is a function that
+     * receives assignments (true/false) for each of the binary variables
+     * involved in the node and returns a cost associated to them.
+     */
     public double getPotential(Domain domainValue);
 
+    /**
+     * Receive an incoming message.
+     * 
+     * @param message message to receive.
+     */
     public void receive(IncomingMessage message);
 
+    /**
+     * Perform a single iteration of the max-sum algorithm.
+     */
     public void iter();
-
-    public void update(Map<DK, DV> domain) {
-       this.domain = domain;
-
-       /*#######################################################################
-           @TIP:  Because there are no lost messages here, it makes no sense to
-                  maintain old messages at all.
-
-       Iterator<Map.Entry<DK, MSMessage>> it = lastMessages.entrySet().iterator();
-       while (it.hasNext()) {
-           if (!domain.containsKey(it.next().getKey())) {
-               it.remove();
-           }
-       }
-       */
-       lastMessages.clear();
-       //#######################################################################
-    }
-
-    protected abstract double getPotential(DK p);
-    protected abstract MSMessage buildOutgoingMessage(DK t, double value);
-    protected abstract String getIdentifier();
-
-    public void gather() {
-        minimizer.reset();
-
-        double[] vs = new double[domain.size()];
-        int i = 0;
-        for (DK p : domain.keySet()) {
-            MSMessage msg = lastMessages.get(p);
-            final double value = msg != null ? msg.getValue() : 0;
-            final double belief = getPotential(p) + value;
-            minimizer.track(p, belief);
-            vs[i++] = belief;
-        }
-        if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{getIdentifier(), Arrays.toString(vs)});
-        }
-    }
-
-    public void scatter() {
-        for (DK p : domain.keySet()) {
-            final double value = getPotential(p) - minimizer.getComplementary(p);
-            MSMessage msg = buildOutgoingMessage(p, value);
-            msg.setRecipient(getRecipient(p));
-
-            plane.send(msg);
-            if (LOG.isLoggable(Level.FINER)) {
-                LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
-            }
-        }
-
-    }
-
-    public DK makeDecision() {
-        //LOG.log(Level.SEVERE, "M: {0}", minimizer.toString());
-        return minimizer.getBest();
-    }
-
+    
     /**
-     * Get the key used to isert this message into the last received messages
-     * map.
-     *
-     * @param msg message being received.
-     * @return key used to insert this message into the map.
+     * Chose the best domain value according to the node's belief.
+     * 
+     * @return best domain value according to the node's belief.
+     * @TODO this is strange and should be changed. It should be possible to
+     * activate multiple domain values at this point.
      */
-    protected abstract DK getKey(MSMessage msg);
+    public Domain makeDecision();
 
-    /**
-     * Get the recipient plane of a message that is about the given key.
-     *
-     * @param key about which message is "speaking".
-     * @return plane where the message should be sent to.
-     */
-    protected abstract MSPlane getRecipient(DK key);
-
-    void receive(MSMessage msg) {
-        lastMessages.put(getKey(msg), msg);
-    }
-
-    public Map<DK, DV> getDomain() {
-        return domain;
-    }
 }
