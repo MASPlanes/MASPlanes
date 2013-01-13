@@ -41,7 +41,9 @@ import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.evaluation.IndependentDistanceBatteryEvaluation;
 import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
+import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
 import es.csic.iiia.planes.maxsum.MSPlane;
+import es.csic.iiia.planes.maxsum.MSPlaneNode;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
@@ -106,6 +108,7 @@ public class Configuration {
     /* MAXSUM specific stuff */
     public final int msIterations;
     public final int msStartEvery;
+    public final Class<? extends MSPlaneNode> msPlaneNodeType;
 
     public Configuration(Properties settings) {
 
@@ -166,9 +169,19 @@ public class Configuration {
         }
         problemDefinition = d;
 
+        // Auctions settings
+        aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
+        
+        // Max-sum settings
         msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
         msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
-        aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
+        value = settings.getProperty("maxsum-planes-function");
+        if (value.equalsIgnoreCase("independent")) {
+            msPlaneNodeType = MSIndependentPlaneNode.class;
+        } else {
+            throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
+        }
+        
     }
 
     @Override
@@ -183,6 +196,7 @@ public class Configuration {
             .append("# auction-every = ").append(aucEvery).append("\n")
             .append("# maxsum-start-every = ").append(msStartEvery).append("\n")
             .append("# maxsum-iterations = ").append(msIterations).append("\n")
+            .append("# maxsum-planes-function = ").append(msPlaneNodeType.getSimpleName()).append("\n")
         ;
 
         return buf.toString();

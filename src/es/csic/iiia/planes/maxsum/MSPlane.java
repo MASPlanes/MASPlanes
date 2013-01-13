@@ -44,6 +44,7 @@ import es.csic.iiia.planes.messaging.Message;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -54,7 +55,7 @@ import java.util.logging.Logger;
 public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
-    final private MSPlaneNode planeFunction = new MSPlaneNode(this);
+    private MSPlaneNode planeFunction;
     private boolean inactive;
 
     public MSPlaneNode getPlaneFunction() {
@@ -70,6 +71,20 @@ public class MSPlane extends AbstractPlane {
         addBehavior(new MSExecutionBehavior(this));
         addBehavior(new MSTasksDecideBehavior(this));
     }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        try {
+            planeFunction = getWorld().getFactory().getConfiguration()
+                    .msPlaneNodeType.getConstructor(MSPlane.class)
+                    .newInstance(this);
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to instantiate the specified plane node type.", ex);
+        }
+    }
+    
+    
 
     @Override
     protected void taskCompleted(Task t) {

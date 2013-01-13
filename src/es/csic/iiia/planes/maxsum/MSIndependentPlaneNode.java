@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2013 Expression application is undefined on line 6, column 57 in Templates/Licenses/license-bsd.txt..
+ * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -16,11 +16,11 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of Expression application is undefined on line 21, column 41 in Templates/Licenses/license-bsd.txt.
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
- *   Expression application is undefined on line 25, column 21 in Templates/Licenses/license-bsd.txt.
+ *   IIIA-CSIC, Artificial Intelligence Research Institute
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -39,37 +39,26 @@ package es.csic.iiia.planes.maxsum;
 import es.csic.iiia.planes.Task;
 
 /**
- *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * Max-sum node that represents the interests of a plane.
+ * <p/>
+ * This node just introduces the cost for each task as specified by the plane's
+ * {@link MSPlane#getCost(es.csic.iiia.planes.Task)}.
+ * 
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class MSPlaneNode extends AbstractMSNode<Task, MSTask2Plane> {
+public class MSIndependentPlaneNode extends MSPlaneNode {
 
-    public MSPlaneNode(MSPlane plane) {
+    public MSIndependentPlaneNode(MSPlane plane) {
         super(plane);
     }
 
     @Override
-    public Task getDomain(MSTask2Plane message) {
-        return message.getTask();
-    }
+    public void iter() {
 
-    @Override
-    public double getPotential(Task task) {
-        return getPlane().getCost(task);
-    }
-
-    @Override
-    public Task makeDecision() {
-        double minCost = Double.MAX_VALUE;
-        Task bestTask = null;
         for (Task t : getDomain()) {
-            final double cost = getPotential(t);
-            if (cost < minCost) {
-                bestTask = t;
-                minCost = cost;
-            }
+            MSPlane2Task msg = new MSPlane2Task(getPlane(), t, getPotential(t));
+            send(msg, t);
         }
-        return bestTask;
+
     }
-    
 }
