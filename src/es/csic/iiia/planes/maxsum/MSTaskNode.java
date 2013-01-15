@@ -41,6 +41,7 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.bcel.generic.GETSTATIC;
 
 /**
  * Max-sum node representing the interests of a task.
@@ -48,7 +49,7 @@ import java.util.logging.Logger;
  * Basically, a task tries to guarantee that it is going to be picked up by one
  * (and only one) plane. Further, it tries to do it in a way that minimizes the
  * travel cost of the planes.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
@@ -57,7 +58,7 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
     private Minimizer<MSPlane> minimizer = new Minimizer<MSPlane>();
 
     private Task task;
-    
+
     public MSTaskNode(MSPlane plane, Task task) {
         super(plane);
         this.task = task;
@@ -67,7 +68,7 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
     public double getPotential(MSPlane domainValue) {
         return 0;
     }
-    
+
     @Override
     public MSPlane getDomain(MSPlane2Task message) {
         return message.getPlane();
@@ -78,7 +79,7 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
         final boolean logEnabled = LOG.isLoggable(Level.FINEST);
         final Set<MSPlane> domain = getDomain();
         minimizer.reset();
-        
+
         double[] vs = null; int i = 0;
         if (logEnabled) {
             vs = new double[domain.size()];
@@ -93,7 +94,7 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
                 vs[i++] = belief;
             }
         }
-        if (LOG.isLoggable(Level.FINER)) {
+        if (logEnabled) {
             LOG.log(Level.FINER, "{0}''s belief: {1}", new Object[]{this, Arrays.toString(vs)});
         }
 
@@ -111,6 +112,11 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
     @Override
     public MSPlane makeDecision() {
         return minimizer.getBest();
+    }
+
+    @Override
+    public String toString() {
+        return "T(" + task.getId() + ")";
     }
 
 }

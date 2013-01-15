@@ -41,6 +41,7 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.MessagingAgent;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -87,8 +88,8 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
      * The structure is updated according to the neighboring planes (that are
      * guaranteed to still be neighbors after {@link Configuration#msIterations}
      * iterations) and their tasks.
-     * 
-     * @TODO: This function is cheating a bit. We should *not* be able to 
+     *
+     * @TODO: This function is cheating a bit. We should *not* be able to
      * directly fetch the tasks from other agents. Instead, we should be
      * obtaining that information through the NeighborTracking behavior.
      */
@@ -106,13 +107,12 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             f.getEdges().clear();
         }
 
-        // Don't do anything if there are no neighbors
-        plane.setInactive(!tracker.hasNeighbors(getConfiguration().msIterations));
-
         // Track tasks from our neighbors
-        tracker.getNeighbors(getConfiguration().msIterations);
+        List<MSPlane> neighbors = plane.getNeighbors();
+        neighbors.clear();
         for (MessagingAgent a : tracker.getNeighbors(getConfiguration().msIterations)) {
             MSPlane p = (MSPlane)a;
+            neighbors.add(p);
 
             for (Task t : p.getTasks()) {
                 planeEdges.put(t, p);
@@ -127,6 +127,10 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
                 LOG.log(Level.FINEST, "{0} has neighbor {1}", new Object[]{getAgent(), a});
             }
         }
+
+        // Disable the plane if it has no neighbors (the plane itself is always in the
+        // neighbors list)
+        plane.setInactive(neighbors.size()<2);
 
         if (LOG.isLoggable(Level.FINEST)) {
             for (Task t : plane.getTasks()) {

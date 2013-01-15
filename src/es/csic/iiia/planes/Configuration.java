@@ -110,6 +110,7 @@ public class Configuration {
     public final int msIterations;
     public final int msStartEvery;
     public final Class<? extends MSPlaneNode> msPlaneNodeType;
+    public final double msWorkloadK;
 
     public Configuration(Properties settings) {
 
@@ -172,7 +173,7 @@ public class Configuration {
 
         // Auctions settings
         aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
-        
+
         // Max-sum settings
         msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
         msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
@@ -184,7 +185,8 @@ public class Configuration {
         } else {
             throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
         }
-        
+        msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
+
     }
 
     @Override
@@ -200,6 +202,7 @@ public class Configuration {
             .append("# maxsum-start-every = ").append(msStartEvery).append("\n")
             .append("# maxsum-iterations = ").append(msIterations).append("\n")
             .append("# maxsum-planes-function = ").append(msPlaneNodeType.getSimpleName()).append("\n")
+            .append("# maxsum-workload-k = ").append(msWorkloadK).append("\n")
         ;
 
         return buf.toString();

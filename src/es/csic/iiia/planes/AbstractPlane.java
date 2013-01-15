@@ -304,6 +304,8 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     protected void setNextTask(Task t) {
         if (t != null && state == State.NORMAL) {
             setDestination(t.getLocation());
+        } else if (state == State.NORMAL) {
+            setDestination(getWorld().getNearestOperator(getLocation()).getLocation());
         }
         nextTask = t;
     }

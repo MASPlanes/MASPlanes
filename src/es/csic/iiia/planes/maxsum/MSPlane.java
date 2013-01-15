@@ -41,6 +41,7 @@ import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.Message;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -83,8 +84,8 @@ public class MSPlane extends AbstractPlane {
             throw new RuntimeException("Unable to instantiate the specified plane node type.", ex);
         }
     }
-    
-    
+
+
 
     @Override
     protected void taskCompleted(Task t) {
@@ -103,6 +104,9 @@ public class MSPlane extends AbstractPlane {
     protected void taskRemoved(Task t) {
         // Cleanup any actions done at taskAdded...
         taskFunctions.remove(t);
+
+        // And replan if necessary
+        setNextTask(getNearest(getLocation(), getTasks()));
     }
 
     @Override
@@ -121,6 +125,9 @@ public class MSPlane extends AbstractPlane {
     @Override
     public void send(Message message) {
         super.send(message);
+        if (LOG.isLoggable(Level.FINER) && message instanceof MSMessage) {
+            LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{message, message.getRecipient()});
+        }
     }
 
     /**
@@ -186,6 +193,11 @@ public class MSPlane extends AbstractPlane {
 
     public boolean isInactive() {
         return inactive;
+    }
+
+    private List<MSPlane> neighbors = new ArrayList<MSPlane>();
+    List<MSPlane> getNeighbors() {
+        return neighbors;
     }
 
 }

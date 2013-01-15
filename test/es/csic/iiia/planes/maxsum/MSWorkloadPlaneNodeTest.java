@@ -51,22 +51,22 @@ import static org.junit.Assert.*;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSWorkloadPlaneNodeTest {
-    
+
     public MSWorkloadPlaneNodeTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -79,20 +79,20 @@ public class MSWorkloadPlaneNodeTest {
         System.out.println("iter");
         MSPlane plane = new MSPlane(new Location(0,0));
         MSWorkloadPlaneNode instance = new MSWorkloadPlaneNode(plane);
-        
+
         // Build a domain
         Map<Task, MSPlane> edges = instance.getEdges();
         Task t1 = new Task(new Location(0,1)); edges.put(t1, null);
         Task t2 = new Task(new Location(0,2)); edges.put(t2, null);
         Task t3 = new Task(new Location(0,3)); edges.put(t3, null);
         Task t4 = new Task(new Location(0,4)); edges.put(t4, null);
-        
+
         // And some messages
-        instance.receive(new MSTask2Plane(t1, null, 5));   //+1 distance
-        instance.receive(new MSTask2Plane(t2, null, 10));  //+2 distance
-        instance.receive(new MSTask2Plane(t3, null, 3));   //+3 distance
-        instance.receive(new MSTask2Plane(t4, null, 30));   //+3 distance
-        
+        instance.receive(new MSTask2Plane(t1, null, 10));   //+1 distance
+        instance.receive(new MSTask2Plane(t2, null, 3));  //+2 distance
+        instance.receive(new MSTask2Plane(t3, null, 7));   //+3 distance
+        //instance.receive(new MSTask2Plane(t4, null, 30));   //+3 distance
+
         // We need mocking for this
         instance.iter();
     }
