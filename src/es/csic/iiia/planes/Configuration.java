@@ -188,7 +188,7 @@ public class Configuration {
         }
         msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
         msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
-
+        
     }
 
     @Override
@@ -205,6 +205,7 @@ public class Configuration {
             .append("# maxsum-iterations = ").append(msIterations).append("\n")
             .append("# maxsum-planes-function = ").append(msPlaneNodeType.getSimpleName()).append("\n")
             .append("# maxsum-workload-k = ").append(msWorkloadK).append("\n")
+            .append("# maxsum-workload-alpha = ").append(msWorkloadAlpha).append("\n")
         ;
 
         return buf.toString();
