@@ -41,7 +41,6 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.bcel.generic.GETSTATIC;
 
 /**
  * Max-sum node representing the interests of a task.
