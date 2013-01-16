@@ -48,7 +48,7 @@ public interface Agent extends Element {
     /**
      * Pre-action method for the Agents.
      * <p/>
-     * This method is also called every second. However, all of the
+     * This method is also called every tenth of second. However, all of the
      * <em>preStep</em> calls are made before any {@link #step()} call is done
      * in the current iteration. This allows agents to perform some sort
      * of "initialization" before each step.
@@ -58,8 +58,8 @@ public interface Agent extends Element {
     /**
      * Action method for the Agents.
      * <p/>
-     * This method is called every second. All actors must implement it so that
-     * they perform the desired actions.
+     * This method is called every tenth of second. All actors must implement it
+     * so that they perform the desired actions.
      */
     public void step();
 

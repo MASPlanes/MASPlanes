@@ -80,12 +80,12 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     private long rechargeRatio = 3;
 
     /**
-     * Remaining battery in seconds
+     * Remaining battery in tenths of second
      */
     private long battery;
 
     /**
-     * Battery capacity in seconds
+     * Battery capacity in tenths of second
      */
     private long batteryCapacity;
 

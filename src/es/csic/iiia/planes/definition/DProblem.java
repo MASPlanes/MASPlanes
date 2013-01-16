@@ -99,7 +99,7 @@ public class DProblem {
     /**
      * Get the duration of this scenario.
      *
-     * @return duration of this scenario (in seconds).
+     * @return duration of this scenario (in tenths of second).
      */
     public long getDuration() {
         return duration;
@@ -108,7 +108,7 @@ public class DProblem {
     /**
      * Set the duration of this scenario.
      *
-     * @param duration of this scenario (in seconds).
+     * @param duration of this scenario (in tenths of second).
      */
     public void setDuration(long duration) {
         this.duration = duration;

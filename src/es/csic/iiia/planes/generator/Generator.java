@@ -60,7 +60,8 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class Generator {
 
-    private long duration = 3600*24*30;
+    // Duration in tenths of second
+    private long duration = 25920000L; //=3600*24*30*1000;
     private int width = 10000;
     private int height = 10000;
     private int num_planes = 10;
@@ -125,10 +126,12 @@ public class Generator {
         ArrayList<DPlane> planes = p.getPlanes();
         for (int i=0;i<num_planes;i++) {
             DPlane pl = new DPlane();
-            pl.setSpeed(50/3.6);
+            // Speed in meters per tenth of second
+            pl.setSpeed(50d/36);
             pl.setX(r.nextInt(p.getWidth()));
             pl.setY(r.nextInt(p.getHeight()));
-            pl.setBatteryCapacity(3600*3);
+            // battery capacity in tenths of second
+            pl.setBatteryCapacity(3600*3*10);
             pl.setInitialBattery((long)(pl.getBatteryCapacity()*r.nextDouble()));
             pl.setCommunicationRange(2000);
             pl.setColor(colorList[i]);

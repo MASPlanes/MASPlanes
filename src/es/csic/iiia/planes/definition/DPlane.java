@@ -75,9 +75,9 @@ public class DPlane extends DLocation {
     }
 
     /**
-     * Get the speed of this plane, in meters per second.
+     * Get the speed of this plane, in meters per tenth of second.
      *
-     * @return speed of this plane, in meters per second.
+     * @return speed of this plane, in meters per tenth of second.
      */
     public double getSpeed() {
         return speed;
@@ -86,7 +86,7 @@ public class DPlane extends DLocation {
     /**
      * Set the speed of this plane
      *
-     * @param speed of this plane in meters per second.
+     * @param speed of this plane in meters per tenth of second.
      */
     public void setSpeed(double speed) {
         this.speed = speed;

@@ -74,7 +74,7 @@ public abstract class AbstractWorld implements World {
     private long time = 0;
 
     /**
-     * Duration of this simulation in seconds.
+     * Duration of this simulation in tenths of second.
      */
     protected long duration;
 
@@ -200,7 +200,7 @@ public abstract class AbstractWorld implements World {
     }
 
     /**
-     * Computes a single simulation step (second).
+     * Computes a single simulation step (tenths of second).
      *
      * This should give all of the simulation's actors the opportunity to
      * perform actions, by calling their {@link Agent#step()} methods.

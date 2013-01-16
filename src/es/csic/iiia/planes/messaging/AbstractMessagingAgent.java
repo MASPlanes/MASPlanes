@@ -63,7 +63,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
     private static final Logger LOG = Logger.getLogger(AbstractMessagingAgent.class.getName());
 
     /**
-     * Agent speed in meters per second
+     * Agent speed in meters per tenth of second
      */
     private double speed = 0;
 
@@ -255,7 +255,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
             method = getMethod(bClass, mClass);
             if (method != null) {
                 if (LOG.isLoggable(Level.FINEST)) {
-                    LOG.log(Level.FINEST, "Dispatching {0} to {1}", 
+                    LOG.log(Level.FINEST, "Dispatching {0} to {1}",
                             new Object[]{mClass.getSimpleName(), method.toGenericString()});
                 }
             }

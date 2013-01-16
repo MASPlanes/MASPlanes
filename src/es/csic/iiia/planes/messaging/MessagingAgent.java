@@ -65,7 +65,7 @@ public interface MessagingAgent extends Agent, Positioned {
     public void setCommunicationRange(double range);
 
     /**
-     * Get the speed at which this agent moves (in meters per second).
+     * Get the speed at which this agent moves (in meters per millisecond).
      * @return speed at which this agent moves.
      */
     public double getSpeed();
@@ -86,7 +86,7 @@ public interface MessagingAgent extends Agent, Positioned {
      *
      * Since this is a synchronous platform, the messages must be stored
      * so that they are <strong>not</strong> available to the agent
-     * until at least the next iteration (second).
+     * until at least the next iteration (tenth of second).
      */
     public void receive(Message message);
 

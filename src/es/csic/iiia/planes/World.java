@@ -127,9 +127,9 @@ public interface World extends Runnable {
     void removeTask(Task task);
 
     /**
-     * Get the current simulation time (in seconds).
+     * Get the current simulation time (in tenths of second).
      *
-     * @return current simulation time (in seconds).
+     * @return current simulation time (in tenths of second).
      */
     long getTime();
 
@@ -151,9 +151,9 @@ public interface World extends Runnable {
     public void sendMessage(Message message);
 
     /**
-     * Set the duration of this scenario (in seconds).
+     * Set the duration of this scenario (in tenths of second).
      *
-     * @param duration of this scenario in seconds.
+     * @param duration of this scenario in tenths of second.
      */
     public void setDuration(long duration);
 

@@ -37,7 +37,6 @@
 package es.csic.iiia.planes.behaviors.neighbors;
 
 import es.csic.iiia.planes.AbstractPlane;
-import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.messaging.MessagingAgent;
@@ -96,7 +95,7 @@ public class NeighborTracking extends AbstractBehavior {
         if (LOG.isLoggable(Level.FINEST)) {
             LOG.log(Level.FINEST, "{1} checking if {0} will be neighbor for {2} iterations.",
                     new Object[]{agent, getAgent(), iterations});
-            LOG.finest("Neighbors: " + neighbors);
+            LOG.log(Level.FINEST, "Neighbors: {0}", neighbors);
         }
 
         return neighbors.contains(agent, iterations);
@@ -183,7 +182,10 @@ public class NeighborTracking extends AbstractBehavior {
         if (a instanceof AbstractPlane) {
             AbstractPlane p = (AbstractPlane)this.getAgent();
             if (p.getState() != AbstractPlane.State.NORMAL) {
-                LOG.log(Level.FINE, "Skipping beacon because " + a + " is in " + p.getState()  + " state.");
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Skipping beacon because {0} is in {1} state.",
+                            new Object[]{a, p.getState()});
+                }
                 return;
             }
         }

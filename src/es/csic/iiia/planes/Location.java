@@ -63,7 +63,7 @@ public class Location extends Point2D {
 
     /**
      * Moves this location towards the given destination, at speed meters per
-     * second.
+     * millisecond.
      *
      * @param destination
      * @param speed
@@ -114,9 +114,9 @@ public class Location extends Point2D {
     /**
      * Returns the movestep plan to reach the desired destination.
      * <p/>
-     * Because it is usually needed to advance during multiple steps (seconds)
-     * to reach the desired destination, this function returns a MoveStep
-     * object. Then, the subsequent steps can be made using
+     * Because it is usually needed to advance during multiple steps (tenths of
+     * second) to reach the desired destination, this function returns a
+     * MoveStep object. Then, the subsequent steps can be made using
      * {@link #move(es.csic.iiia.planes.Location.MoveStep)}, which is more
      * efficient.
      *
@@ -157,10 +157,14 @@ public class Location extends Point2D {
 
     public boolean within(double range, Location l) {
         double dx = x - l.x;
-        if (dx > range) return false;
+        if (dx > range) {
+            return false;
+        }
 
         double dy = y - l.y;
-        if (dy > range) return false;
+        if (dy > range) {
+            return false;
+        }
 
         return Math.sqrt(dx*dx + dy*dy) >= range;
     }
