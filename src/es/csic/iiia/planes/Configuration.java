@@ -111,6 +111,7 @@ public class Configuration {
     public final int msStartEvery;
     public final Class<? extends MSPlaneNode> msPlaneNodeType;
     public final double msWorkloadK;
+    public final double msWorkloadAlpha;
 
     public Configuration(Properties settings) {
 
@@ -186,6 +187,7 @@ public class Configuration {
             throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
         }
         msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
+        msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
 
     }
 

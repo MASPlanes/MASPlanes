@@ -42,7 +42,6 @@ import java.util.Comparator;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.omg.CORBA.TRANSACTION_MODE;
 
 /**
  * Max-sum plane node that introduces the cost for each task as specified
@@ -179,8 +178,9 @@ public class MSWorkloadPlaneNode extends MSPlaneNode {
     }
 
     private double getAdditionalCost(double i) {
-        return getPlane().getWorld().getFactory().getConfiguration().msWorkloadK
-                * Math.pow(i, 2);
+        final double k = getPlane().getWorld().getFactory().getConfiguration().msWorkloadK;
+        final double alpha = getPlane().getWorld().getFactory().getConfiguration().msWorkloadAlpha;
+        return k * Math.pow(i, alpha);
     }
 
     private Double getMessageValue(Task task) {
