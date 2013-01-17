@@ -171,13 +171,6 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         return battery;
     }
 
-    /**
-     * Updates the battery, consuming one second
-     */
-    private void updateBattery() {
-        battery--;
-    }
-
     @Override
     public void setBatteryCapacity(long capacity) {
         batteryCapacity = capacity;
@@ -215,12 +208,12 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         angle = getLocation().getAngle(l);
         currentDestination = getLocation().buildMoveStep(l, getSpeed());
     }
-    
+
     protected Task getNearest(List<Task> tasks) {
         final Location l = getLocation();
         double mind = Double.MAX_VALUE;
         Task best = null;
-        
+
         for (Task t : tasks) {
             final double d = l.distance(t.getLocation());
             if (d < mind) {
@@ -228,7 +221,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
                 best = t;
             }
         }
-        
+
         return best;
     }
 
@@ -262,26 +255,38 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
 
         // Move the plane if not charging or going to charge
         if (nextTask != null) {
-            if (getLocation().move(currentDestination)) {
+            if (move()) {
                 final Task completed = nextTask;
                 nextTask = null;
                 triggerTaskCompleted(completed);
             }
-            updateBattery();
-            flightDistance += getSpeed();
 
         // Try to get in range of an operator, because the plane is idle
         } else if (!(this instanceof OmniscientPlane)) {
 
             Operator o = getWorld().getNearestOperator(getLocation());
             if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
-                getLocation().move(currentDestination);
-                flightDistance += getSpeed();
+                move();
             } else {
                 angle += 0.01;
             }
 
         }
+    }
+
+    /**
+     * Moves this plane towards its current destination.
+     * <p/>
+     * Be careful when using this place, because using it multiple times
+     * within the same iteration will result in the plane going further than it
+     * physically could.
+     *
+     * @return True if the destination has been reached, or False otherwise.
+     */
+    protected boolean move() {
+        flightDistance += getSpeed();
+        battery--;
+        return getLocation().move(currentDestination);
     }
 
     /**
@@ -292,12 +297,10 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      */
     private void goCharge(Station st) {
         state = State.TO_CHARGE;
-        flightDistance += getSpeed();
-        if (this.getLocation().move(currentDestination)) {
+        if (move()) {
             state = State.CHARGING;
             this.completedLocations.add(st.getLocation());
         }
-        flightDistance += getSpeed();
     }
 
     /**
