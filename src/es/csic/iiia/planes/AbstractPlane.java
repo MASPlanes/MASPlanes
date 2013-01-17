@@ -42,7 +42,6 @@ import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.messaging.AbstractMessagingAgent;
-import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -253,25 +252,28 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         // Handle this iteration's messages
         super.step();
 
-        // Move the plane if not charging or going to charge
+        // Move the plane if it has some task to fulfuill and is not charging
+        // or going to charge
         if (nextTask != null) {
             if (move()) {
                 final Task completed = nextTask;
                 nextTask = null;
                 triggerTaskCompleted(completed);
             }
-
-        // Try to get in range of an operator, because the plane is idle
-        } else if (!(this instanceof OmniscientPlane)) {
-
-            Operator o = getWorld().getNearestOperator(getLocation());
-            if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
-                move();
-            } else {
-                angle += 0.01;
-            }
-
+            return;
         }
+
+        // If we reach this point, it means that the plane is idle, so let it
+        // do some "idle action"
+        idleAction();
+    }
+
+    /**
+     * Action done by the plane whenever it is ready to handle tasks but no
+     * task has been assigned to it.
+     */
+    protected void idleAction() {
+        angle += 0.01;
     }
 
     /**
@@ -324,7 +326,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     protected void setNextTask(Task t) {
         if (t != null && state == State.NORMAL) {
             setDestination(t.getLocation());
-        } else if (state == State.NORMAL && (!(this instanceof OmniscientPlane))) {
+        } else if (state == State.NORMAL) {
             setDestination(getWorld().getNearestOperator(getLocation()).getLocation());
         }
         nextTask = t;
@@ -340,7 +342,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         getWorld().removeTask(t);
         removeTask(t);
         taskCompleted(t);
-        if ((tasks.isEmpty() || nextTask == null) && (!(this instanceof OmniscientPlane))) {
+        if (tasks.isEmpty() || nextTask == null) {
             Operator o = getWorld().getNearestOperator(getLocation());
             setDestination(o.getLocation());
         }

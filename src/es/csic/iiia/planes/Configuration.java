@@ -48,7 +48,7 @@ import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
 import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
-import es.csic.iiia.planes.operator_behavior.Omniscient;
+import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import es.csic.iiia.planes.operator_behavior.Random;
 import es.csic.iiia.planes.operator_behavior.RandomInRange;
@@ -145,6 +145,13 @@ public class Configuration {
             throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
         }
 
+        // Omniscient planes must run with omniscient operators and biceversa.
+        boolean o1 = operatorStrategy instanceof Omniscient;
+        boolean o2 = planesClass == OmniscientPlane.class;
+        if (o1 != o2) {
+            throw new IllegalArgumentException("Omniscient planes must run with omniscient operators and biceversa.");
+        }
+
         value = settings.getProperty("task-evaluation");
         if (value.equalsIgnoreCase("independent-distance")) {
             evaluationClass = IndependentDistanceEvaluation.class;
@@ -194,7 +201,7 @@ public class Configuration {
         }
         msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
         msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
-        
+
     }
 
     @Override

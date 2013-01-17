@@ -38,9 +38,11 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.messaging.Message;
+import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -107,6 +109,16 @@ public class MSPlane extends AbstractPlane {
 
         // And replan if necessary
         setNextTask(getNearest(getLocation(), getTasks()));
+    }
+
+    @Override
+    protected void idleAction() {
+        Operator o = getWorld().getNearestOperator(getLocation());
+        if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
+            move();
+        } else {
+            super.idleAction();
+        }
     }
 
     @Override

@@ -38,6 +38,7 @@ package es.csic.iiia.planes.auctions;
 
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import java.util.ArrayList;
@@ -64,6 +65,16 @@ public class AuctionPlane extends AbstractPlane {
         addBehavior(new NeighborTracking(this));
         addBehavior(new AuctionBehavior(this));
         super.initialize();
+    }
+
+    @Override
+    protected void idleAction() {
+        Operator o = getWorld().getNearestOperator(getLocation());
+        if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
+            move();
+        } else {
+            super.idleAction();
+        }
     }
 
     @Override

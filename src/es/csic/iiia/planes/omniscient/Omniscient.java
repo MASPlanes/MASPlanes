@@ -34,12 +34,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.operator_behavior;
+package es.csic.iiia.planes.omniscient;
 
 import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
+import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 
 /**
  *
@@ -53,23 +54,28 @@ public class Omniscient implements OperatorStrategy {
         Plane best = null;
         for (Plane p : w.getPlanes()) {
             double d = p.getLocation().distance(t.getLocation());
-            
+
             double cd = Double.MAX_VALUE;
             if (p.getNextTask() != null) {
                 cd = p.getLocation().distance(p.getNextTask().getLocation());
             }
-            
+
             if (d < cd && d < mind) {
                 mind = d;
                 best = p;
             }
         }
-        
+
         if (best != null) {
+            Task newTask = best.getNextTask();
             best.addTask(t);
+
+            if (newTask != null) {
+                return submitTask(w, o, newTask);
+            }
         }
-        
+
         return true;
     }
-    
+
 }

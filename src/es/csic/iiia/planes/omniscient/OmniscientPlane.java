@@ -41,7 +41,6 @@ import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -49,13 +48,13 @@ import java.util.List;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class OmniscientPlane extends AbstractPlane {
-    
+
     private static HashMap<Task, OmniscientPlane> beingAttended = new HashMap<Task, OmniscientPlane>();
 
     public OmniscientPlane(Location location) {
         super(location);
     }
-    
+
     @Override
     protected void taskCompleted(Task t) {
         removeTask(t);
@@ -70,8 +69,8 @@ public class OmniscientPlane extends AbstractPlane {
         }
         super.addTask(task);
     }
-    
-    
+
+
 
     @Override
     protected void taskAdded(Task t) {
@@ -80,19 +79,19 @@ public class OmniscientPlane extends AbstractPlane {
             setNextTask(null);
             removeTask(oldt);
         }
-        
+
         if (getTasks().size() > 2) {
             System.err.println("Big time error.");
             System.exit(0);
         }
-        
+
         beingAttended.put(t, this);
         setNextTask(t);
     }
-    
+
     private void replan() {
         List<Task> available = new ArrayList<Task>(getWorld().getTasks());
-        
+
         Task best = getNearest(available);
         while (best != null) {
             if (beingAttended.containsKey(best)) {
@@ -126,6 +125,6 @@ public class OmniscientPlane extends AbstractPlane {
     public List<Location> getPlannedLocations() {
         return null;
     }
-    
-    
+
+
 }
