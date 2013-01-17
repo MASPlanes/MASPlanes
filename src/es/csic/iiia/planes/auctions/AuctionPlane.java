@@ -93,9 +93,7 @@ public class AuctionPlane extends AbstractPlane {
     @Override
     protected void taskRemoved(Task t) {
         localTasks.remove(t);
-        if (!localTasks.isEmpty()) {
-            setNextTask(findClosest(getLocation(), localTasks));
-        }
+        setNextTask(findClosest(getLocation(), localTasks));
     }
 
     private static double replan(Location origin, List<Task> tasks) {
