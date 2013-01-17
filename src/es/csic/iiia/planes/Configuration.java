@@ -45,8 +45,10 @@ import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.maxsum.MSPlaneNode;
 import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
+import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
+import es.csic.iiia.planes.operator_behavior.Omniscient;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import es.csic.iiia.planes.operator_behavior.Random;
 import es.csic.iiia.planes.operator_behavior.RandomInRange;
@@ -124,6 +126,8 @@ public class Configuration {
             operatorStrategy = new NearestInRange();
         } else if (value.equalsIgnoreCase("random-inrange")) {
             operatorStrategy = new RandomInRange();
+        } else if (value.equalsIgnoreCase("omniscient")) {
+            operatorStrategy = new Omniscient();
         } else {
             throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
         }
@@ -135,6 +139,8 @@ public class Configuration {
             planesClass = DefaultPlane.class;
         } else if (value.equalsIgnoreCase("maxsum")) {
             planesClass = MSPlane.class;
+        } else if (value.equalsIgnoreCase("omniscient")) {
+            planesClass = OmniscientPlane.class;
         } else {
             throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
         }

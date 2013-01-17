@@ -125,6 +125,14 @@ public interface World extends Runnable {
      * @param task to remove.
      */
     void removeTask(Task task);
+    
+    /**
+     * Get the list of tasks in the world.
+     * 
+     * This method should not be used by any simulation agent, unless it is
+     * considered as being omniscient.
+     */
+    public List<Task> getTasks();
 
     /**
      * Get the current simulation time (in tenths of second).

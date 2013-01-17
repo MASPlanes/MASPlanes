@@ -39,6 +39,7 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.operator_behavior.Omniscient;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import java.awt.Color;
 import java.awt.Font;
@@ -159,7 +160,7 @@ public class Operator extends AbstractPositionedElement
      */
     @Override
     public void step() {
-        if (!isPlaneInRange()) {
+        if (!isPlaneInRange() && (!(strategy instanceof Omniscient))) {
             return;
         }
 

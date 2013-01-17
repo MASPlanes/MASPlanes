@@ -42,6 +42,7 @@ import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.messaging.AbstractMessagingAgent;
+import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -214,6 +215,22 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         angle = getLocation().getAngle(l);
         currentDestination = getLocation().buildMoveStep(l, getSpeed());
     }
+    
+    protected Task getNearest(List<Task> tasks) {
+        final Location l = getLocation();
+        double mind = Double.MAX_VALUE;
+        Task best = null;
+        
+        for (Task t : tasks) {
+            final double d = l.distance(t.getLocation());
+            if (d < mind) {
+                mind = d;
+                best = t;
+            }
+        }
+        
+        return best;
+    }
 
     @Override
     public void step() {
@@ -254,7 +271,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
             flightDistance += getSpeed();
 
         // Try to get in range of an operator, because the plane is idle
-        } else {
+        } else if (!(this instanceof OmniscientPlane)) {
 
             Operator o = getWorld().getNearestOperator(getLocation());
             if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
@@ -304,7 +321,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     protected void setNextTask(Task t) {
         if (t != null && state == State.NORMAL) {
             setDestination(t.getLocation());
-        } else if (state == State.NORMAL) {
+        } else if (state == State.NORMAL && (!(this instanceof OmniscientPlane))) {
             setDestination(getWorld().getNearestOperator(getLocation()).getLocation());
         }
         nextTask = t;
@@ -320,7 +337,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         getWorld().removeTask(t);
         removeTask(t);
         taskCompleted(t);
-        if (tasks.isEmpty() || nextTask == null) {
+        if ((tasks.isEmpty() || nextTask == null) && (!(this instanceof OmniscientPlane))) {
             Operator o = getWorld().getNearestOperator(getLocation());
             setDestination(o.getLocation());
         }
