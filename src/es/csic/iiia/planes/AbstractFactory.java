@@ -38,6 +38,7 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
+import es.csic.iiia.planes.idle.IdleStrategy;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.logging.Level;
@@ -87,10 +88,12 @@ public abstract class AbstractFactory implements Factory {
         try {
             Constructor<? extends Plane> c = config.planesClass.getConstructor(Location.class);
             p = c.newInstance(location);
-            EvaluationStrategy strategy = config.evaluationClass.newInstance();
+            EvaluationStrategy strategy = config.evaluationStrategy;
             p.setEvaluationStrategy(strategy);
+            IdleStrategy idle = config.idleStrategy;
+            p.setIdleStrategy(idle);
         } catch (Exception ex) {
-            throw new RuntimeException(ex);
+            throw new RuntimeException("Unable to build the planes", ex);
         }
         initialize(p);
         world.addPlane(p);

@@ -2,5 +2,6 @@ anifest.mf
 build
 dist
 problem
+problem.short
 nbproject/private
 dependencies

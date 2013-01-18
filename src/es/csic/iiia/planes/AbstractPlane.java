@@ -37,6 +37,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.idle.IdleStrategy;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
@@ -110,6 +111,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     private EvaluationStrategy evaluationStrategy = new IndependentDistanceEvaluation();
 
     /**
+     * Idling strategy of this plane
+     */
+    private IdleStrategy idleStrategy;
+
+    /**
      * Current plane angle, used only for drawing purposes
      */
     private double angle = 0;
@@ -141,7 +147,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     public void initialize() {
         super.initialize();
         final Location l = getLocation();
-        setDestination(getWorld().getNearestOperator(l).getLocation());
+        //setDestination(getWorld().getNearestOperator(l).getLocation());
     }
 
     @Override
@@ -190,6 +196,16 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         this.evaluationStrategy = evaluationStrategy;
     }
 
+    @Override
+    public IdleStrategy getIdleStrategy() {
+        return idleStrategy;
+    }
+
+    @Override
+    public void setIdleStrategy(IdleStrategy idleStrategy) {
+        this.idleStrategy = idleStrategy;
+    }
+
     public long getRechargeRatio() {
         return rechargeRatio;
     }
@@ -203,7 +219,12 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
         return evaluationStrategy.getCost(this, task);
     }
 
-    private void setDestination(Location l) {
+    @Override
+    public void setDestination(Location l) {
+        if (currentDestination != null && currentDestination.destination.equals(l)) {
+            return;
+        }
+
         angle = getLocation().getAngle(l);
         currentDestination = getLocation().buildMoveStep(l, getSpeed());
     }
@@ -272,20 +293,14 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      * Action done by the plane whenever it is ready to handle tasks but no
      * task has been assigned to it.
      */
-    protected void idleAction() {
-        angle += 0.01;
+    private void idleAction() {
+        if (!idleStrategy.idleAction(this)) {
+            angle += 0.01;
+        }
     }
 
-    /**
-     * Moves this plane towards its current destination.
-     * <p/>
-     * Be careful when using this place, because using it multiple times
-     * within the same iteration will result in the plane going further than it
-     * physically could.
-     *
-     * @return True if the destination has been reached, or False otherwise.
-     */
-    protected boolean move() {
+    @Override
+    public boolean move() {
         flightDistance += getSpeed();
         battery--;
         return getLocation().move(currentDestination);

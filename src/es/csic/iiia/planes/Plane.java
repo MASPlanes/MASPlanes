@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.idle.IdleStrategy;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.gui.Drawable;
@@ -142,6 +143,44 @@ public interface Plane extends MessagingAgent {
      * @return cost of performing the given task.
      */
     public double getCost(Task task);
+
+    /**
+     * Set the idle strategy of this plane.
+     * <p/>
+     * This strategy defines the behavior of the plane whenever it has no tasks
+     * to accomplish.
+     *
+     * @param strategy new strategy of this plane.
+     */
+    public void setIdleStrategy(IdleStrategy strategy);
+
+    /**
+     * Get the idle strategy of this plane.
+     */
+    public IdleStrategy getIdleStrategy();
+
+
+
+    /***************************************************************************
+     * MOVEMENT STUFF. This should only be used by idling strategies!
+     **************************************************************************/
+
+    /**
+     * Sets the plane's destination.
+     *
+     * @param location location where to move towards.
+     */
+    public void setDestination(Location location);
+
+    /**
+     * Moves the plane towards its current destination.
+     * <p/>
+     * <em>Warning:</em> this action should never be executed twice during a
+     * single iteration.
+     *
+     * @return True if the destination has been reached, or False otherwise.
+     */
+    public boolean move();
 
     /***************************************************************************
      * STATISTICS TRACKING

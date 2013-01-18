@@ -68,16 +68,6 @@ public class AuctionPlane extends AbstractPlane {
     }
 
     @Override
-    protected void idleAction() {
-        Operator o = getWorld().getNearestOperator(getLocation());
-        if (getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
-            move();
-        } else {
-            super.idleAction();
-        }
-    }
-
-    @Override
     public List<Location> getPlannedLocations() {
         replan(getLocation(), localTasks);
         List<Location> locations = new ArrayList<Location>();
