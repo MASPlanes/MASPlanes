@@ -144,24 +144,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     }
 
     @Override
-    public void initialize() {
-        super.initialize();
-        final Location l = getLocation();
-        //setDestination(getWorld().getNearestOperator(l).getLocation());
-    }
-
-    @Override
     public int getId() {
         return id;
     }
 
-
-    /**
-     * Get the state of this plane.
-     *
-     * @see State
-     * @return state of this plane.
-     */
+    @Override
     public State getState() {
         return state;
     }
@@ -222,6 +209,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     @Override
     public void setDestination(Location l) {
         if (currentDestination != null && currentDestination.destination.equals(l)) {
+            angle = getLocation().getAngle(l);
             return;
         }
 

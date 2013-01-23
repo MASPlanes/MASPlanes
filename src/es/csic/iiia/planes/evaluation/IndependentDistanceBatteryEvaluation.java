@@ -71,16 +71,19 @@ public class IndependentDistanceBatteryEvaluation implements EvaluationStrategy<
         final double plane2task   = pl.distance(tl);
         final double task2station = tl.distance(sl);
 
+        // Reject tasks when not ready
+        if (plane.getState() != Plane.State.NORMAL) {
+            return Double.MAX_VALUE;
+        }
+
         // Battery required to fulfill the task before recharging
         double reqBattery = (long)((plane2task + task2station) / plane.getSpeed());
         if (plane.getBattery() > reqBattery) {
             return plane2task;
         }
 
-        // The plane can't fulfill the task without recharging, so the offer
-        // considers charging first
-        final Location nsl = world.getNearestStation(pl).getLocation();
-        return pl.distance(nsl) + nsl.distance(tl);
+        // The plane can't fulfill the task without recharging, so reject it.
+        return Double.MAX_VALUE;
     }
 
 }

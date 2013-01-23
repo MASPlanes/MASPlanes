@@ -52,9 +52,8 @@ public class FlyTowardsOperator implements IdleStrategy {
     public boolean idleAction(Plane plane) {
         Operator o = plane.getWorld().getNearestOperator(plane.getLocation());
         if (plane.getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
-            AbstractPlane p = (AbstractPlane)plane;
-            p.setDestination(o.getLocation());
-            p.move();
+            plane.setDestination(o.getLocation());
+            plane.move();
             return true;
         }
 

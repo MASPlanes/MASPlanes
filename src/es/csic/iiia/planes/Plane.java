@@ -66,6 +66,14 @@ public interface Plane extends MessagingAgent {
     public int getId();
 
     /**
+     * Get the state of this plane.
+     *
+     * @see State
+     * @return state of this plane.
+     */
+    public State getState();
+
+    /**
      * Adds a new task to the list of tasks owned by this plane
      *
      * Task addition triggers a reevaluation of the next task to be completed.

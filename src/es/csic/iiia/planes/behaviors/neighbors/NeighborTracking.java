@@ -159,11 +159,11 @@ public class NeighborTracking extends AbstractBehavior {
         final int n = (int)s;
 
         if (n > 0) {
-            LOG.log(Level.FINE, "Adding {0} as a neighbor for {1} iterations.",
+            LOG.log(Level.FINER, "Adding {0} as a neighbor for {1} iterations.",
                     new Object[]{neighbor, n});
             neighbors.add(neighbor, n);
         } else {
-            LOG.log(Level.FINE, "Ignoring {0} as a neighbor (s={1}, d_step={2}).",
+            LOG.log(Level.FINEST, "Ignoring {0} as a neighbor (s={1}, d_step={2}).",
                     new Object[]{neighbor, s, d_step});
         }
     }
@@ -177,20 +177,9 @@ public class NeighborTracking extends AbstractBehavior {
     @Override
     public void afterMessages() {
         MessagingAgent a = getAgent();
-
-        // Skip the tracking message if it's a non-charged plane
-        if (a instanceof AbstractPlane) {
-            AbstractPlane p = (AbstractPlane)this.getAgent();
-            if (p.getState() != AbstractPlane.State.NORMAL) {
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, "Skipping beacon because {0} is in {1} state.",
-                            new Object[]{a, p.getState()});
-                }
-                return;
-            }
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "{0} sending beacon.", new Object[]{a});
         }
-
-        LOG.log(Level.FINE, "Sending beacon.");
         a.send(new TrackingMessage());
     }
 
