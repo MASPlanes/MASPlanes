@@ -88,9 +88,9 @@ public abstract class AbstractFactory implements Factory {
         try {
             Constructor<? extends Plane> c = config.planesClass.getConstructor(Location.class);
             p = c.newInstance(location);
-            EvaluationStrategy strategy = config.evaluationStrategy;
+            EvaluationStrategy strategy = config.evaluationClass.newInstance();
             p.setEvaluationStrategy(strategy);
-            IdleStrategy idle = config.idleStrategy;
+            IdleStrategy idle = config.idleClass.newInstance();
             p.setIdleStrategy(idle);
         } catch (Exception ex) {
             throw new RuntimeException("Unable to build the planes", ex);

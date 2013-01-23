@@ -43,6 +43,7 @@ import es.csic.iiia.planes.evaluation.IndependentDistanceBatteryEvaluation;
 import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.idle.DoNothing;
 import es.csic.iiia.planes.idle.FlyTowardsOperator;
+import es.csic.iiia.planes.idle.FlyTowardsOperatorP;
 import es.csic.iiia.planes.idle.IdleStrategy;
 import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
 import es.csic.iiia.planes.maxsum.MSPlane;
@@ -103,12 +104,15 @@ public class Configuration {
      */
     public final Class<? extends Plane> planesClass;
 
-    public final IdleStrategy idleStrategy;
+    /**
+     * Class of th eidle strategy used by the planes in this simulation.
+     */
+    public final Class<? extends IdleStrategy> idleClass;
 
     /**
      * Class of the evaluation strategy used by the planes in this simulation.
      */
-    public final EvaluationStrategy evaluationStrategy;
+    public final Class<? extends EvaluationStrategy> evaluationClass;
 
     /* AUCTIONS specific stuff */
     public final int aucEvery;
@@ -152,9 +156,11 @@ public class Configuration {
 
         value = settings.getProperty("idle-strategy");
         if (value.equalsIgnoreCase("do-nothing")) {
-            idleStrategy = new DoNothing();
+            idleClass = DoNothing.class;
         } else if (value.equalsIgnoreCase("fly-towards-operator")) {
-            idleStrategy = new FlyTowardsOperator();
+            idleClass = FlyTowardsOperator.class;
+        } else if (value.equalsIgnoreCase("fly-towards-operator-p")) {
+            idleClass = FlyTowardsOperatorP.class;
         } else {
             throw new IllegalArgumentException("Illegal idling strategy \"" + value + "\".");
         }
@@ -162,16 +168,16 @@ public class Configuration {
         // Omniscient planes must run with omniscient operators and biceversa.
         boolean o1 = operatorStrategy instanceof Omniscient;
         boolean o2 = planesClass == OmniscientPlane.class;
-        boolean o3 = idleStrategy instanceof DoNothing;
+        boolean o3 = idleClass == DoNothing.class;
         if (o1 != o2 || o2 != o3) {
             throw new IllegalArgumentException("Omniscient planes must run with omniscient operators and the do-nothing idle behavior.");
         }
 
         value = settings.getProperty("task-evaluation");
         if (value.equalsIgnoreCase("independent-distance")) {
-            evaluationStrategy = new IndependentDistanceEvaluation();
+            evaluationClass = IndependentDistanceEvaluation.class;
         } else if (value.equalsIgnoreCase("independent-distance-battery")) {
-            evaluationStrategy = new IndependentDistanceBatteryEvaluation();
+            evaluationClass = IndependentDistanceBatteryEvaluation.class;
         } else {
             throw new IllegalArgumentException("Illegal task evaluation strategy \"" + value + "\".");
         }
@@ -227,8 +233,8 @@ public class Configuration {
             .append("# problem = ").append(problemFile).append("\n")
             .append("# operator = ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
             .append("# planes = ").append(planesClass.getSimpleName()).append("\n")
-            .append("# task-evaluation = ").append(evaluationStrategy.getClass().getSimpleName()).append("\n")
-            .append("# idle-strategy = ").append(idleStrategy.getClass().getSimpleName()).append("\n")
+            .append("# task-evaluation = ").append(evaluationClass.getSimpleName()).append("\n")
+            .append("# idle-strategy = ").append(idleClass.getSimpleName()).append("\n")
             .append("# auction-every = ").append(aucEvery).append("\n")
             .append("# maxsum-start-every = ").append(msStartEvery).append("\n")
             .append("# maxsum-iterations = ").append(msIterations).append("\n")
