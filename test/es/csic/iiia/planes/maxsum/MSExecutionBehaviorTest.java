@@ -36,9 +36,11 @@
  */
 package es.csic.iiia.planes.maxsum;
 
-import es.csic.iiia.planes.Configuration;
+import es.csic.iiia.planes.Battery;
+import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.DefaultFactory;
 import es.csic.iiia.planes.Factory;
+import es.csic.iiia.planes.InfiniteBattery;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
@@ -111,8 +113,7 @@ public class MSExecutionBehaviorTest {
         MSPlane p = (MSPlane) factory.buildPlane(new Location(x,y));
         p.setCommunicationRange(2000);
         p.setSpeed(0.001);
-        p.setBatteryCapacity((long)1e20);
-        p.setBattery((long)1e20);
+        Battery b = factory.buildBattery(p);
         return p;
     }
 

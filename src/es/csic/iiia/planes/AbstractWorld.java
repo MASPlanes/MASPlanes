@@ -143,9 +143,10 @@ public abstract class AbstractWorld implements World {
         for (DPlane pd : d.getPlanes()) {
             Location l = new Location(pd.getX(), pd.getY());
             Plane p = factory.buildPlane(l);
+            Battery b = factory.buildBattery(p);
             p.setSpeed(pd.getSpeed());
-            p.setBattery(pd.getInitialBattery());
-            p.setBatteryCapacity(pd.getBatteryCapacity());
+            b.setEnergy(pd.getInitialBattery());
+            b.setCapacity(pd.getBatteryCapacity());
             p.setCommunicationRange(pd.getCommunicationRange());
             p.setColor(pd.getColor());
         }

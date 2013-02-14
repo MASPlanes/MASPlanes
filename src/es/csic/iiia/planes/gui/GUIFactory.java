@@ -38,7 +38,7 @@
 package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.AbstractFactory;
-import es.csic.iiia.planes.Configuration;
+import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.AbstractWorld;
 
 /**

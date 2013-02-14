@@ -1,8 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright (c) 2012, IIIA-CSIC, Artificial Intelligence Research Institute
- * All rights reserved.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -37,31 +36,49 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.cli.Configuration;
-
 /**
- * Factory that will be used to create most elements.
+ * Simple rechargeable battery.
  *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class DefaultFactory extends AbstractFactory {
+public class DefaultBattery implements Battery {
 
-    public DefaultFactory(Configuration config) {
-        super(config);
+    private long capacity;
+    private long energy;
+
+    @Override
+    public void setCapacity(long capacity) {
+        this.capacity = capacity;
     }
 
-    /**
-     * Builds a {@link DefaultWorld}.
-     */
     @Override
-    public World buildWorld() {
-        if (getConfiguration().quiet) {
-            world = new DefaultWorld(this);
-        } else {
-            world = new ProgressWorld(this);
-        }
+    public long getCapacity() {
+        return capacity;
+    }
 
-        return world;
+    @Override
+    public void consume(long energy) {
+        this.energy -= energy;
+    }
+
+    @Override
+    public void recharge(long energy) {
+        this.energy += energy;
+    }
+
+    @Override
+    public void setEnergy(long energy) {
+        this.energy = energy;
+    }
+
+    @Override
+    public long getEnergy() {
+        return this.energy;
+    }
+
+    @Override
+    public boolean isFull() {
+        return energy == capacity;
     }
 
 }

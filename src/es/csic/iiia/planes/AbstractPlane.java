@@ -83,12 +83,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     /**
      * Remaining battery in tenths of second
      */
-    private long battery;
-
-    /**
-     * Battery capacity in tenths of second
-     */
-    private long batteryCapacity;
+    private Battery battery;
 
     /**
      * List of completed tasks' locations, for tracking purposes
@@ -154,23 +149,13 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     }
 
     @Override
-    public void setBattery(long battery) {
+    public void setBattery(Battery battery) {
         this.battery = battery;
     }
 
     @Override
-    public long getBattery() {
+    public Battery getBattery() {
         return battery;
-    }
-
-    @Override
-    public void setBatteryCapacity(long capacity) {
-        batteryCapacity = capacity;
-    }
-
-    @Override
-    public long getBatteryCapacity() {
-        return batteryCapacity;
     }
 
     @Override
@@ -236,9 +221,8 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     @Override
     public void step() {
         if (state == State.CHARGING) {
-            this.battery += rechargeRatio;
-            if (this.battery >= this.batteryCapacity) {
-                battery = batteryCapacity;
+            battery.recharge(rechargeRatio);
+            if (battery.isFull()) {
                 state = State.NORMAL;
                 setNextTask(nextTask);
             }
@@ -251,7 +235,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
             goCharge(st);
             super.step();
             return;
-        } else if (battery <= getLocation().getDistance(st.getLocation())/getSpeed()) {
+        } else if (battery.getEnergy() <= getLocation().getDistance(st.getLocation())/getSpeed()) {
             setDestination(st.getLocation());
             goCharge(st);
             super.step();
@@ -290,7 +274,7 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     @Override
     public boolean move() {
         flightDistance += getSpeed();
-        battery--;
+        battery.consume(1);
         return getLocation().move(currentDestination);
     }
 

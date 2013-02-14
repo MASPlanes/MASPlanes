@@ -36,7 +36,6 @@
  */
 package es.csic.iiia.planes.cli;
 
-import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultFactory;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.World;

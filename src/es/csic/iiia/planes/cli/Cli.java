@@ -37,7 +37,6 @@
  */
 package es.csic.iiia.planes.cli;
 
-import es.csic.iiia.planes.Configuration;
 import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;

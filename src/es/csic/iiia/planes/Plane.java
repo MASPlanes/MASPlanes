@@ -99,32 +99,18 @@ public interface Plane extends MessagingAgent {
     List<Task> getTasks();
 
     /**
-     * Set plane's the remaining battery, in tenths of second.
+     * Set the plane's battery.
      *
      * @param battery
      */
-    void setBattery(long battery);
+    public void setBattery(Battery battery);
 
     /**
-     * Get the plane's remianing battery in tenths of second.
+     * Get the plane's battery.
      *
      * @return the reamining battery of this plane (in flight tenths of second)
      */
-    long getBattery();
-
-    /**
-     * Set the battery capacity (maximum battery charge in tenths of second)
-     *
-     * @param capacity
-     */
-    public void setBatteryCapacity(long capacity);
-
-    /**
-     * Get the battery capacity (maximum battery charge in tenths of second)
-     *
-     * @return the capacity of the battery of this plane.
-     */
-    public long getBatteryCapacity();
+    public Battery getBattery();
 
     /**
      * Get the evaluation strategy used by this plane.

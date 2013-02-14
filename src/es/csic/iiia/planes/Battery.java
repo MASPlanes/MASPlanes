@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -36,80 +36,60 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.cli.Configuration;
-import es.csic.iiia.planes.definition.DTask;
-import java.util.List;
-
 /**
- * Factory used to build all of the simulation's participants.
- *
- * Every element participating in the simulation is instantiated through this
- * factory, which is the responsible of "gluing" them together.
+ * A battery that planes can use.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Factory {
+public interface Battery {
 
     /**
-     * Get the configuration object of this simulation.
+     * Set the maximum capacity of this battery.
      *
-     * @return the configuration of this simulation.
+     * @param capacity to set.
      */
-    public Configuration getConfiguration();
+    public void setCapacity(long capacity);
 
     /**
-     * Builds an {@link Operator}.
+     * Get the maximum capacity of this battery.
      *
-     * The created operator will create and submit tasks according to the given
-     * list of task definitions.
-     *
-     * @param location location where this operator is positioned.
-     * @param taskDefinitions list of task definitions,
-     * @return Operator newly build Operator.
+     * @return maximum capacity of this battery.
      */
-    public Operator buildOperator(Location location, List<DTask> taskDefinitions);
+    public long getCapacity();
 
     /**
-     * Builds a {@link Plane}.
+     * Consumes the specified amount of energy.
      *
-     * @param location initial location of the plane.
-     * @return newly built plane.
+     * @param energy to consume.
      */
-    public Plane buildPlane(Location location);
+    public void consume(long energy);
 
     /**
-     * Builds a {@link Battery} for the specified plane.
+     * Recharges the specified amount of energy.
      *
-     * @param plane the plane that will use this battery.
-     * @return newly built battery.
+     * @param energy to recharge.
      */
-    public Battery buildBattery(Plane plane);
+    public void recharge(long energy);
 
     /**
-     * Builds a charging {@link Station}.
+     * Set the remaining amount of energy.
      *
-     * @param location location of the recharging station.
-     * @return newly built station.
+     * @param energy remaining amount of energy to set.
      */
-    public Station buildStation(Location location);
+    public void setEnergy(long energy);
 
     /**
-     * Builds a new {@link Task}.
+     * Get the remaining amount of energy.
      *
-     * The task's submission time is automatically set to the current simulation
-     * time.
-     *
-     * @see Task#getSubmissionTime()
-     *
-     * @param location that must be visited by some plane.
-     * @return newly built task.
+     * @return remaining amount of energy.
      */
-    public Task buildTask(Location location);
+    public long getEnergy();
 
     /**
-     * Builds a new {@link World}.
-     * @return newly built World;
+     * Check if the battery is full.
+     *
+     * @return True if the battery is full, or False otherwise.
      */
-    public World buildWorld();
+    public boolean isFull();
 
 }

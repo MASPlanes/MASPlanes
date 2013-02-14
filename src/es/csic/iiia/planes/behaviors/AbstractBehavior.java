@@ -36,7 +36,7 @@
  */
 package es.csic.iiia.planes.behaviors;
 
-import es.csic.iiia.planes.Configuration;
+import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.messaging.MessagingAgent;
 
 /**

@@ -34,8 +34,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes;
+package es.csic.iiia.planes.cli;
 
+import es.csic.iiia.planes.Battery;
+import es.csic.iiia.planes.DefaultBattery;
+import es.csic.iiia.planes.DefaultPlane;
+import es.csic.iiia.planes.InfiniteBattery;
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.auctions.AuctionPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
@@ -49,10 +54,10 @@ import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.maxsum.MSPlaneNode;
 import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
+import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
-import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import es.csic.iiia.planes.operator_behavior.Random;
 import es.csic.iiia.planes.operator_behavior.RandomInRange;
@@ -105,6 +110,11 @@ public class Configuration {
     public final Class<? extends Plane> planesClass;
 
     /**
+     * Class of the battery used by the planes.
+     */
+    public final Class<? extends Battery> batteryClass;
+
+    /**
      * Class of th eidle strategy used by the planes in this simulation.
      */
     public final Class<? extends IdleStrategy> idleClass;
@@ -152,6 +162,15 @@ public class Configuration {
             planesClass = OmniscientPlane.class;
         } else {
             throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
+        }
+
+        value = settings.getProperty("battery");
+        if (value.equalsIgnoreCase("default")) {
+            batteryClass = DefaultBattery.class;
+        } else if (value.equalsIgnoreCase("infinite")) {
+            batteryClass = InfiniteBattery.class;
+        } else {
+            throw new IllegalArgumentException("Illegal battery type \"" + value + "\".");
         }
 
         value = settings.getProperty("idle-strategy");

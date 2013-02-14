@@ -48,6 +48,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
+import java.text.MessageFormat;
 import java.util.List;
 
 /**
@@ -216,9 +217,10 @@ public class PlaneDrawer implements Drawable {
         FontMetrics m = g.getFontMetrics(f);
         int w = m.stringWidth(sid);
         int h = m.getHeight();
-        String bat = String.valueOf(plane.getBattery());
+        double percent = plane.getBattery().getEnergy()/(double)plane.getBattery().getCapacity();
+        String bat =  MessageFormat.format("{0,number,#.##%}", percent);
         g.setColor(new Color(240,240,240));
-        g.fillRect(x-(w/2), y+200, (int)(w*plane.getBattery()/plane.getBatteryCapacity()), h);
+        g.fillRect(x-(w/2), y+200, (int)(w*percent), h);
         g.setColor(Color.DARK_GRAY);
         g.drawRect(x-(w/2), y+200, w, h);
         g.drawString(bat, x-(w/2), y+200+h-25);

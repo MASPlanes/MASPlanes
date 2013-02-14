@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.idle.IdleStrategy;
@@ -99,6 +100,18 @@ public abstract class AbstractFactory implements Factory {
         world.addPlane(p);
         p.setAngle(location.getAngle(world.getNearestOperator(location).getLocation()));
         return p;
+    }
+
+    @Override
+    public Battery buildBattery(Plane p) {
+        Battery b = null;
+        try {
+            b = config.batteryClass.newInstance();
+        } catch (Exception ex) {
+            throw new RuntimeException("Unable to build the battery", ex);
+        }
+        p.setBattery(b);
+        return b;
     }
 
     @Override

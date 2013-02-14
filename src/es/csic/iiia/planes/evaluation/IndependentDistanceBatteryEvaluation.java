@@ -78,7 +78,7 @@ public class IndependentDistanceBatteryEvaluation implements EvaluationStrategy<
 
         // Battery required to fulfill the task before recharging
         double reqBattery = (long)((plane2task + task2station) / plane.getSpeed());
-        if (plane.getBattery() > reqBattery) {
+        if (plane.getBattery().getEnergy() > reqBattery) {
             return plane2task;
         }
 
