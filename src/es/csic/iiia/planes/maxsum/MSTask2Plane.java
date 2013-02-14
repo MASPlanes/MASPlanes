@@ -40,7 +40,7 @@ import es.csic.iiia.planes.Task;
 
 /**
  * Message sent from a {@link MSTaskNode} to a {@link MSPlaneNode}.
- * 
+ *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSTask2Plane extends MSMessage {
@@ -51,7 +51,7 @@ public class MSTask2Plane extends MSMessage {
 
     @Override
     public String toString() {
-        return "T(" + getTask() + ") -> P(" + getRecipient() + ") : " + getValue();
+        return "T(" + getTask().getId() + ") -> P(" + getRecipient() + ") : " + getValue();
     }
-    
+
 }

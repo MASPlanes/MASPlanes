@@ -101,10 +101,6 @@ public class MSTaskNode extends AbstractMSNode<MSPlane, MSPlane2Task> {
             final double value = getPotential(p) - minimizer.getComplementary(p);
             MSMessage msg = new MSTask2Plane(task, p, value);
             send(msg, p);
-
-            if (LOG.isLoggable(Level.FINER)) {
-                LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{msg, msg.getRecipient()});
-            }
         }
     }
 

@@ -128,7 +128,7 @@ public class MSPlane extends AbstractPlane {
     public void send(Message message) {
         super.send(message);
         if (LOG.isLoggable(Level.FINER) && message instanceof MSMessage) {
-            LOG.log(Level.FINER, "Sending {0} to {1}", new Object[]{message, message.getRecipient()});
+                LOG.log(Level.FINER, "[{2}] Sending {0} to {1}", new Object[]{message, message.getRecipient(), getWorld().getTime()});
         }
     }
 
