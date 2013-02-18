@@ -60,12 +60,13 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class Generator {
 
-    // Duration in tenths of second
-    private long duration = 25920000L; //=3600*24*30*1000;
+    // Duration in tenths of second (10us/s * 60s/m * 60m/h * 24h/d * 30d/month)
+    private long duration = 10L * 60L * 60L * 24L * 30L;
     private int width = 10000;
     private int height = 10000;
     private int num_planes = 10;
     private int num_operators = 1;
+    // 1 task per minute
     private int num_tasks = 60*24*30;
     private int num_stations = 1;
     private int num_crisis = 4;
@@ -87,7 +88,15 @@ public class Generator {
      */
     public static void main(String[] args) {
         Generator t = new Generator();
+        if (args.length >= 1 && args[0].equalsIgnoreCase("short")) {
+            t.shorten();
+        }
         t.run();
+    }
+
+    private void shorten() {
+        duration /= 10;
+        num_tasks /= 10;
     }
 
     /**
@@ -200,12 +209,12 @@ public class Generator {
             data[i] = tasks.get(i).getTime();
         }
 
-        EmpiricalDistribution d = new EmpiricalDistribution(100);
+        EmpiricalDistribution d = new EmpiricalDistribution(30);
         d.load(data);
 
         for (SummaryStatistics stats : d.getBinStats()) {
             StringBuilder buf = new StringBuilder();
-            for (int i=0, len=Math.round(stats.getN()/10f); i<len; i++) {
+            for (int i=0, len=Math.round(stats.getN()/50f); i<len; i++) {
                 buf.append('#');
             }
             System.err.println(buf);
