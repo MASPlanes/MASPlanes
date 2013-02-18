@@ -187,9 +187,8 @@ public class Configuration {
         // Omniscient planes must run with omniscient operators and biceversa.
         boolean o1 = operatorStrategy instanceof Omniscient;
         boolean o2 = planesClass == OmniscientPlane.class;
-        boolean o3 = idleClass == DoNothing.class;
-        if (o1 != o2 || o2 != o3) {
-            throw new IllegalArgumentException("Omniscient planes must run with omniscient operators and the do-nothing idle behavior.");
+        if (o1 != o2) {
+            throw new IllegalArgumentException("Omniscient planes must run with omniscient operators.");
         }
 
         value = settings.getProperty("task-evaluation");

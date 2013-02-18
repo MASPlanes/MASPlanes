@@ -53,6 +53,12 @@ public class Omniscient implements OperatorStrategy {
         double mind = Double.MAX_VALUE;
         Plane best = null;
         for (Plane p : w.getPlanes()) {
+            double o2p = o.getLocation().distance(p.getLocation());
+            if (o2p > o.getCommunicationRange()) {
+                continue;
+            }
+
+            OmniscientPlane.addVisibility(p, t);
             double d = p.getLocation().distance(t.getLocation());
 
             double cd = Double.MAX_VALUE;
