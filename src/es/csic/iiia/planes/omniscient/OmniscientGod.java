@@ -113,8 +113,8 @@ class OmniscientGod {
         if (checkPlaneVisibility() || changes) {
 
             updateVisibility();
-            assignmentMap.clear();
-            reverseMap.clear();
+            //assignmentMap.clear();
+            //reverseMap.clear();
             for (OmniscientPlane p : visibilityMap.keySet()) {
                 assign(p);
             }
@@ -126,7 +126,7 @@ class OmniscientGod {
                 if (t == null) {
                     it.remove();
                 } else {
-                    System.err.println(p + " : " + t);
+                    //System.err.println(p + " : " + t + " D: " + p.getLocation().distance(t.getLocation()));
                 }
             }
 
@@ -136,18 +136,25 @@ class OmniscientGod {
         changes = false;
     }
 
+    private void pick(OmniscientPlane p, Task best) {
+        if (assignmentMap.containsKey(p)) {
+            reverseMap.remove(assignmentMap.get(p));
+        }
+        assignmentMap.put(p, best);
+        reverseMap.put(best, p);
+    }
+
     private void assign(OmniscientPlane p) {
         ArrayList<Task> candidates = getCandidateTasks(p);
         while (!candidates.isEmpty()) {
             Task best = getNearest(p, candidates);
-            if (reverseMap.containsKey(best)) {
+            if (reverseMap.containsKey(best) && reverseMap.get(best) != p) {
                 OmniscientPlane o = reverseMap.get(best);
                 double myd = p.getLocation().distance(best.getLocation());
                 double otd = o.getLocation().distance(best.getLocation());
                 if (myd < otd) {
                     assignmentMap.remove(o);
-                    assignmentMap.put(p, best);
-                    reverseMap.put(best, p);
+                    pick(p, best);
                     assign(o);
                     break;
                 } else {
@@ -155,8 +162,7 @@ class OmniscientGod {
                     continue;
                 }
             } else {
-                assignmentMap.put(p, best);
-                reverseMap.put(best, p);
+                pick(p, best);
                 break;
             }
         }
@@ -169,6 +175,7 @@ class OmniscientGod {
             double d = p.getLocation().distance(t.getLocation());
             if (d < mind) {
                 best = t;
+                mind = d;
             }
         }
         return best;
@@ -204,7 +211,7 @@ class OmniscientGod {
     public void updateVisibility() {
         for (OmniscientPlane p : visibilityMap.keySet()) {
             for (OmniscientPlane p2 : getNeighbors(p.getLocation(), p.getCommunicationRange())) {
-                visibilityMap.get(p2).addAll(visibilityMap.get(p));
+                visibilityMap.get(p).addAll(visibilityMap.get(p2));
             }
         }
     }
@@ -217,6 +224,8 @@ class OmniscientGod {
         for (OmniscientPlane p : visibilityMap.keySet()) {
             visibilityMap.get(p).remove(t);
         }
+        assignmentMap.remove(reverseMap.get(t));
+        reverseMap.remove(t);
         changes = true;
     }
 
