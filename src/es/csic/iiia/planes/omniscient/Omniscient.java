@@ -48,40 +48,27 @@ import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
  */
 public class Omniscient implements OperatorStrategy {
 
+    private static OmniscientGod god = new OmniscientGod();
+
+    static Task getNextTask(OmniscientPlane plane) {
+        return god.getNextTask(plane);
+    }
+
+    static void taskCompleted(Task t) {
+        god.taskCompleted(t);
+    }
+
+    static void iter(long time) {
+        god.iter(time);
+    }
+
+    static void initialize(World w) {
+        god.initialize(w);
+    }
+
     @Override
     public boolean submitTask(World w, Operator o, Task t) {
-        double mind = Double.MAX_VALUE;
-        Plane best = null;
-        for (Plane p : w.getPlanes()) {
-            double o2p = o.getLocation().distance(p.getLocation());
-            if (o2p > o.getCommunicationRange()) {
-                continue;
-            }
-
-            OmniscientPlane.addVisibility(p, t);
-            double d = p.getLocation().distance(t.getLocation());
-
-            double cd = Double.MAX_VALUE;
-            if (p.getNextTask() != null) {
-                cd = p.getLocation().distance(p.getNextTask().getLocation());
-            }
-
-            if (d < cd && d < mind) {
-                mind = d;
-                best = p;
-            }
-        }
-
-        if (best != null) {
-            Task newTask = best.getNextTask();
-            best.addTask(t);
-
-            if (newTask != null) {
-                return submitTask(w, o, newTask);
-            }
-        }
-
-        return true;
+        return god.addTask(o, t);
     }
 
 }

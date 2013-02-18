@@ -38,15 +38,8 @@ package es.csic.iiia.planes.omniscient;
 
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
-import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
 
 /**
  *
@@ -54,175 +47,39 @@ import java.util.TreeSet;
  */
 public class OmniscientPlane extends AbstractPlane {
 
-    private static HashMap<Task, OmniscientPlane> beingAttended = new HashMap<Task, OmniscientPlane>();
-    private static TreeMap<Plane, Set<Task>> visibility = new TreeMap<Plane, Set<Task>>();
-
-    private boolean changes = false;
-
-    @Override
-    public void initialize() {
-        super.initialize();
-        visibility.put(this, new TreeSet<Task>());
-    }
-
-    private void log(String message) {
-        System.err.println("[" + getWorld().getTime() + "] " + message);
-    }
-
-    @Override
-    public void preStep() {
-        super.preStep();
-        changes = false;
-
-        // Update the visibility map
-        Set<Task> visibles = visibility.get(this);
-        for (Plane p : getWorld().getPlanes()) {
-            double d2p = p.getLocation().distance(getLocation());
-
-            if (d2p > getCommunicationRange()) {
-                continue;
-            }
-
-            for (Task t : visibility.get(p)) {
-                if (!visibles.contains(t)) {
-                    addVisibility(this, t);
-                }
-            }
-        }
-    }
-
-    @Override
-    public void step() {
-        if (changes) {
-            replan();
-        }
-        super.step();
-    }
-
-
-
-    public void setChanges() {
-        changes = true;
-    }
-
-    static void addVisibility(Plane p, Task t) {
-        //System.err.println("Plane " + p + " now sees " + t);
-        visibility.get(p).add(t);
-        ((OmniscientPlane)p).setChanges();
-    }
-
     public OmniscientPlane(Location location) {
         super(location);
     }
 
     @Override
+    public void initialize() {
+        Omniscient.initialize(getWorld());
+    }
+
+    @Override
+    public void preStep() {
+        Omniscient.iter(getWorld().getTime());
+    }
+
+    @Override
+    public void step() {
+        Task nextTask = Omniscient.getNextTask(this);
+        if (nextTask != getNextTask()) {
+            setNextTask(nextTask);
+        }
+        super.step();
+    }
+
+    @Override
     protected void taskCompleted(Task t) {
-        removeTask(t);
-        for (Set<Task> taskSet : visibility.values()) {
-            taskSet.remove(t);
-        }
-        replan();
+        Omniscient.taskCompleted(t);
     }
 
     @Override
-    public void addTask(Task task) {
-        if (task.getId() == 2609 || getWorld().getTime() == 2209605) {
-            log("Adding Task[" + task.getId() + "] to " + this);
-            log("Attended: " + beingAttended.get(task));
-        }
-
-        if (getTasks().contains(task)) {
-            System.err.println("Attempting to add " + task + " twice!");
-            System.exit(0);
-        }
-        super.addTask(task);
-    }
-
-
+    protected void taskAdded(Task t) {}
 
     @Override
-    protected void taskAdded(Task t) {
-        Task oldt = getNextTask();
-        if (oldt != null) {
-            setNextTask(null);
-            removeTask(oldt);
-        }
-
-        if (getTasks().size() > 2) {
-            System.err.println("Big time error.");
-            System.exit(0);
-        }
-
-        beingAttended.put(t, this);
-        setNextTask(t);
-
-        if (t.getId() == 2609 || getWorld().getTime() == 2209605) {
-            log(this + " heading to Task[" + t.getId() + "]");
-            log("Attended: " + beingAttended.get(t));
-        }
-    }
-
-    private void replan() {
-        List<Task> available = new ArrayList<Task>(getWorld().getTasks());
-
-        // Filter available tasks by the visibility of this plane
-        Iterator<Task> it = available.iterator();
-        Set<Task> visibles = visibility.get(this);
-        while (it.hasNext()) {
-            if (!visibles.contains(it.next())) {
-                it.remove();
-            }
-        }
-
-        Task best = getNearest(available);
-        while (best != null) {
-            if (beingAttended.containsKey(best)) {
-                if (best.getId() == 2609 || getWorld().getTime() == 2209605) {
-                    log(this + " evaluating Task[" + best.getId() + "]");
-                    log("Attended: " + beingAttended.get(best));
-                }
-
-                Plane other = beingAttended.get(best);
-                if (other == this) {
-                    break;
-                }
-
-                double other_distance = other.getLocation().distance(best.getLocation());
-                double my_distance    = getLocation().distance(best.getLocation());
-                if (my_distance < other_distance) {
-                    if (best.getId() == 2609 || getWorld().getTime() == 2209605) {
-                        log(this + " stealing Task[" + best.getId() + "] from " + other);
-                        log("Attended: " + beingAttended.get(best));
-                    }
-                    beingAttended.put(best, this);
-                    other.removeTask(best);
-                    addTask(best);
-                    break;
-                } else {
-                    available.remove(best);
-                    best = getNearest(available);
-                }
-            } else {
-                addTask(best);
-                break;
-            }
-        }
-    }
-
-    @Override
-    protected void taskRemoved(Task t) {
-        if (getNextTask() == t) {
-            setNextTask(null);
-            replan();
-        }
-        if (beingAttended.get(t) == this) {
-            beingAttended.remove(t);
-        }
-        if (t.getId() == 2609 || getWorld().getTime() == 2209605) {
-            log(this + " removing Task[" + t.getId() + "]");
-            log("Attended: " + beingAttended.get(t));
-        }
-    }
+    protected void taskRemoved(Task t) {}
 
     @Override
     public List<Location> getPlannedLocations() {

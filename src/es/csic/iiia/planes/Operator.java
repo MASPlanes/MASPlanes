@@ -160,7 +160,7 @@ public class Operator extends AbstractPositionedElement
      */
     @Override
     public void step() {
-        if (!isPlaneInRange() && (!(strategy instanceof Omniscient))) {
+        if (!isPlaneInRange()) {
             return;
         }
 
