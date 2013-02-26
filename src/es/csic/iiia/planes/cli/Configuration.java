@@ -251,6 +251,7 @@ public class Configuration {
             .append("# problem = ").append(problemFile).append("\n")
             .append("# operator = ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
             .append("# planes = ").append(planesClass.getSimpleName()).append("\n")
+            .append("# battery = ").append(batteryClass.getSimpleName()).append("\n")
             .append("# task-evaluation = ").append(evaluationClass.getSimpleName()).append("\n")
             .append("# idle-strategy = ").append(idleClass.getSimpleName()).append("\n")
             .append("# auction-every = ").append(aucEvery).append("\n")
