@@ -34,45 +34,49 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.messaging;
+package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.MessagingAgent;
+import es.csic.iiia.planes.Agent;
+import es.csic.iiia.planes.Positioned;
+import es.csic.iiia.planes.messaging.Message;
 
 /**
- * Base type for any messages exchanged by {@link MessagingAgent}s.
+ * An {@link Agent} that communicates with other agents using message passing.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Message {
+public interface MessagingAgent extends Agent, Positioned, Comparable {
 
     /**
-     * Get the sender of this message.
-     * @return sender of this message.
-     */
-    public MessagingAgent getSender();
-
-    /**
-     * Set the sender of this message.
-     * @param sender of this message.
-     */
-    public void setSender(MessagingAgent sender);
-
-    /**
-     * Get the intended recipient of this message.
-     * <p/>
-     * A broadcast message should have an intended recipient of <em>null</em>.
-     * The intended recipient is just informational: any agent within the
-     * sender's {@link MessagingAgent#getCommunicationRange()} will receive it.
+     * Get the communication range of this agent.
      *
-     * @return intented recipient of this message.
+     * The communication range of an agent defines the furthest distance (in
+     * meters) at which it is able to send messages.
+     *
+     * @return communication range of this agent.
      */
-    public MessagingAgent getRecipient();
+    public double getCommunicationRange();
 
     /**
-     * Set the intended recipient of this message.
-     * @see #getRecipient()
-     * @param recipient of this message.
+     * Set the communication range of this agent.
+     *
+     * @see #getCommunicationRange()
+     * @param range communication range.
      */
-    public void setRecipient(MessagingAgent recipient);
+    public void setCommunicationRange(double range);
+
+    /**
+     * Send a message.
+     */
+    public void send(Message message);
+
+    /**
+     * Receive a message issued by another agent.
+     *
+     * Since this is a synchronous platform, the messages must be stored
+     * so that they are <strong>not</strong> available to the agent
+     * until at least the next iteration (tenth of second).
+     */
+    public void receive(Message message);
 
 }

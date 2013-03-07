@@ -101,7 +101,7 @@ public abstract class AbstractWorld implements World {
      * Get the list of operators.
      * @return list of operators.
      */
-    protected List<Operator> getOperators() {
+    public List<Operator> getOperators() {
         return operators;
     }
 

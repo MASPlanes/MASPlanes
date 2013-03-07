@@ -37,9 +37,10 @@
 package es.csic.iiia.planes.behaviors.neighbors;
 
 import es.csic.iiia.planes.AbstractPlane;
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.AbstractMessage;
-import es.csic.iiia.planes.messaging.MessagingAgent;
+import es.csic.iiia.planes.MessagingAgent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,8 +65,13 @@ public class NeighborTracking extends AbstractBehavior {
      *
      * @param agent exhibiting this behavior.
      */
-    public NeighborTracking(MessagingAgent agent) {
+    public NeighborTracking(Plane agent) {
         super(agent);
+    }
+
+    @Override
+    public Plane getAgent() {
+        return (Plane)super.getAgent();
     }
 
     @Override
@@ -151,7 +157,11 @@ public class NeighborTracking extends AbstractBehavior {
         // Compute the number of steps that the neighbor is guaranteed to still
         // be in range.
         final double d = getAgent().getLocation().distance(neighbor.getLocation());
-        final double d_step = getAgent().getSpeed() + neighbor.getSpeed();
+
+        double d_step = getAgent().getSpeed();
+        if (neighbor instanceof Plane) {
+            d_step += ((Plane)neighbor).getSpeed();
+        }
 
         // The objective is max(n) s.t. d + d_step * n < comm_range
         // we compute that as n=int(s) where s = (comm_range - d)/d_step

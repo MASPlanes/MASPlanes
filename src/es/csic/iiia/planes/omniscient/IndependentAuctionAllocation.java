@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,45 +34,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.messaging;
+package es.csic.iiia.planes.omniscient;
 
+import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.MessagingAgent;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
- * Base type for any messages exchanged by {@link MessagingAgent}s.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Message {
+public class IndependentAuctionAllocation extends AbstractAllocationStrategy {
 
-    /**
-     * Get the sender of this message.
-     * @return sender of this message.
-     */
-    public MessagingAgent getSender();
+    @Override
+    public void allocate(
+        World world,
+        OmniscientPlane[] planes,
+        TreeMap<MessagingAgent, Set<Task>> visibilityMap,
+        TreeMap<OmniscientPlane, Task> assignmentMap,
+        TreeMap<Task, OmniscientPlane> reverseMap)
+    {
+        for (Task t : world.getTasks()) {
+            final Location tl = t.getLocation();
+            OmniscientPlane best = null;
+            double mind = Double.MAX_VALUE;
 
-    /**
-     * Set the sender of this message.
-     * @param sender of this message.
-     */
-    public void setSender(MessagingAgent sender);
+            for (OmniscientPlane p : planes) {
+                if (!visibilityMap.get(p).contains(t)) {
+                    continue;
+                }
 
-    /**
-     * Get the intended recipient of this message.
-     * <p/>
-     * A broadcast message should have an intended recipient of <em>null</em>.
-     * The intended recipient is just informational: any agent within the
-     * sender's {@link MessagingAgent#getCommunicationRange()} will receive it.
-     *
-     * @return intented recipient of this message.
-     */
-    public MessagingAgent getRecipient();
+                final Location pl = p.getLocation();
+                double d = tl.distance(pl);
+                if (d < mind) {
+                    best = p;
+                    mind = d;
+                }
+            }
 
-    /**
-     * Set the intended recipient of this message.
-     * @see #getRecipient()
-     * @param recipient of this message.
-     */
-    public void setRecipient(MessagingAgent recipient);
+            if (best != null) {
+                if (  assignmentMap.containsKey(best)
+                   && distance(best, assignmentMap.get(best)) <= mind )
+                {
+                    continue;
+                }
+                if (reverseMap.containsKey(t)) {
+                    OmniscientPlane other = reverseMap.get(t);
+                    if (assignmentMap.get(other) == t) {
+                        assignmentMap.remove(other);
+                    }
+                }
+                assignmentMap.put(best, t);
+                reverseMap.put(t, best);
+            }
+        }
+    }
 
 }

@@ -37,7 +37,7 @@
 package es.csic.iiia.planes.behaviors;
 
 import es.csic.iiia.planes.messaging.Message;
-import es.csic.iiia.planes.messaging.MessagingAgent;
+import es.csic.iiia.planes.MessagingAgent;
 
 /**
  * Defines some behavior for {@link MessagingAgent}s, by implementing arbitrary

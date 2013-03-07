@@ -41,11 +41,15 @@ import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
+import es.csic.iiia.planes.cli.Configuration;
+import es.csic.iiia.planes.MessagingAgent;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Omniscient god that sees everything and commands omniscient planes.
@@ -53,14 +57,16 @@ import java.util.TreeSet;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class OmniscientGod {
+    private static final Logger LOG = Logger.getLogger(OmniscientGod.class.getName());
 
     private World world = null;
-    private TreeMap<OmniscientPlane, Set<Task>> visibilityMap = new TreeMap<OmniscientPlane, Set<Task>>();
+    private OmniscientPlane[] planes;
+    private TreeMap<MessagingAgent, Set<Task>> visibilityMap = new TreeMap<MessagingAgent, Set<Task>>();
     private TreeMap<OmniscientPlane, Task> assignmentMap = new TreeMap<OmniscientPlane, Task>();
     private TreeMap<Task, OmniscientPlane> reverseMap = new TreeMap<Task, OmniscientPlane>();
     private boolean[][] planeVisibility;
-    private int nplanes;
     private boolean changes = true;
+    private AllocationStrategy strategy;
 
     public OmniscientGod() {
 
@@ -72,15 +78,26 @@ class OmniscientGod {
         }
 
         this.world = w;
+
+        Configuration config = w.getFactory().getConfiguration();
+        try {
+            strategy = config.omniscientAllocationStrategy.newInstance();
+        } catch (InstantiationException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            System.exit(1);
+        } catch (IllegalAccessException ex) {
+            LOG.log(Level.SEVERE, null, ex);
+            System.exit(1);
+        }
     }
 
     private boolean checkPlaneVisibility() {
         boolean changed = false;
         int i=0;
-        for (Plane p1 : visibilityMap.keySet()) {
+        for (MessagingAgent p1 : visibilityMap.keySet()) {
             double r = p1.getCommunicationRange();
             int j=0;
-            for (Plane p2 : visibilityMap.keySet()) {
+            for (MessagingAgent p2 : visibilityMap.keySet()) {
                 double d = p1.getLocation().distance(p2.getLocation());
                 boolean expected = false;
                 if (d <= r) {
@@ -101,23 +118,24 @@ class OmniscientGod {
     public void iter(long i) {
         if (lastIter == i) return;
         if (lastIter == -1) {
-            nplanes = world.getPlanes().size();
+            planes = world.getPlanes().toArray(new OmniscientPlane[0]);
+            int nagents = world.getPlanes().size();
             for (Plane p : world.getPlanes()) {
-                if (p instanceof OmniscientPlane) {
-                    visibilityMap.put((OmniscientPlane) p, new TreeSet<Task>());
-                }
+                visibilityMap.put(p, new TreeSet<Task>());
             }
-            planeVisibility = new boolean[nplanes][nplanes];
+            nagents += world.getOperators().size();
+            for (Operator o : world.getOperators()) {
+                visibilityMap.put(o, new TreeSet<Task>());
+            }
+            planeVisibility = new boolean[nagents][nagents];
         }
 
         if (checkPlaneVisibility() || changes) {
 
             updateVisibility();
-            //assignmentMap.clear();
-            //reverseMap.clear();
-            for (OmniscientPlane p : visibilityMap.keySet()) {
-                assign(p);
-            }
+            strategy.allocate(world, planes, visibilityMap, assignmentMap, reverseMap);
+            LOG.finer("[" + world.getTime() + "] " + assignmentMap.toString());
+            LOG.finer("[" + world.getTime() + "] " + reverseMap.toString());
 
             Iterator<OmniscientPlane> it = assignmentMap.keySet().iterator();
             while (it.hasNext()) {
@@ -136,59 +154,10 @@ class OmniscientGod {
         changes = false;
     }
 
-    private void pick(OmniscientPlane p, Task best) {
-        if (assignmentMap.containsKey(p)) {
-            reverseMap.remove(assignmentMap.get(p));
-        }
-        assignmentMap.put(p, best);
-        reverseMap.put(best, p);
-    }
+    private ArrayList<MessagingAgent> getNeighbors(Location from, double range) {
+        ArrayList<MessagingAgent> neighs = new ArrayList<MessagingAgent>();
 
-    private void assign(OmniscientPlane p) {
-        ArrayList<Task> candidates = getCandidateTasks(p);
-        while (!candidates.isEmpty()) {
-            Task best = getNearest(p, candidates);
-            if (reverseMap.containsKey(best) && reverseMap.get(best) != p) {
-                OmniscientPlane o = reverseMap.get(best);
-                double myd = p.getLocation().distance(best.getLocation());
-                double otd = o.getLocation().distance(best.getLocation());
-                if (myd < otd) {
-                    assignmentMap.remove(o);
-                    pick(p, best);
-                    assign(o);
-                    break;
-                } else {
-                    candidates.remove(best);
-                    continue;
-                }
-            } else {
-                pick(p, best);
-                break;
-            }
-        }
-    }
-
-    private Task getNearest(OmniscientPlane p, ArrayList<Task> candidates) {
-        double mind = Double.MAX_VALUE;
-        Task best = null;
-        for (Task t : candidates) {
-            double d = p.getLocation().distance(t.getLocation());
-            if (d < mind) {
-                best = t;
-                mind = d;
-            }
-        }
-        return best;
-    }
-
-    private ArrayList<Task> getCandidateTasks(OmniscientPlane p) {
-        return new ArrayList<Task>(visibilityMap.get(p));
-    }
-
-    private ArrayList<OmniscientPlane> getNeighbors(Location from, double range) {
-        ArrayList<OmniscientPlane> neighs = new ArrayList<OmniscientPlane>();
-
-        for (OmniscientPlane p : visibilityMap.keySet()) {
+        for (MessagingAgent p : visibilityMap.keySet()) {
             final double d = from.distance(p.getLocation());
             if (d <= range) {
                 neighs.add(p);
@@ -200,7 +169,7 @@ class OmniscientGod {
 
     public boolean addTask(Operator o, Task t) {
         boolean added = false;
-        for (OmniscientPlane p : getNeighbors(o.getLocation(), o.getCommunicationRange())) {
+        for (MessagingAgent p : getNeighbors(o.getLocation(), o.getCommunicationRange())) {
             visibilityMap.get(p).add(t);
             added = true;
         }
@@ -209,8 +178,8 @@ class OmniscientGod {
     }
 
     public void updateVisibility() {
-        for (OmniscientPlane p : visibilityMap.keySet()) {
-            for (OmniscientPlane p2 : getNeighbors(p.getLocation(), p.getCommunicationRange())) {
+        for (MessagingAgent p : visibilityMap.keySet()) {
+            for (MessagingAgent p2 : getNeighbors(p.getLocation(), p.getCommunicationRange())) {
                 visibilityMap.get(p).addAll(visibilityMap.get(p2));
             }
         }
@@ -221,9 +190,11 @@ class OmniscientGod {
     }
 
     void taskCompleted(Task t) {
-        for (OmniscientPlane p : visibilityMap.keySet()) {
+        for (MessagingAgent p : visibilityMap.keySet()) {
             visibilityMap.get(p).remove(t);
         }
+
+        LOG.fine("Removing task " + t + " because it has been completed.");
         assignmentMap.remove(reverseMap.get(t));
         reverseMap.remove(t);
         changes = true;

@@ -37,7 +37,7 @@
 package es.csic.iiia.planes.behaviors;
 
 import es.csic.iiia.planes.cli.Configuration;
-import es.csic.iiia.planes.messaging.MessagingAgent;
+import es.csic.iiia.planes.MessagingAgent;
 
 /**
  * Skeletal implementation of a behavior.

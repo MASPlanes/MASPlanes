@@ -39,24 +39,26 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.gui.Drawable;
-import es.csic.iiia.planes.omniscient.Omniscient;
+import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Operator that will be submitting tasks to the UAVs.
  *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public class Operator extends AbstractPositionedElement
-    implements Agent, Drawable {
+public class Operator extends AbstractMessagingAgent implements Drawable {
+
+    private static AtomicInteger idGenerator = new AtomicInteger();
+
+    private int id = idGenerator.incrementAndGet();
 
     /**
      * List of the definitions of all the tasks that this operator will submit
@@ -80,11 +82,6 @@ public class Operator extends AbstractPositionedElement
     private OperatorStrategy strategy;
 
     /**
-     * The communication radius.
-     */
-    private double communicationRange;
-
-    /**
      * Tasks that should have been submitted to some UAV, but were not because
      * no plane is range.
      */
@@ -100,28 +97,6 @@ public class Operator extends AbstractPositionedElement
         this.tasks = tasks;
         Collections.sort(this.tasks, new TaskSorter());
         nextTaskTime = this.tasks.get(0).getTime();
-    }
-
-    /**
-     * Get the communication range of this agent.
-     *
-     * The communication range of an agent defines the furthest distance (in
-     * meters) at which it is able to send messages.
-     *
-     * @return communication range of this agent.
-     */
-    public double getCommunicationRange() {
-        return communicationRange;
-    }
-
-    /**
-     * Set the communication range of this agent.
-     *
-     * @see #getCommunicationRange()
-     * @param range communication range.
-     */
-    public void setCommunicationRange(double range) {
-        this.communicationRange = range;
     }
 
     @Override
@@ -211,12 +186,34 @@ public class Operator extends AbstractPositionedElement
         final Location l = getLocation();
 
         for (Plane p : getWorld().getPlanes()) {
-            if (l.getDistance(p.getLocation()) <= communicationRange) {
+            if (l.getDistance(p.getLocation()) <= getCommunicationRange()) {
                 return true;
             }
         }
 
         return false;
+    }
+
+    @Override
+    public void send(Message message) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public void receive(Message message) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public int compareTo(Object t) {
+        if (t == null) {
+            return -1;
+        }
+        if (t instanceof Operator) {
+            return id - ((Operator)t).id;
+        }
+
+        return 1;
     }
 
     /**

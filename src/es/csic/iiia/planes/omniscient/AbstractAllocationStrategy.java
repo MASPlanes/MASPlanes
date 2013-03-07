@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,60 +34,48 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.messaging;
+package es.csic.iiia.planes.omniscient;
 
-import es.csic.iiia.planes.Agent;
-import es.csic.iiia.planes.Positioned;
+import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.Task;
+import java.util.ArrayList;
+import java.util.TreeMap;
 
 /**
- * An {@link Agent} that communicates with other agents using message passing.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface MessagingAgent extends Agent, Positioned {
+public abstract class AbstractAllocationStrategy implements AllocationStrategy {
 
-    /**
-     * Get the communication range of this agent.
-     *
-     * The communication range of an agent defines the furthest distance (in
-     * meters) at which it is able to send messages.
-     *
-     * @return communication range of this agent.
-     */
-    public double getCommunicationRange();
+    protected Task getNearest(OmniscientPlane p, ArrayList<Task> candidates) {
+        double mind = Double.MAX_VALUE;
+        Task best = null;
+        for (Task t : candidates) {
+            double d = p.getLocation().distance(t.getLocation());
+            if (d < mind) {
+                best = t;
+                mind = d;
+            }
+        }
+        return best;
+    }
 
-    /**
-     * Set the communication range of this agent.
-     *
-     * @see #getCommunicationRange()
-     * @param range communication range.
-     */
-    public void setCommunicationRange(double range);
+    protected void pick(OmniscientPlane p, Task best,
+            TreeMap<OmniscientPlane, Task> assignmentMap,
+            TreeMap<Task, OmniscientPlane> reverseMap)
+    {
+        if (assignmentMap.containsKey(p)) {
+            reverseMap.remove(assignmentMap.get(p));
+        }
+        assignmentMap.put(p, best);
+        reverseMap.put(best, p);
+    }
 
-    /**
-     * Get the speed at which this agent moves (in meters per millisecond).
-     * @return speed at which this agent moves.
-     */
-    public double getSpeed();
-
-    /**
-     * Set the speed at which this agent moves.
-     * @param speed
-     */
-    public void setSpeed(double speed);
-
-    /**
-     * Send a message.
-     */
-    public void send(Message message);
-
-    /**
-     * Receive a message issued by another agent.
-     *
-     * Since this is a synchronous platform, the messages must be stored
-     * so that they are <strong>not</strong> available to the agent
-     * until at least the next iteration (tenth of second).
-     */
-    public void receive(Message message);
+    protected double distance(Plane p, Task t) {
+        return p.getLocation().distance(t.getLocation());
+    }
+    protected double distance(Task t, Plane p) {
+        return p.getLocation().distance(t.getLocation());
+    }
 
 }

@@ -42,7 +42,7 @@ import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.idle.IdleStrategy;
-import es.csic.iiia.planes.messaging.AbstractMessagingAgent;
+import es.csic.iiia.planes.messaging.AbstractBehaviorAgent;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -56,8 +56,8 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public abstract class AbstractPlane extends AbstractMessagingAgent
-    implements Plane, Comparable<Plane> {
+public abstract class AbstractPlane extends AbstractBehaviorAgent
+    implements Plane {
     private static final Logger LOG = Logger.getLogger(AbstractPlane.class.getName());
 
     /**
@@ -79,6 +79,11 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
      * Recharge ratio (flight seconds per charning second)
      */
     private long rechargeRatio = 3;
+
+    /**
+     * Agent speed in meters per tenth of second
+     */
+    private double speed = 0;
 
     /**
      * Remaining battery in tenths of second
@@ -272,6 +277,16 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     }
 
     @Override
+    public double getSpeed() {
+        return speed;
+    }
+
+    @Override
+    public void setSpeed(double speed) {
+        this.speed = speed;
+    }
+
+    @Override
     public boolean move() {
         flightDistance += getSpeed();
         battery.consume(1);
@@ -425,12 +440,16 @@ public abstract class AbstractPlane extends AbstractMessagingAgent
     }
 
     @Override
-    public int compareTo(Plane o) {
+    public int compareTo(Object o) {
         if (o == null) {
             return -1;
         }
 
-        return id - o.getId();
+        if (o instanceof Plane) {
+            return id - ((Plane)o).getId();
+        }
+
+        return -1;
     }
 
     @Override

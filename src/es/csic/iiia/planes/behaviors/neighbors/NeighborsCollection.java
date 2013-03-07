@@ -36,7 +36,7 @@
  */
 package es.csic.iiia.planes.behaviors.neighbors;
 
-import es.csic.iiia.planes.messaging.MessagingAgent;
+import es.csic.iiia.planes.MessagingAgent;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;

@@ -40,7 +40,6 @@ import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.idle.IdleStrategy;
-import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.awt.Color;
 import java.util.List;
 
@@ -158,6 +157,18 @@ public interface Plane extends MessagingAgent {
     /***************************************************************************
      * MOVEMENT STUFF. This should only be used by idling strategies!
      **************************************************************************/
+
+    /**
+     * Get the speed at which this agent moves (in meters per millisecond).
+     * @return speed at which this agent moves.
+     */
+    public double getSpeed();
+
+    /**
+     * Set the speed at which this agent moves.
+     * @param speed
+     */
+    public void setSpeed(double speed);
 
     /**
      * Sets the plane's destination.

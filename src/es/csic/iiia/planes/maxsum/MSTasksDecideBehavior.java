@@ -38,7 +38,7 @@ package es.csic.iiia.planes.maxsum;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
-import es.csic.iiia.planes.messaging.MessagingAgent;
+import es.csic.iiia.planes.MessagingAgent;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -80,7 +80,7 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
 
     /**
      * Receive a task from a neighboring plane.
-     * 
+     *
      * @param msg message hading a task to us.
      */
     public void on(HandTaskMessage msg) {

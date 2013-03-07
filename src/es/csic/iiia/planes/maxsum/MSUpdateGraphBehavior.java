@@ -40,7 +40,7 @@ import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
-import es.csic.iiia.planes.messaging.MessagingAgent;
+import es.csic.iiia.planes.MessagingAgent;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;

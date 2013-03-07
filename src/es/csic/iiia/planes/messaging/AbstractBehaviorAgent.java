@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.messaging;
 
+import es.csic.iiia.planes.AbstractMessagingAgent;
 import es.csic.iiia.planes.AbstractPositionedElement;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.behaviors.Behavior;
@@ -57,15 +58,8 @@ import org.apache.commons.collections.map.MultiKeyMap;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class AbstractMessagingAgent extends AbstractPositionedElement
-    implements MessagingAgent
-{
-    private static final Logger LOG = Logger.getLogger(AbstractMessagingAgent.class.getName());
-
-    /**
-     * Agent speed in meters per tenth of second
-     */
-    private double speed = 0;
+public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
+    private static final Logger LOG = Logger.getLogger(AbstractBehaviorAgent.class.getName());
 
     /**
      * The communication radius.
@@ -94,7 +88,7 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
      */
     private boolean initialized = false;
 
-    public AbstractMessagingAgent(Location location) {
+    public AbstractBehaviorAgent(Location location) {
         super(location);
         currentMessages = new ArrayList<Message>();
         futureMessages = new ArrayList<Message>();
@@ -157,16 +151,6 @@ public abstract class AbstractMessagingAgent extends AbstractPositionedElement
             }
         }
         return null;
-    }
-
-    @Override
-    public double getSpeed() {
-        return speed;
-    }
-
-    @Override
-    public void setSpeed(double speed) {
-        this.speed = speed;
     }
 
     @Override

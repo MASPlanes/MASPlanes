@@ -54,8 +54,13 @@ import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
 import es.csic.iiia.planes.maxsum.MSPlane;
 import es.csic.iiia.planes.maxsum.MSPlaneNode;
 import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
+import es.csic.iiia.planes.omniscient.AllocationStrategy;
+import es.csic.iiia.planes.omniscient.HungarianMethodAllocation;
+import es.csic.iiia.planes.omniscient.IndependentAuctionAllocation;
+import es.csic.iiia.planes.omniscient.NaiveAdhocAllocation;
 import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.omniscient.OmniscientPlane;
+import es.csic.iiia.planes.omniscient.SSIAllocation;
 import es.csic.iiia.planes.operator_behavior.Nearest;
 import es.csic.iiia.planes.operator_behavior.NearestInRange;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
@@ -110,6 +115,11 @@ public class Configuration {
     public final Class<? extends Plane> planesClass;
 
     /**
+     * Class of allocation used by the omniscient god.
+     */
+    public final Class<? extends AllocationStrategy> omniscientAllocationStrategy;
+
+    /**
      * Class of the battery used by the planes.
      */
     public final Class<? extends Battery> batteryClass;
@@ -162,6 +172,19 @@ public class Configuration {
             planesClass = OmniscientPlane.class;
         } else {
             throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
+        }
+
+        value = settings.getProperty("omniscient-allocation");
+        if (value.equalsIgnoreCase("auction")) {
+            omniscientAllocationStrategy = IndependentAuctionAllocation.class;
+        } else if (value.equalsIgnoreCase("adhoc")) {
+            omniscientAllocationStrategy = NaiveAdhocAllocation.class;
+        } else if (value.equalsIgnoreCase("hungarian")) {
+            omniscientAllocationStrategy = HungarianMethodAllocation.class;
+        } else if (value.equalsIgnoreCase("ssi")) {
+            omniscientAllocationStrategy = SSIAllocation.class;
+        } else {
+            throw new IllegalArgumentException("Illegal omniscient allocation strategy \"" + value + "\".");
         }
 
         value = settings.getProperty("battery");
@@ -249,6 +272,7 @@ public class Configuration {
             .append("# gui = ").append(gui).append("\n")
             .append("# quiet = ").append(quiet).append("\n")
             .append("# problem = ").append(problemFile).append("\n")
+            .append("# omniscient-allocation = ").append(omniscientAllocationStrategy.getSimpleName()).append("\n")
             .append("# operator = ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
             .append("# planes = ").append(planesClass.getSimpleName()).append("\n")
             .append("# battery = ").append(batteryClass.getSimpleName()).append("\n")

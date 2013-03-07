@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,54 +34,60 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.behaviors.neighbors;
+package es.csic.iiia.planes.omniscient;
 
+import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.MessagingAgent;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.TreeMap;
 
 /**
- * Represents an entry in the NeighborList
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class NeighborEntry implements Comparable<NeighborEntry> {
-
-    public final int iters;
-    public final MessagingAgent agent;
-
-    protected NeighborEntry(MessagingAgent agent, int iters) {
-        this.agent = agent;
-        this.iters = iters;
-    }
+public class NaiveAdhocAllocation extends AbstractAllocationStrategy {
 
     @Override
-    public int compareTo(NeighborEntry o) {
-        int r = o.iters - iters;
-        if (r == 0 && agent != null && o.agent != null) {
-            r = agent.hashCode() - o.agent.hashCode();
+    public void allocate(
+        World world,
+        OmniscientPlane[] planes,
+        TreeMap<MessagingAgent, Set<Task>> visibilityMap,
+        TreeMap<OmniscientPlane, Task> assignmentMap,
+        TreeMap<Task, OmniscientPlane> reverseMap)
+    {
+        for (OmniscientPlane p : planes) {
+            assign(p, visibilityMap, assignmentMap, reverseMap);
         }
-        return r;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == null) return false;
-        if (!(o instanceof NeighborEntry)) return false;
-
-        NeighborEntry other = (NeighborEntry)o;
-        return agent.equals(other.agent) && iters == other.iters;
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 5;
-        hash = 67 * hash + (this.agent != null ? this.agent.hashCode() : 0);
-        hash = 67 * hash + iters;
-        return hash;
-    }
-
-    @Override
-    public String toString() {
-        return "(" + agent + ":" + iters + ")";
+    private void assign(OmniscientPlane p,
+        TreeMap<MessagingAgent, Set<Task>> visibilityMap,
+        TreeMap<OmniscientPlane, Task> assignmentMap,
+        TreeMap<Task, OmniscientPlane> reverseMap)
+    {
+        ArrayList<Task> candidates = new ArrayList<Task>(visibilityMap.get(p));
+        while (!candidates.isEmpty()) {
+            Task best = getNearest(p, candidates);
+            if (reverseMap.containsKey(best) && reverseMap.get(best) != p) {
+                OmniscientPlane o = reverseMap.get(best);
+                double myd = p.getLocation().distance(best.getLocation());
+                double otd = o.getLocation().distance(best.getLocation());
+                if (myd < otd) {
+                    assignmentMap.remove(o);
+                    pick(p, best, assignmentMap, reverseMap);
+                    assign(o, visibilityMap, assignmentMap, reverseMap);
+                    break;
+                } else {
+                    candidates.remove(best);
+                    continue;
+                }
+            } else {
+                pick(p, best, assignmentMap, reverseMap);
+                break;
+            }
+        }
     }
 
 }

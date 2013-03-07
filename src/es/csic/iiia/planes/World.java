@@ -39,7 +39,6 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.messaging.Message;
-import es.csic.iiia.planes.messaging.MessagingAgent;
 import java.util.List;
 
 /**
@@ -125,10 +124,10 @@ public interface World extends Runnable {
      * @param task to remove.
      */
     void removeTask(Task task);
-    
+
     /**
      * Get the list of tasks in the world.
-     * 
+     *
      * This method should not be used by any simulation agent, unless it is
      * considered as being omniscient.
      */
@@ -164,5 +163,7 @@ public interface World extends Runnable {
      * @param duration of this scenario in tenths of second.
      */
     public void setDuration(long duration);
+
+    public List<Operator> getOperators();
 
 }

@@ -36,6 +36,8 @@
  */
 package es.csic.iiia.planes.messaging;
 
+import es.csic.iiia.planes.MessagingAgent;
+
 /**
  * Skeletal implementation of a message.
  *
