@@ -68,6 +68,7 @@ import es.csic.iiia.planes.operator_behavior.Random;
 import es.csic.iiia.planes.operator_behavior.RandomInRange;
 import java.io.File;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Properties;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -144,9 +145,12 @@ public class Configuration {
     public final double msWorkloadK;
     public final double msWorkloadAlpha;
 
+    public final LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
+
     public Configuration(Properties settings) {
 
         String value = settings.getProperty("operator-strategy");
+        values.put("operator-strategy", value.toLowerCase());
         if (value.equalsIgnoreCase("nearest")) {
             operatorStrategy = new Nearest();
         } else if (value.equalsIgnoreCase("random")) {
@@ -162,6 +166,7 @@ public class Configuration {
         }
 
         value = settings.getProperty("planes");
+        values.put("planes", value.toLowerCase());
         if (value.equalsIgnoreCase("auction")) {
             planesClass = AuctionPlane.class;
         } else if (value.equalsIgnoreCase("none")) {
@@ -174,20 +179,26 @@ public class Configuration {
             throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
         }
 
-        value = settings.getProperty("omniscient-allocation");
-        if (value.equalsIgnoreCase("auction")) {
-            omniscientAllocationStrategy = IndependentAuctionAllocation.class;
-        } else if (value.equalsIgnoreCase("adhoc")) {
-            omniscientAllocationStrategy = NaiveAdhocAllocation.class;
-        } else if (value.equalsIgnoreCase("hungarian")) {
-            omniscientAllocationStrategy = HungarianMethodAllocation.class;
-        } else if (value.equalsIgnoreCase("ssi")) {
-            omniscientAllocationStrategy = SSIAllocation.class;
+        if (values.get("operator-strategy").equals("omniscient")) {
+            value = settings.getProperty("omniscient-allocation");
+            values.put("omniscient-allocation", value.toLowerCase());
+            if (value.equalsIgnoreCase("auction")) {
+                omniscientAllocationStrategy = IndependentAuctionAllocation.class;
+            } else if (value.equalsIgnoreCase("adhoc")) {
+                omniscientAllocationStrategy = NaiveAdhocAllocation.class;
+            } else if (value.equalsIgnoreCase("hungarian")) {
+                omniscientAllocationStrategy = HungarianMethodAllocation.class;
+            } else if (value.equalsIgnoreCase("ssi")) {
+                omniscientAllocationStrategy = SSIAllocation.class;
+            } else {
+                throw new IllegalArgumentException("Illegal omniscient allocation strategy \"" + value + "\".");
+            }
         } else {
-            throw new IllegalArgumentException("Illegal omniscient allocation strategy \"" + value + "\".");
+            omniscientAllocationStrategy = IndependentAuctionAllocation.class;
         }
 
         value = settings.getProperty("battery");
+        values.put("battery", value.toLowerCase());
         if (value.equalsIgnoreCase("default")) {
             batteryClass = DefaultBattery.class;
         } else if (value.equalsIgnoreCase("infinite")) {
@@ -197,6 +208,7 @@ public class Configuration {
         }
 
         value = settings.getProperty("idle-strategy");
+        values.put("idle-strategy", value.toLowerCase());
         if (value.equalsIgnoreCase("do-nothing")) {
             idleClass = DoNothing.class;
         } else if (value.equalsIgnoreCase("fly-towards-operator")) {
@@ -215,6 +227,7 @@ public class Configuration {
         }
 
         value = settings.getProperty("task-evaluation");
+        values.put("task-evaluation", value.toLowerCase());
         if (value.equalsIgnoreCase("independent-distance")) {
             evaluationClass = IndependentDistanceEvaluation.class;
         } else if (value.equalsIgnoreCase("independent-distance-battery")) {
@@ -240,6 +253,7 @@ public class Configuration {
         DProblem d = new DProblem();
         ObjectMapper mapper = new ObjectMapper();
         problemFile = settings.getProperty("problem");
+        values.put("problem", problemFile);
         try {
             d = mapper.readValue(new File(problemFile), DProblem.class);
         } catch (IOException ex) {
@@ -248,43 +262,50 @@ public class Configuration {
         problemDefinition = d;
 
         // Auctions settings
-        aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
+        if (values.get("planes").equals("auction")) {
+            aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
+            values.put("auction-every", String.valueOf(aucEvery));
+        } else {
+            aucEvery = 0;
+        }
 
         // Max-sum settings
-        msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
-        msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
-        value = settings.getProperty("maxsum-planes-function");
-        if (value.equalsIgnoreCase("independent")) {
-            msPlaneNodeType = MSIndependentPlaneNode.class;
-        } else if (value.equalsIgnoreCase("workload")) {
-            msPlaneNodeType = MSWorkloadPlaneNode.class;
+        if (values.get("planes").equals("maxsum")) {
+            msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
+            values.put("maxsum-iterations", String.valueOf(msIterations));
+            msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
+            values.put("maxsum-start-every", String.valueOf(msStartEvery));
+            value = settings.getProperty("maxsum-planes-function");
+            values.put("maxsum-planes-function", value.toLowerCase());
+            if (value.equalsIgnoreCase("independent")) {
+                msPlaneNodeType = MSIndependentPlaneNode.class;
+                msWorkloadK = 0;
+                msWorkloadAlpha = 0;
+            } else if (value.equalsIgnoreCase("workload")) {
+                msPlaneNodeType = MSWorkloadPlaneNode.class;
+                msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
+                values.put("maxsum-workload-k", String.valueOf(msWorkloadK));
+                msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
+                values.put("maxsum-workload-alpha", String.valueOf(msWorkloadAlpha));
+            } else {
+                throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
+            }
         } else {
-            throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
+            msIterations = 0;
+            msStartEvery = 0;
+            msPlaneNodeType = MSIndependentPlaneNode.class;
+            msWorkloadK = 0;
+            msWorkloadAlpha = 0;
         }
-        msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
-        msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
 
     }
 
     @Override
     public String toString() {
-        StringBuilder buf = new StringBuilder("###### Settings:\n")
-            .append("# gui = ").append(gui).append("\n")
-            .append("# quiet = ").append(quiet).append("\n")
-            .append("# problem = ").append(problemFile).append("\n")
-            .append("# omniscient-allocation = ").append(omniscientAllocationStrategy.getSimpleName()).append("\n")
-            .append("# operator = ").append(operatorStrategy.getClass().getSimpleName()).append("\n")
-            .append("# planes = ").append(planesClass.getSimpleName()).append("\n")
-            .append("# battery = ").append(batteryClass.getSimpleName()).append("\n")
-            .append("# task-evaluation = ").append(evaluationClass.getSimpleName()).append("\n")
-            .append("# idle-strategy = ").append(idleClass.getSimpleName()).append("\n")
-            .append("# auction-every = ").append(aucEvery).append("\n")
-            .append("# maxsum-start-every = ").append(msStartEvery).append("\n")
-            .append("# maxsum-iterations = ").append(msIterations).append("\n")
-            .append("# maxsum-planes-function = ").append(msPlaneNodeType.getSimpleName()).append("\n")
-            .append("# maxsum-workload-k = ").append(msWorkloadK).append("\n")
-            .append("# maxsum-workload-alpha = ").append(msWorkloadAlpha).append("\n")
-        ;
+        StringBuilder buf = new StringBuilder("###### Settings:\n");
+        for (String key : values.keySet()) {
+            buf.append("# ").append(key).append(" = ").append(values.get(key)).append("\n");
+        }
 
         return buf.toString();
     }
