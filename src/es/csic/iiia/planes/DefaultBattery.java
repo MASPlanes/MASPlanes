@@ -64,6 +64,7 @@ public class DefaultBattery implements Battery {
     @Override
     public void recharge(long energy) {
         this.energy += energy;
+        this.energy = Math.min(this.energy, capacity);
     }
 
     @Override
