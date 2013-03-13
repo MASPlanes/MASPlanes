@@ -98,6 +98,9 @@ public class Cli {
                 .withDescription("Load settings from <file>.")
                 .withLongOpt("settings")
                 .create('s'));
+        options.addOption(OptionBuilder.withLongOpt("dry-run")
+                .withDescription("Output only the resolved settings, but do not run the simulation.")
+                .create('t'));
 
         try {
             Configuration config = parseOptions(args);
@@ -164,6 +167,10 @@ public class Cli {
 
         Configuration c = new Configuration(settings);
         System.out.println(c.toString());
+
+        if (line.hasOption('t')) {
+            System.exit(0);
+        }
         return c;
     }
 
