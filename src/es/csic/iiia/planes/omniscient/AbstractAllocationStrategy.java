@@ -36,9 +36,11 @@
  */
 package es.csic.iiia.planes.omniscient;
 
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.TreeMap;
 
 /**
@@ -77,5 +79,12 @@ public abstract class AbstractAllocationStrategy implements AllocationStrategy {
     protected double distance(Task t, Plane p) {
         return p.getLocation().distance(t.getLocation());
     }
+
+    @Override
+    public List<Location> getPlannedLocations(OmniscientPlane plane) {
+        return null;
+    }
+
+
 
 }

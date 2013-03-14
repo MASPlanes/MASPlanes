@@ -37,6 +37,7 @@
 package es.csic.iiia.planes.idle;
 
 import es.csic.iiia.planes.AbstractPlane;
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 
@@ -50,10 +51,16 @@ public class FlyTowardsOperator implements IdleStrategy {
 
     @Override
     public boolean idleAction(Plane plane) {
-        Operator o = plane.getWorld().getNearestOperator(plane.getLocation());
-        if (plane.getLocation().getDistance(o.getLocation()) >= o.getCommunicationRange()) {
-            plane.setDestination(o.getLocation());
+        Location pl = plane.getLocation();
+        Operator o  = plane.getWorld().getNearestOperator(pl);
+        Location ol = o.getLocation();
+
+        if (pl.getDistance(ol) >= o.getCommunicationRange()) {
+            plane.setDestination(ol);
             plane.move();
+            if (pl.getDistance(ol) < o.getCommunicationRange()) {
+                plane.getCompletedLocations().add(new Location(plane.getLocation()));
+            }
             return true;
         }
 

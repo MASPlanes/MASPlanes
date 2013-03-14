@@ -108,12 +108,15 @@ public class PlaneDrawer implements Drawable {
         }
 
         g.setStroke(normalStroke);
-        g.setColor(Color.RED);
+        g.setColor(plane.getColor());
         g.draw(p);
     }
 
     private void drawPastLocations(Graphics2D g) {
         List<Location> completedLocations = plane.getCompletedLocations();
+        if (completedLocations == null || completedLocations.isEmpty()) {
+            return;
+        }
 
         /*** Past locations */
         GeneralPath p = new GeneralPath(GeneralPath.WIND_EVEN_ODD, completedLocations.size());
@@ -126,6 +129,7 @@ public class PlaneDrawer implements Drawable {
                 p.lineTo(l.getX(), l.getY());
             }
         }
+        p.lineTo(plane.getLocation().getX(), plane.getLocation().getY());
         g.setColor(Color.RED);
         g.setStroke(new BasicStroke(10f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[]{100f,100f}, 0.0f));
         g.draw(p);
@@ -242,6 +246,7 @@ public class PlaneDrawer implements Drawable {
         drawTasks(g, plane.getColor());
         drawPlane(g, Color.DARK_GRAY, plane.getColor());
         drawBattery(g);
+        drawFutureLocations(g);
 
         g.setColor(previous);
     }

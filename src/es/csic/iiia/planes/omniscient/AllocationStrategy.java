@@ -36,9 +36,11 @@
  */
 package es.csic.iiia.planes.omniscient;
 
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.MessagingAgent;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -54,5 +56,7 @@ public interface AllocationStrategy {
             TreeMap<MessagingAgent, Set<Task>> visibilityMap,
             TreeMap<OmniscientPlane, Task>      assignmentMap,
             TreeMap<Task, OmniscientPlane>      reverseMap);
+
+    public List<Location> getPlannedLocations(OmniscientPlane plane);
 
 }

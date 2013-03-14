@@ -36,11 +36,13 @@
  */
 package es.csic.iiia.planes.omniscient;
 
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
+import java.util.List;
 
 /**
  *
@@ -64,6 +66,10 @@ public class Omniscient implements OperatorStrategy {
 
     static void initialize(World w) {
         god.initialize(w);
+    }
+
+    static List<Location> getPlannedLocations(OmniscientPlane plane) {
+        return god.getPlannedLocations(plane);
     }
 
     @Override

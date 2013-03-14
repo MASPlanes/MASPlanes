@@ -45,6 +45,7 @@ import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.MessagingAgent;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -198,6 +199,10 @@ class OmniscientGod {
         assignmentMap.remove(reverseMap.get(t));
         reverseMap.remove(t);
         changes = true;
+    }
+
+    List<Location> getPlannedLocations(OmniscientPlane plane) {
+        return strategy.getPlannedLocations(plane);
     }
 
 }

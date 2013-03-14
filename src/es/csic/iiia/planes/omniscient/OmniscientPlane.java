@@ -83,7 +83,7 @@ public class OmniscientPlane extends AbstractPlane {
 
     @Override
     public List<Location> getPlannedLocations() {
-        return null;
+        return Omniscient.getPlannedLocations(this);
     }
 
 
