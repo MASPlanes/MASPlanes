@@ -56,6 +56,7 @@ import es.csic.iiia.planes.maxsum.MSPlaneNode;
 import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
 import es.csic.iiia.planes.omniscient.AllocationStrategy;
 import es.csic.iiia.planes.omniscient.HungarianMethodAllocation;
+import es.csic.iiia.planes.omniscient.IncrementalSSIAllocation;
 import es.csic.iiia.planes.omniscient.IndependentAuctionAllocation;
 import es.csic.iiia.planes.omniscient.NaiveAdhocAllocation;
 import es.csic.iiia.planes.omniscient.Omniscient;
@@ -190,6 +191,8 @@ public class Configuration {
                 omniscientAllocationStrategy = HungarianMethodAllocation.class;
             } else if (value.equalsIgnoreCase("ssi")) {
                 omniscientAllocationStrategy = SSIAllocation.class;
+            } else if (value.equalsIgnoreCase("incremental-ssi")) {
+                omniscientAllocationStrategy = IncrementalSSIAllocation.class;
             } else {
                 throw new IllegalArgumentException("Illegal omniscient allocation strategy \"" + value + "\".");
             }
