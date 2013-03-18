@@ -37,6 +37,7 @@
  */
 package es.csic.iiia.planes.gui;
 
+import es.csic.iiia.planes.definition.DProblem;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -50,7 +51,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.AbstractAction;
-import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -76,9 +76,15 @@ public class Display extends JFrame {
     private JLabel time;
     private final JLayeredPane layers;
     private final TaskDistributionPane tasksPane;
+    private Color[] colors;
+    private final TimeHistogramPane histogramPane;
+    private final DProblem problemDefinition;
 
     public Display(GUIWorld w) {
         this.world = w;
+        problemDefinition = w.getFactory().getConfiguration().problemDefinition;
+        generateColors();
+        
         JPanel root = new JPanel(new BorderLayout());
         this.setContentPane(root);
 
@@ -93,17 +99,20 @@ public class Display extends JFrame {
         displayPane.setOpaque(false);
         layers.add(displayPane);
 
-        tasksPane = new TaskDistributionPane(w.getFactory().getConfiguration().problemDefinition);
+        tasksPane = new TaskDistributionPane(this, problemDefinition);
         tasksPane.setPreferredSize(d);
         tasksPane.setBackground(Color.WHITE);
         tasksPane.setBounds(new Rectangle(d));
         tasksPane.setOpaque(true);
         layers.add(tasksPane);
+        
+        histogramPane = new TimeHistogramPane(this, problemDefinition);
+        histogramPane.setPreferredSize(new Dimension(d.width, TimeHistogramPane.DEFAULT_HEIGHT));
+        root.add(histogramPane, BorderLayout.SOUTH);
 
         //viewer = new TaskDistributionViewer(w.getFactory().getConfiguration().problemDefinition);
 
         JPanel top = new JPanel(new FlowLayout());
-
         JToggleButton b = new JToggleButton("Tasks");
         b.addActionListener(new AbstractAction("Tasks") {
 
@@ -185,9 +194,29 @@ public class Display extends JFrame {
         });
 
     }
+    
+    public Color getColor(int nCrisis) {
+        return colors[nCrisis];
+    }
+    
+    private void generateColors() {
+        float ratio = 0.618033988749895f;
+        float h = 0.534f;
+        colors = new Color[problemDefinition.getnCrisis()];
+        for (int i=0; i<problemDefinition.getnCrisis(); i++) {
+            Color c = Color.getHSBColor(h, 0.9f, 0.9f);
+            colors[i] = new Color(c.getRed(), c.getGreen(), c.getBlue(), 20);
+            h += ratio;
+            h %= 1;
+        }
+    }
 
     public Dimension getDisplayDimension() {
         return layers.getSize();
+    }
+    
+    public long getTime() {
+        return world.getTime();
     }
 
     @Override

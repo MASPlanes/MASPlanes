@@ -56,6 +56,7 @@ public class DProblem {
     private int width = 1000;
     private int height = 1000;
     private long duration = 3600*24*30;
+    private int nCrisis = 5;
     private ArrayList<DOperator> operators = new ArrayList<DOperator>();
     private ArrayList<DPlane> planes = new ArrayList<DPlane>();
     private ArrayList<DStation> stations = new ArrayList<DStation>();
@@ -103,6 +104,24 @@ public class DProblem {
      */
     public long getDuration() {
         return duration;
+    }
+
+    /**
+     * Get the number of crisis in this problem.
+     * 
+     * @return number of crisis in this problem.
+     */
+    public int getnCrisis() {
+        return nCrisis;
+    }
+
+    /**
+     * Set the number of crisis in this problem.
+     * 
+     * @param nCrisis number of crisis.
+     */
+    public void setnCrisis(int nCrisis) {
+        this.nCrisis = nCrisis;
     }
 
     /**

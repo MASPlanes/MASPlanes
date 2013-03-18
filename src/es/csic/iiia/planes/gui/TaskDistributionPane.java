@@ -40,6 +40,7 @@ import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DTask;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
@@ -58,16 +59,14 @@ public class TaskDistributionPane extends JPanel {
     BufferedImage image;
     final DProblem problem;
     BufferedImage buffer;
-
-    private Color[] taskColorList = new Color[]{
-        Color.GREEN, Color.CYAN, Color.RED, Color.MAGENTA, Color.GRAY
-    };
     private boolean showTasks = false;
+    private final Display display;
 
-    public TaskDistributionPane(DProblem p) {
+    public TaskDistributionPane(Display display, DProblem p) {
+        this.display = display;
         problem = p;
-        generateColors();
         buildImage(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        this.setPreferredSize(new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT));
     }
 
     @Override
@@ -92,17 +91,6 @@ public class TaskDistributionPane extends JPanel {
         this.repaint();
     }
 
-    private void generateColors() {
-        float ratio = 0.618033988749895f;
-        float h = 0.534f;
-        for (int i=0; i<taskColorList.length; i++) {
-            Color c = Color.getHSBColor(h, 0.9f, 0.9f);
-            taskColorList[i] = new Color(c.getRed(), c.getGreen(), c.getBlue(), 20);
-            h += ratio;
-            h %= 1;
-        }
-    }
-
     private void buildImage(int width, int height) {
         image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         double xscale = ((double)width) / problem.getWidth();
@@ -114,7 +102,7 @@ public class TaskDistributionPane extends JPanel {
 
         for (DOperator o : problem.getOperators()) {
             for (DTask t : o.getTasks()) {
-                g.setColor(taskColorList[t.getnCrisis()]);
+                g.setColor(display.getColor(t.getnCrisis()));
                 g.fillOval((int) (t.getX() * xscale), (int) (t.getY() * yscale), 10, 10);
             }
         }

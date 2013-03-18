@@ -36,23 +36,16 @@
  */
 package es.csic.iiia.planes.generator;
 
-import apple.awt.CColor;
 import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.definition.DTask;
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import org.apache.commons.math3.distribution.MultivariateNormalDistribution;
 import org.apache.commons.math3.distribution.MultivariateRealDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
@@ -80,7 +73,7 @@ public class Generator {
     // 1 task per minute
     private int num_tasks = 60*24*30;
     private int num_stations = 1;
-    private int num_crisis = 4;
+    private int num_crisis = 5;
 
     private int[][] colorList = new int[][]{
         new int[]{0, 0, 0}, new int[]{233, 222, 187}, new int[]{173, 35, 35},
@@ -136,6 +129,7 @@ public class Generator {
         DProblem p = new DProblem();
 
         p.setDuration(duration);
+        p.setnCrisis(num_crisis);
         p.setWidth(width);
         p.setHeight(height);
 
@@ -186,26 +180,26 @@ public class Generator {
 
         // How is it done?
         // 1.a Create a "base" uniform distribution between 0 and duration
-        RealDistribution[] timeDistributions = new RealDistribution[num_crisis+1];
+        RealDistribution[] timeDistributions = new RealDistribution[num_crisis];
         timeDistributions[0] = new UniformRealDistribution(0, duration);
         timeDistributions[0].reseedRandomGenerator(r.nextLong());
         // 1.b Create a "base" uniform distribution for the 2d space
         MultivariateRealDistribution[] spaceDistributions =
-                new MultivariateRealDistribution[num_crisis+1];
+                new MultivariateRealDistribution[num_crisis];
         spaceDistributions[0] = new MultivariateUniformDistribution(
                 new double[]{0, 0}, new double[]{p.getWidth(), p.getHeight()} );
         spaceDistributions[0].reseedRandomGenerator(r.nextLong());
 
         // 2.a Create one gaussian distribution for each crisis, trying to
         //    spread them out through time.
-        for (int i=1; i<=num_crisis; i++) {
+        for (int i=1; i<num_crisis; i++) {
             double mean = r.nextDouble()*duration;
             double std = (duration/(double)num_crisis)*0.05;
             timeDistributions[i] = new NormalDistribution(mean, std);
             timeDistributions[i].reseedRandomGenerator(r.nextLong());
         }
         // 2.b Create one multivariate gaussian distribution for each crisis
-        for (int i=1; i<=num_crisis; i++) {
+        for (int i=1; i<num_crisis; i++) {
             double[] means = new double[]{
                 r.nextInt(p.getWidth()), r.nextInt(p.getHeight()),
             };
@@ -221,7 +215,7 @@ public class Generator {
 
         // 3. Uniformly sample task times from these distributions
         for (DTask t : tasks) {
-            final int i = (int)(r.nextDouble()*(num_crisis+1));
+            final int i = (int)(r.nextDouble()*(num_crisis));
             t.setnCrisis(i);
 
             // Time sampling
