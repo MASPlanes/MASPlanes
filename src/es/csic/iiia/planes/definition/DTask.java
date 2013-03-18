@@ -47,6 +47,8 @@ import es.csic.iiia.planes.Task;
 public class DTask extends DLocation {
     private long time;
 
+    private int nCrisis;
+
     /**
      * Get the time at which this task will be submitted.
      *
@@ -64,4 +66,24 @@ public class DTask extends DLocation {
     public void setTime(long time) {
         this.time = time;
     }
+
+    /**
+     * Get the number of crisis that spawned this task.
+     *
+     * @return number of crisis that spawned this task.
+     */
+    public int getnCrisis() {
+        return nCrisis;
+    }
+
+    /**
+     * Set the number of crisis that spawned this task.
+     *
+     * @param nCrisis
+     */
+    public void setnCrisis(int nCrisis) {
+        this.nCrisis = nCrisis;
+    }
+    
+
 }

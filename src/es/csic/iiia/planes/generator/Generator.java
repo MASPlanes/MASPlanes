@@ -36,19 +36,30 @@
  */
 package es.csic.iiia.planes.generator;
 
+import apple.awt.CColor;
 import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.definition.DTask;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import org.apache.commons.math3.distribution.MultivariateNormalDistribution;
+import org.apache.commons.math3.distribution.MultivariateRealDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -174,32 +185,77 @@ public class Generator {
         // Set task times. Use the crisis model for now.
 
         // How is it done?
-        // 1. Create a "base" uniform distribution between 0 and duration
-        RealDistribution[] distributions = new RealDistribution[num_crisis+1];
-        distributions[0] = new UniformRealDistribution(0, duration);
-        distributions[0].reseedRandomGenerator(r.nextLong());
+        // 1.a Create a "base" uniform distribution between 0 and duration
+        RealDistribution[] timeDistributions = new RealDistribution[num_crisis+1];
+        timeDistributions[0] = new UniformRealDistribution(0, duration);
+        timeDistributions[0].reseedRandomGenerator(r.nextLong());
+        // 1.b Create a "base" uniform distribution for the 2d space
+        MultivariateRealDistribution[] spaceDistributions =
+                new MultivariateRealDistribution[num_crisis+1];
+        spaceDistributions[0] = new MultivariateUniformDistribution(
+                new double[]{0, 0}, new double[]{p.getWidth(), p.getHeight()} );
+        spaceDistributions[0].reseedRandomGenerator(r.nextLong());
 
-        // 2. Create one gaussian distribution for each crisis, trying to
+        // 2.a Create one gaussian distribution for each crisis, trying to
         //    spread them out through time.
         for (int i=1; i<=num_crisis; i++) {
             double mean = r.nextDouble()*duration;
             double std = (duration/(double)num_crisis)*0.05;
-            distributions[i] = new NormalDistribution(mean, std);
-            distributions[i].reseedRandomGenerator(r.nextLong());
+            timeDistributions[i] = new NormalDistribution(mean, std);
+            timeDistributions[i].reseedRandomGenerator(r.nextLong());
+        }
+        // 2.b Create one multivariate gaussian distribution for each crisis
+        for (int i=1; i<=num_crisis; i++) {
+            double[] means = new double[]{
+                r.nextInt(p.getWidth()), r.nextInt(p.getHeight()),
+            };
+//            double [][] covariances = new double[][]{
+//                new double[]{p.getWidth() * r.nextDouble() * 50 + 10, 0},
+//                new double[]{0, p.getHeight() * r.nextDouble() * 50 + 10},
+//            };
+            double[][] covariances = getCovarianceMatrix(p.getWidth(), p.getHeight());
+            spaceDistributions[i] = new MultivariateNormalDistribution(
+                    means, covariances);
+            spaceDistributions[i].reseedRandomGenerator(r.nextLong());
         }
 
         // 3. Uniformly sample task times from these distributions
         for (DTask t : tasks) {
             final int i = (int)(r.nextDouble()*(num_crisis+1));
-            long time = (long)distributions[i].sample();
+            t.setnCrisis(i);
+
+            // Time sampling
+            long time = (long)timeDistributions[i].sample();
             while (time < 0 || time > duration) {
-                time = (long)distributions[i].sample();
+                time = (long)timeDistributions[i].sample();
             }
             t.setTime(time);
+
+            // Position sampling
+            double[] position = spaceDistributions[i].sample();
+            while (  position[0] < 0 || position[1] < 0
+                  || position[0] > p.getWidth() || position[1] > p.getHeight())
+            {
+                position = spaceDistributions[i].sample();
+            }
+            t.setX((int)position[0]);
+            t.setY((int)position[1]);
         }
 
         // 4. Debug stuff
         printTaskHistogram(tasks);
+    }
+
+    private double[][] getCovarianceMatrix(int width, int height) {
+        double scale = .01 + .05*r.nextDouble();
+        double w = width * scale;
+        double h = width * scale;
+        RealMatrix m = new Array2DRowRealMatrix(new double[][]{
+                new double[]{w + w, r.nextDouble() * h + w},
+                new double[]{0, h + h},
+        });
+        RealMatrix result = m.multiply(m.transpose());
+        return result.getData();
     }
 
     private void printTaskHistogram(ArrayList<DTask> tasks) {

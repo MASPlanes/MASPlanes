@@ -42,10 +42,13 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -67,6 +70,7 @@ public class Display extends JFrame {
     private GUIWorld world;
     private DisplayPane displayPane;
     private JLabel time;
+    private final TaskDistributionViewer viewer;
 
     public Display(GUIWorld w) {
         this.world = w;
@@ -78,7 +82,20 @@ public class Display extends JFrame {
         root.add(displayPane, BorderLayout.CENTER);
         this.setContentPane(root);
 
+        viewer = new TaskDistributionViewer(w.getFactory().getConfiguration().problemDefinition);
         JPanel top = new JPanel(new FlowLayout());
+
+        JButton b = new JButton("Tasks");
+        b.addActionListener(new AbstractAction("Tasks") {
+
+            @Override
+            public void actionPerformed(ActionEvent ae) {
+                viewer.setVisible(!viewer.isVisible());
+            }
+
+        });
+        top.add(b);
+
         JLabel l = new JLabel("Speed: ");
         top.add(l);
         JSlider s = new JSlider(1, 50, 25);
