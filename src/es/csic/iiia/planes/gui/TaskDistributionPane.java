@@ -39,16 +39,12 @@ package es.csic.iiia.planes.gui;
 import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.definition.DTask;
-import es.csic.iiia.planes.generator.Generator;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 /**
@@ -56,22 +52,43 @@ import javax.swing.JPanel;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class TaskDistributionPane extends JPanel {
+    private static final int DEFAULT_WIDTH  = 1000;
+    private static final int DEFAULT_HEIGHT = 1000;
 
-    BufferedImage buffer;
+    BufferedImage image;
     final DProblem problem;
+    BufferedImage buffer;
 
     private Color[] taskColorList = new Color[]{
         Color.GREEN, Color.CYAN, Color.RED, Color.MAGENTA, Color.GRAY
     };
+    private boolean showTasks = false;
 
     public TaskDistributionPane(DProblem p) {
         problem = p;
         generateColors();
-        buildBuffer(600, 600);
+        buildImage(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+    }
+
+    @Override
+    public void setBounds(int i, int i1, int i2, int i3) {
+        super.setBounds(i, i1, i2, i3);
+        changeSize(i2, i3);
+    }
+
+    @Override
+    public void setBounds(Rectangle rctngl) {
+        super.setBounds(rctngl);
+        changeSize(rctngl.width, rctngl.height);
     }
 
     public void changeSize(int width, int height) {
-        buildBuffer(width, height);
+        double xscale = ((double)width)  / DEFAULT_WIDTH;
+        double yscale = ((double)height) / DEFAULT_HEIGHT;
+        buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = (Graphics2D)buffer.getGraphics();
+        g.setTransform(AffineTransform.getScaleInstance(xscale, yscale));
+        g.drawImage(image, 0, 0, null);
         this.repaint();
     }
 
@@ -86,11 +103,11 @@ public class TaskDistributionPane extends JPanel {
         }
     }
 
-    private void buildBuffer(int width, int height) {
-        buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+    private void buildImage(int width, int height) {
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         double xscale = ((double)width) / problem.getWidth();
         double yscale = ((double)height) / problem.getHeight();
-        Graphics2D g = (Graphics2D) buffer.getGraphics();
+        Graphics2D g = (Graphics2D) image.getGraphics();
 
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, width, height);
@@ -107,7 +124,13 @@ public class TaskDistributionPane extends JPanel {
     @Override
     public void paint(Graphics grphcs) {
         super.paint(grphcs);
-        grphcs.drawImage(buffer, 0, 0, null);
+        if (showTasks) {
+            grphcs.drawImage(buffer, 0, 0, null);
+        }
+    }
+
+    void toggle() {
+        showTasks = !showTasks;
     }
 
 }

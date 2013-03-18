@@ -101,13 +101,13 @@ public class GUIWorld extends AbstractWorld {
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gs = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gs.getDefaultConfiguration();
-        BufferedImage bimage = gc.createCompatibleImage(display.getWidth(), display.getHeight(), Transparency.OPAQUE);
+        BufferedImage bimage = gc.createCompatibleImage(display.getWidth(), display.getHeight(), Transparency.TRANSLUCENT);
 
         Graphics2D surface = (Graphics2D)(bimage.getGraphics());
 
-        surface.setColor(Color.WHITE);
         Dimension dd = display.getDisplayDimension();
-        surface.fillRect(0, 0, dd.width, dd.height);
+//        surface.setColor(Color.WHITE);
+//        surface.fillRect(0, 0, dd.width, dd.height);
 
         surface.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         surface.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);

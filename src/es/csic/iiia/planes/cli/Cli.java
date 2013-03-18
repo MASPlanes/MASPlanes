@@ -102,14 +102,9 @@ public class Cli {
                 .withDescription("Output only the resolved settings, but do not run the simulation.")
                 .create('t'));
 
-        try {
-            Configuration config = parseOptions(args);
-            CliApp app = new CliApp(config);
-            app.run();
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-            System.exit(1);
-        }
+        Configuration config = parseOptions(args);
+        CliApp app = new CliApp(config);
+        app.run();
     }
 
     private static void showHelp() {

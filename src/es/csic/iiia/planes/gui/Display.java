@@ -38,10 +38,12 @@
 package es.csic.iiia.planes.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Insets;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -51,8 +53,10 @@ import javax.swing.AbstractAction;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JSlider;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
@@ -70,27 +74,42 @@ public class Display extends JFrame {
     private GUIWorld world;
     private DisplayPane displayPane;
     private JLabel time;
-    private final TaskDistributionViewer viewer;
+    private final JLayeredPane layers;
+    private final TaskDistributionPane tasksPane;
 
     public Display(GUIWorld w) {
         this.world = w;
+        JPanel root = new JPanel(new BorderLayout());
+        this.setContentPane(root);
+
         Dimension d = new Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT);
+        layers = new JLayeredPane();
+        root.add(layers, BorderLayout.CENTER);
+        layers.setPreferredSize(d);
 
         displayPane = new DisplayPane(world);
         displayPane.setPreferredSize(d);
-        JPanel root = new JPanel(new BorderLayout());
-        root.add(displayPane, BorderLayout.CENTER);
-        this.setContentPane(root);
+        displayPane.setBounds(new Rectangle(d));
+        displayPane.setOpaque(false);
+        layers.add(displayPane);
 
-        viewer = new TaskDistributionViewer(w.getFactory().getConfiguration().problemDefinition);
+        tasksPane = new TaskDistributionPane(w.getFactory().getConfiguration().problemDefinition);
+        tasksPane.setPreferredSize(d);
+        tasksPane.setBackground(Color.WHITE);
+        tasksPane.setBounds(new Rectangle(d));
+        tasksPane.setOpaque(true);
+        layers.add(tasksPane);
+
+        //viewer = new TaskDistributionViewer(w.getFactory().getConfiguration().problemDefinition);
+
         JPanel top = new JPanel(new FlowLayout());
 
-        JButton b = new JButton("Tasks");
+        JToggleButton b = new JToggleButton("Tasks");
         b.addActionListener(new AbstractAction("Tasks") {
 
             @Override
             public void actionPerformed(ActionEvent ae) {
-                viewer.setVisible(!viewer.isVisible());
+                tasksPane.toggle();
             }
 
         });
@@ -150,14 +169,17 @@ public class Display extends JFrame {
                 ratio = Math.round(ratio*100f) / 100f;
                 System.err.println("Ratio: " + ratio);
                 if (ratio > 1) {
-                  Display.this.setSize((int)(width/ratio), height);
+                    Display.this.setSize((int) (width / ratio), height);
                 } else if (ratio < 1) {
-                  Display.this.setSize(width, (int)(height*ratio));
+                    Display.this.setSize(width, (int) (height * ratio));
+                } else {
+                    super.componentResized(ce);
+                    Dimension dim = Display.this.getContentPane().getSize();
+                    displayPane.setBounds(new Rectangle(d));
+                    tasksPane.changeSize(width, height);
+                    tasksPane.setBounds(new Rectangle(d));
+                    System.err.println(dim);
                 }
-
-                super.componentResized(ce);
-                Dimension dim = Display.this.getContentPane().getSize();
-                System.err.println(dim);
             }
 
         });
@@ -165,7 +187,7 @@ public class Display extends JFrame {
     }
 
     public Dimension getDisplayDimension() {
-        return displayPane.getSize();
+        return layers.getSize();
     }
 
     @Override
