@@ -36,7 +36,6 @@
  */
 package es.csic.iiia.planes.idle;
 
-import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Operator;
 import es.csic.iiia.planes.Plane;
