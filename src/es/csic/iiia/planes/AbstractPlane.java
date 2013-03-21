@@ -199,7 +199,6 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     @Override
     public void setDestination(Location l) {
         if (currentDestination != null && currentDestination.destination.equals(l)) {
-            angle = getLocation().getAngle(l);
             return;
         }
 
