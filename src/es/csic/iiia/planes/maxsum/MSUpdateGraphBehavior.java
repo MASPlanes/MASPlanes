@@ -95,7 +95,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
      */
     @Override
     public void afterMessages() {
-        final long remainder = getAgent().getWorld().getTime() % getConfiguration().msStartEvery;
+        final long remainder = getAgent().getWorld().getTime() % getConfiguration().getMsStartEvery();
         if (remainder != 1) {
             return;
         }
@@ -110,7 +110,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
         // Track tasks from our neighbors
         List<MSPlane> neighbors = plane.getNeighbors();
         neighbors.clear();
-        for (MessagingAgent a : tracker.getNeighbors(getConfiguration().msIterations)) {
+        for (MessagingAgent a : tracker.getNeighbors(getConfiguration().getMsIterations())) {
             MSPlane p = (MSPlane)a;
             neighbors.add(p);
 

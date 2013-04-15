@@ -78,7 +78,7 @@ public abstract class AbstractFactory implements Factory {
     @Override
     public Operator buildOperator(Location location, List<DTask> tasks) {
         Operator o = new Operator(location, tasks);
-        o.setStrategy(config.operatorStrategy);
+        o.setStrategy(config.getOperatorStrategy());
         initialize(o);
         return o;
     }
@@ -87,11 +87,11 @@ public abstract class AbstractFactory implements Factory {
     public Plane buildPlane(Location location) {
         Plane p = null;
         try {
-            Constructor<? extends Plane> c = config.planesClass.getConstructor(Location.class);
+            Constructor<? extends Plane> c = config.getPlanesClass().getConstructor(Location.class);
             p = c.newInstance(location);
-            EvaluationStrategy strategy = config.evaluationClass.newInstance();
+            EvaluationStrategy strategy = config.getEvaluationClass().newInstance();
             p.setEvaluationStrategy(strategy);
-            IdleStrategy idle = config.idleClass.newInstance();
+            IdleStrategy idle = config.getIdleClass().newInstance();
             p.setIdleStrategy(idle);
         } catch (Exception ex) {
             throw new RuntimeException("Unable to build the planes", ex);
@@ -106,7 +106,7 @@ public abstract class AbstractFactory implements Factory {
     public Battery buildBattery(Plane p) {
         Battery b = null;
         try {
-            b = config.batteryClass.newInstance();
+            b = config.getBatteryClass().newInstance();
         } catch (Exception ex) {
             throw new RuntimeException("Unable to build the battery", ex);
         }

@@ -69,7 +69,9 @@ import es.csic.iiia.planes.operator_behavior.Random;
 import es.csic.iiia.planes.operator_behavior.RandomInRange;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Properties;
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -83,30 +85,30 @@ public class Configuration {
     /**
      * True if running with a graphical display, false otherwise.
      */
-    public final boolean gui;
+    private boolean gui;
 
     /**
      * True if running in "quiet" mode (no output except for final
      * statistics & errors)
      */
-    public final boolean quiet;
+    private boolean quiet;
 
     /**
      * Problem's file name.
      */
-    public final String problemFile;
+    private String problemFile;
 
     /**
      * Pointer to the problem definition of the problem (scenario definition)
      * being simulated.
      */
-    public final DProblem problemDefinition;
+    private DProblem problemDefinition;
 
     /**
      * Strategy used by the {@link Operator} to decide to which plane it will
      * submit the task.
      */
-    public final OperatorStrategy operatorStrategy;
+    private OperatorStrategy operatorStrategy;
 
     /**
      * Class of planes used by this simulation.
@@ -114,113 +116,59 @@ public class Configuration {
      * Because different planes use different solving strategies, changing their
      * class is how the simulator runs one solving algorithm or another.
      */
-    public final Class<? extends Plane> planesClass;
+    private Class<? extends Plane> planesClass;
 
     /**
      * Class of allocation used by the omniscient god.
      */
-    public final Class<? extends AllocationStrategy> omniscientAllocationStrategy;
+    private Class<? extends AllocationStrategy> omniscientAllocationStrategy;
 
     /**
      * Class of the battery used by the planes.
      */
-    public final Class<? extends Battery> batteryClass;
+    private Class<? extends Battery> batteryClass;
 
     /**
      * Class of th eidle strategy used by the planes in this simulation.
      */
-    public final Class<? extends IdleStrategy> idleClass;
+    private Class<? extends IdleStrategy> idleClass;
 
     /**
      * Class of the evaluation strategy used by the planes in this simulation.
      */
-    public final Class<? extends EvaluationStrategy> evaluationClass;
+    private Class<? extends EvaluationStrategy> evaluationClass;
 
     /* AUCTIONS specific stuff */
-    public final int aucEvery;
+    private int aucEvery;
 
     /* MAXSUM specific stuff */
-    public final int msIterations;
-    public final int msStartEvery;
-    public final Class<? extends MSPlaneNode> msPlaneNodeType;
-    public final double msWorkloadK;
-    public final double msWorkloadAlpha;
+    private int msIterations;
+    private int msStartEvery;
+    private Class<? extends MSPlaneNode> msPlaneNodeType;
+    private double msWorkloadK;
+    private double msWorkloadAlpha;
 
-    public final LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
+    private LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
+
+    private <T> T fetch(Properties settings, Map<String, T> map, String key) {
+        String value = settings.getProperty(key).toLowerCase();
+        if (map.containsKey(value)) {
+            values.put(key, value);
+            return map.get(value);
+        }
+        throw new IllegalArgumentException("Illegal " + key + " \"" + value + "\".");
+    }
 
     public Configuration(Properties settings) {
-
-        String value = settings.getProperty("operator-strategy");
-        values.put("operator-strategy", value.toLowerCase());
-        if (value.equalsIgnoreCase("nearest")) {
-            operatorStrategy = new Nearest();
-        } else if (value.equalsIgnoreCase("random")) {
-            operatorStrategy = new Random();
-        } else if (value.equalsIgnoreCase("nearest-inrange")) {
-            operatorStrategy = new NearestInRange();
-        } else if (value.equalsIgnoreCase("random-inrange")) {
-            operatorStrategy = new RandomInRange();
-        } else if (value.equalsIgnoreCase("omniscient")) {
-            operatorStrategy = new Omniscient();
-        } else {
-            throw new IllegalArgumentException("Illegal operator strategy \"" + value + "\".");
-        }
-
-        value = settings.getProperty("planes");
-        values.put("planes", value.toLowerCase());
-        if (value.equalsIgnoreCase("auction")) {
-            planesClass = AuctionPlane.class;
-        } else if (value.equalsIgnoreCase("none")) {
-            planesClass = DefaultPlane.class;
-        } else if (value.equalsIgnoreCase("maxsum")) {
-            planesClass = MSPlane.class;
-        } else if (value.equalsIgnoreCase("omniscient")) {
-            planesClass = OmniscientPlane.class;
-        } else {
-            throw new IllegalArgumentException("Illegal plane strategy \"" + value + "\".");
-        }
+        operatorStrategy = fetch(settings, getOperatorStrategies(), "operator-strategy");
+        planesClass = fetch(settings, getPlaneClasses(), "planes");
 
         if (values.get("operator-strategy").equals("omniscient")) {
-            value = settings.getProperty("omniscient-allocation");
-            values.put("omniscient-allocation", value.toLowerCase());
-            if (value.equalsIgnoreCase("auction")) {
-                omniscientAllocationStrategy = IndependentAuctionAllocation.class;
-            } else if (value.equalsIgnoreCase("adhoc")) {
-                omniscientAllocationStrategy = NaiveAdhocAllocation.class;
-            } else if (value.equalsIgnoreCase("hungarian")) {
-                omniscientAllocationStrategy = HungarianMethodAllocation.class;
-            } else if (value.equalsIgnoreCase("ssi")) {
-                omniscientAllocationStrategy = SSIAllocation.class;
-            } else if (value.equalsIgnoreCase("incremental-ssi")) {
-                omniscientAllocationStrategy = IncrementalSSIAllocation.class;
-            } else {
-                throw new IllegalArgumentException("Illegal omniscient allocation strategy \"" + value + "\".");
-            }
-        } else {
-            omniscientAllocationStrategy = IndependentAuctionAllocation.class;
+            omniscientAllocationStrategy = fetch(settings, getAllocationStrategies(), "omniscient-allocation");
         }
 
-        value = settings.getProperty("battery");
-        values.put("battery", value.toLowerCase());
-        if (value.equalsIgnoreCase("default")) {
-            batteryClass = DefaultBattery.class;
-        } else if (value.equalsIgnoreCase("infinite")) {
-            batteryClass = InfiniteBattery.class;
-        } else {
-            throw new IllegalArgumentException("Illegal battery type \"" + value + "\".");
-        }
-
-        value = settings.getProperty("idle-strategy");
-        values.put("idle-strategy", value.toLowerCase());
-        if (value.equalsIgnoreCase("do-nothing")) {
-            idleClass = DoNothing.class;
-        } else if (value.equalsIgnoreCase("fly-towards-operator")) {
-            idleClass = FlyTowardsOperator.class;
-        } else if (value.equalsIgnoreCase("fly-towards-operator-p")) {
-            idleClass = FlyTowardsOperatorP.class;
-        } else {
-            throw new IllegalArgumentException("Illegal idling strategy \"" + value + "\".");
-        }
+        batteryClass = fetch(settings, getBatteryClasses(), "battery");
+        idleClass = fetch(settings, getIdleClasses(), "idle-strategy");
 
         // Omniscient planes must run with omniscient operators and biceversa.
         boolean o1 = operatorStrategy instanceof Omniscient;
@@ -229,38 +177,19 @@ public class Configuration {
             throw new IllegalArgumentException("Omniscient planes must run with omniscient operators.");
         }
 
-        value = settings.getProperty("task-evaluation");
-        values.put("task-evaluation", value.toLowerCase());
-        if (value.equalsIgnoreCase("independent-distance")) {
-            evaluationClass = IndependentDistanceEvaluation.class;
-        } else if (value.equalsIgnoreCase("independent-distance-battery")) {
-            evaluationClass = IndependentDistanceBatteryEvaluation.class;
-        } else {
-            throw new IllegalArgumentException("Illegal task evaluation strategy \"" + value + "\".");
-        }
+        evaluationClass = fetch(settings, getEvaluationClasses(), "task-evaluation");
+        gui = fetch(settings, getBooleanValues(), "gui");
+        quiet = fetch(settings, getBooleanValues(), "quiet");
 
-        value = settings.getProperty("gui");
-        if (value.equalsIgnoreCase("true") || value.equals("1")) {
-            gui = true;
-        } else {
-            gui = false;
-        }
-
-        value = settings.getProperty("quiet");
-        if (value.equalsIgnoreCase("true") || value.equals("1")) {
-            quiet = true;
-        } else {
-            quiet = false;
-        }
 
         DProblem d = new DProblem();
         ObjectMapper mapper = new ObjectMapper();
         problemFile = settings.getProperty("problem");
         values.put("problem", problemFile);
         try {
-            d = mapper.readValue(new File(problemFile), DProblem.class);
+            d = mapper.readValue(new File(getProblemFile()), DProblem.class);
         } catch (IOException ex) {
-            throw new IllegalArgumentException("Error reading problem file \"" + problemFile + "\"");
+            throw new IllegalArgumentException("Error reading problem file \"" + getProblemFile() + "\"");
         }
         problemDefinition = d;
 
@@ -268,8 +197,6 @@ public class Configuration {
         if (values.get("planes").equals("auction")) {
             aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
             values.put("auction-every", String.valueOf(aucEvery));
-        } else {
-            aucEvery = 0;
         }
 
         // Max-sum settings
@@ -278,12 +205,10 @@ public class Configuration {
             values.put("maxsum-iterations", String.valueOf(msIterations));
             msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
             values.put("maxsum-start-every", String.valueOf(msStartEvery));
-            value = settings.getProperty("maxsum-planes-function");
+            String value = settings.getProperty("maxsum-planes-function");
             values.put("maxsum-planes-function", value.toLowerCase());
             if (value.equalsIgnoreCase("independent")) {
                 msPlaneNodeType = MSIndependentPlaneNode.class;
-                msWorkloadK = 0;
-                msWorkloadAlpha = 0;
             } else if (value.equalsIgnoreCase("workload")) {
                 msPlaneNodeType = MSWorkloadPlaneNode.class;
                 msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
@@ -293,12 +218,6 @@ public class Configuration {
             } else {
                 throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
             }
-        } else {
-            msIterations = 0;
-            msStartEvery = 0;
-            msPlaneNodeType = MSIndependentPlaneNode.class;
-            msWorkloadK = 0;
-            msWorkloadAlpha = 0;
         }
 
     }
@@ -306,11 +225,192 @@ public class Configuration {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("###### Settings:\n");
-        for (String key : values.keySet()) {
-            buf.append("# ").append(key).append(" = ").append(values.get(key)).append("\n");
+        for (String key : getValues().keySet()) {
+            buf.append("# ").append(key).append(" = ").append(getValues().get(key)).append("\n");
         }
 
         return buf.toString();
+    }
+
+    /**
+     * @return the gui
+     */
+    public boolean isGui() {
+        return gui;
+    }
+
+    /**
+     * @return the quiet
+     */
+    public boolean isQuiet() {
+        return quiet;
+    }
+
+    /**
+     * @return the problemFile
+     */
+    public String getProblemFile() {
+        return problemFile;
+    }
+
+    /**
+     * @return the problemDefinition
+     */
+    public DProblem getProblemDefinition() {
+        return problemDefinition;
+    }
+
+    /**
+     * @return the operatorStrategy
+     */
+    public OperatorStrategy getOperatorStrategy() {
+        return operatorStrategy;
+    }
+
+    /**
+     * @return the planesClass
+     */
+    public Class<? extends Plane> getPlanesClass() {
+        return planesClass;
+    }
+
+    /**
+     * @return the omniscientAllocationStrategy
+     */
+    public Class<? extends AllocationStrategy> getOmniscientAllocationStrategy() {
+        return omniscientAllocationStrategy;
+    }
+
+    /**
+     * @return the batteryClass
+     */
+    public Class<? extends Battery> getBatteryClass() {
+        return batteryClass;
+    }
+
+    /**
+     * @return the idleClass
+     */
+    public Class<? extends IdleStrategy> getIdleClass() {
+        return idleClass;
+    }
+
+    /**
+     * @return the evaluationClass
+     */
+    public Class<? extends EvaluationStrategy> getEvaluationClass() {
+        return evaluationClass;
+    }
+
+    /**
+     * @return the aucEvery
+     */
+    public int getAucEvery() {
+        return aucEvery;
+    }
+
+    /**
+     * @return the msIterations
+     */
+    public int getMsIterations() {
+        return msIterations;
+    }
+
+    /**
+     * @return the msStartEvery
+     */
+    public int getMsStartEvery() {
+        return msStartEvery;
+    }
+
+    /**
+     * @return the msPlaneNodeType
+     */
+    public Class<? extends MSPlaneNode> getMsPlaneNodeType() {
+        return msPlaneNodeType;
+    }
+
+    /**
+     * @return the msWorkloadK
+     */
+    public double getMsWorkloadK() {
+        return msWorkloadK;
+    }
+
+    /**
+     * @return the msWorkloadAlpha
+     */
+    public double getMsWorkloadAlpha() {
+        return msWorkloadAlpha;
+    }
+
+    /**
+     * @return the values
+     */
+    public LinkedHashMap<String, String> getValues() {
+        return values;
+    }
+
+    private Map<String, OperatorStrategy> getOperatorStrategies() {
+        return new HashMap<String, OperatorStrategy>() {{
+           put("nearest", new Nearest());
+           put("random", new Random());
+           put("random-inrange", new RandomInRange());
+           put("nearest-inrange", new NearestInRange());
+           put("omniscient", new Omniscient());
+        }};
+    }
+
+    private Map<String, Class<? extends Plane>> getPlaneClasses() {
+        return new HashMap<String, Class<? extends Plane>>() {{
+           put("auction", AuctionPlane.class);
+           put("none", DefaultPlane.class);
+           put("maxsum", MSPlane.class);
+           put("omniscient", OmniscientPlane.class);
+        }};
+    }
+
+    private Map<String, Class<? extends AllocationStrategy>> getAllocationStrategies() {
+        return new HashMap<String, Class<? extends AllocationStrategy>>() {{
+           put("auction", IndependentAuctionAllocation.class);
+           put("adhoc", NaiveAdhocAllocation.class);
+           put("hungarian", HungarianMethodAllocation.class);
+           put("ssi", SSIAllocation.class);
+           put("incremental-ssi", IncrementalSSIAllocation.class);
+        }};
+    }
+
+    private Map<String, Class<? extends Battery>> getBatteryClasses() {
+        return new HashMap<String, Class<? extends Battery>>() {{
+           put("default", DefaultBattery.class);
+           put("infinite", InfiniteBattery.class);
+        }};
+    }
+
+    private Map<String, Class<? extends IdleStrategy>> getIdleClasses() {
+        return new HashMap<String, Class<? extends IdleStrategy>>() {{
+           put("do-nothing", DoNothing.class);
+           put("fly-towards-operator", FlyTowardsOperator.class);
+           put("fly-towards-operator-p", FlyTowardsOperatorP.class);
+        }};
+    }
+
+    private Map<String, Class<? extends EvaluationStrategy>> getEvaluationClasses() {
+        return new HashMap<String, Class<? extends EvaluationStrategy>>() {{
+           put("independent-distance", IndependentDistanceEvaluation.class);
+           put("independent-distance-battery", IndependentDistanceBatteryEvaluation.class);
+        }};
+    }
+
+    private Map<String, Boolean> getBooleanValues() {
+        return new HashMap<String, Boolean>() {{
+           put("true", true);
+           put("yes", true);
+           put("1", true);
+           put("false", false);
+           put("no", false);
+           put("0", false);
+        }};
     }
 
 }

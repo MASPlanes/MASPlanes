@@ -74,7 +74,7 @@ public class CliApp {
      */
     public void run() {
         Factory f;
-        if (config.gui) {
+        if (config.isGui()) {
             f = new GUIFactory(config);
         } else {
             f = new DefaultFactory(config);
@@ -82,7 +82,7 @@ public class CliApp {
 
         World world = f.buildWorld();
 
-        world.init(config.problemDefinition);
+        world.init(config.getProblemDefinition());
         new Thread(world).start();
     }
 

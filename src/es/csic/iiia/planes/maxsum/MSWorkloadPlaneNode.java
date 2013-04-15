@@ -178,8 +178,8 @@ public class MSWorkloadPlaneNode extends MSPlaneNode {
     }
 
     private double getAdditionalCost(double i) {
-        final double k = getPlane().getWorld().getFactory().getConfiguration().msWorkloadK;
-        final double alpha = getPlane().getWorld().getFactory().getConfiguration().msWorkloadAlpha;
+        final double k = getPlane().getWorld().getFactory().getConfiguration().getMsWorkloadK();
+        final double alpha = getPlane().getWorld().getFactory().getConfiguration().getMsWorkloadAlpha();
         return k * Math.pow(i, alpha);
     }
 
