@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,25 +34,74 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum;
+package es.csic.iiia.planes.maxsum.algo;
 
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.messaging.AbstractMessage;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @deprecated
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class RequestTaskMessage extends AbstractMessage {
+public abstract class AbstractFactor implements Factor {
 
-    private final Task task;
+    public static final AtomicInteger idGenerator = new AtomicInteger();
+    private final int id = idGenerator.incrementAndGet();
 
-    public RequestTaskMessage(Task t) {
-        this.task = t;
+    private Map<Factor, Message> newMessages = new TreeMap<Factor, Message>();
+    private Map<Factor, Message> curMessages = new TreeMap<Factor, Message>();
+    private List<Factor> neighbors = new ArrayList<Factor>();
+
+    @Override
+    public int getId() {
+        return id;
     }
 
-    public Task getTask() {
-        return task;
+    @Override
+    public void addNeighbor(Factor factor) {
+        neighbors.add(factor);
+    }
+
+    @Override
+    public List<Factor> getNeighbors() {
+        return neighbors;
+    }
+
+    public Message getMessage(Factor neighbor) {
+        if (curMessages.containsKey(neighbor)) {
+            return curMessages.get(neighbor);
+        }
+        return new Message(neighbor, 0);
+    }
+
+    @Override
+    public void receive(Message message) {
+        newMessages.put(message.sender, message);
+    }
+
+    @Override
+    public void send(Message message, Factor recipient) {
+        recipient.receive(message);
+    }
+
+    @Override
+    public void tick() {
+        Map<Factor, Message> tmp = curMessages;
+        curMessages = newMessages;
+        newMessages = tmp;
+        newMessages.clear();
+    }
+
+    protected Message buildMessage(double value) {
+        return new Message(this, value);
+    }
+
+    @Override
+    public int compareTo(Factor t) {
+        return id - t.getId();
     }
 
 }
