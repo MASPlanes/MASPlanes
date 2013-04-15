@@ -82,7 +82,7 @@ class OmniscientGod {
 
         Configuration config = w.getFactory().getConfiguration();
         try {
-            strategy = config.omniscientAllocationStrategy.newInstance();
+            strategy = config.getOmniscientAllocationStrategy().newInstance();
         } catch (InstantiationException ex) {
             LOG.log(Level.SEVERE, null, ex);
             System.exit(1);

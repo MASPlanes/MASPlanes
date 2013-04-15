@@ -79,8 +79,7 @@ public class MSPlane extends AbstractPlane {
     public void initialize() {
         super.initialize();
         try {
-            planeFunction = getWorld().getFactory().getConfiguration()
-                    .msPlaneNodeType.getConstructor(MSPlane.class)
+            planeFunction = getWorld().getFactory().getConfiguration().getMsPlaneNodeType().getConstructor(MSPlane.class)
                     .newInstance(this);
         } catch (Exception ex) {
             throw new RuntimeException("Unable to instantiate the specified plane node type.", ex);

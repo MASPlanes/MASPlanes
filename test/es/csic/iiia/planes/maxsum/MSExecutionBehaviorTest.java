@@ -101,7 +101,7 @@ public class MSExecutionBehaviorTest {
         // Create a small problem:
         factory = new DefaultFactory(c);
         world = factory.buildWorld();
-        world.init(c.problemDefinition);
+        world.init(c.getProblemDefinition());
 
     }
 

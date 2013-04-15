@@ -82,9 +82,9 @@ public class Display extends JFrame {
 
     public Display(GUIWorld w) {
         this.world = w;
-        problemDefinition = w.getFactory().getConfiguration().problemDefinition;
+        problemDefinition = w.getFactory().getConfiguration().getProblemDefinition();
         generateColors();
-        
+
         JPanel root = new JPanel(new BorderLayout());
         this.setContentPane(root);
 
@@ -105,7 +105,7 @@ public class Display extends JFrame {
         tasksPane.setBounds(new Rectangle(d));
         tasksPane.setOpaque(true);
         layers.add(tasksPane);
-        
+
         histogramPane = new TimeHistogramPane(this, problemDefinition);
         histogramPane.setPreferredSize(new Dimension(d.width, TimeHistogramPane.DEFAULT_HEIGHT));
         root.add(histogramPane, BorderLayout.SOUTH);
@@ -194,11 +194,11 @@ public class Display extends JFrame {
         });
 
     }
-    
+
     public Color getColor(int nCrisis) {
         return colors[nCrisis];
     }
-    
+
     private void generateColors() {
         float ratio = 0.618033988749895f;
         float h = 0.534f;
@@ -214,7 +214,7 @@ public class Display extends JFrame {
     public Dimension getDisplayDimension() {
         return layers.getSize();
     }
-    
+
     public long getTime() {
         return world.getTime();
     }

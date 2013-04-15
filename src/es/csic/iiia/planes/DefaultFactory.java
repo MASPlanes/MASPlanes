@@ -55,7 +55,7 @@ public class DefaultFactory extends AbstractFactory {
      */
     @Override
     public World buildWorld() {
-        if (getConfiguration().quiet) {
+        if (getConfiguration().isQuiet()) {
             world = new DefaultWorld(this);
         } else {
             world = new ProgressWorld(this);

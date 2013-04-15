@@ -216,7 +216,7 @@ public class AuctionBehavior extends AbstractBehavior {
         final Plane agent = getAgent();
 
         // Auction our tasks every minute
-        if (agent.getWorld().getTime() % getConfiguration().aucEvery == 0) {
+        if (agent.getWorld().getTime() % getConfiguration().getAucEvery() == 0) {
             for(Task t : agent.getTasks()) {
                 if (LOG.isLoggable(Level.FINEST)) {
                     LOG.log(Level.FINEST, "{0} auctioning task {1}", new Object[]{agent, t.getId()});
