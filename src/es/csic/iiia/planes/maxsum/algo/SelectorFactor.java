@@ -65,4 +65,8 @@ public class SelectorFactor extends AbstractFactor {
 
     }
 
+    public Factor select() {
+        return minimizer.getBest();
+    }
+
 }
