@@ -58,6 +58,7 @@ import es.csic.iiia.planes.omniscient.AllocationStrategy;
 import es.csic.iiia.planes.omniscient.HungarianMethodAllocation;
 import es.csic.iiia.planes.omniscient.IncrementalSSIAllocation;
 import es.csic.iiia.planes.omniscient.IndependentAuctionAllocation;
+import es.csic.iiia.planes.omniscient.MaxSumAllocation;
 import es.csic.iiia.planes.omniscient.NaiveAdhocAllocation;
 import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.omniscient.OmniscientPlane;
@@ -220,6 +221,18 @@ public class Configuration {
             }
         }
 
+        // Omniscient max-sum settings
+        if (  values.get("planes").equals("omniscient")
+           && values.get("omniscient-allocation").equals("maxsum") )
+        {
+            msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
+            values.put("maxsum-iterations", String.valueOf(msIterations));
+            msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
+            values.put("maxsum-workload-k", String.valueOf(msWorkloadK));
+            msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
+            values.put("maxsum-workload-alpha", String.valueOf(msWorkloadAlpha));
+        }
+
     }
 
     @Override
@@ -377,6 +390,7 @@ public class Configuration {
            put("hungarian", HungarianMethodAllocation.class);
            put("ssi", SSIAllocation.class);
            put("incremental-ssi", IncrementalSSIAllocation.class);
+           put("maxsum", MaxSumAllocation.class);
         }};
     }
 

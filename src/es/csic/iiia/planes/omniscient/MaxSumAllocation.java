@@ -67,8 +67,8 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
     {
         // Create the workload cost function
         CostFactorFunction workloadFunction = new WorkloadFunction(
-                w.getFactory().getConfiguration().msWorkloadK,
-                w.getFactory().getConfiguration().msWorkloadAlpha
+                w.getFactory().getConfiguration().getMsWorkloadK(),
+                w.getFactory().getConfiguration().getMsWorkloadAlpha()
         );
 
         List<Factor> factors = new ArrayList<Factor>();
@@ -102,7 +102,7 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         }
 
         // Run maxsum!
-        final int n = w.getFactory().getConfiguration().msIterations;
+        final int n = w.getFactory().getConfiguration().getMsIterations();
         for (int i=0; i<n; i++) {
             for (Factor f : factors) f.tick();
             for (Factor f : factors) f.run();
