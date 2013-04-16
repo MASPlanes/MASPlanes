@@ -38,9 +38,9 @@ package es.csic.iiia.planes.maxsum.algo;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 /**
  *
@@ -48,7 +48,7 @@ import java.util.TreeMap;
  */
 public class CostFactor extends AbstractFactor {
 
-    private Map<Factor, Double> potential = new TreeMap<Factor, Double>();
+    private Map<Factor, Double> potential = new HashMap<Factor, Double>();
 
     private CostFactorFunction function;
 

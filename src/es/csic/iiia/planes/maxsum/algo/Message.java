@@ -42,9 +42,22 @@ package es.csic.iiia.planes.maxsum.algo;
  */
 public class Message {
 
+    /**
+     * Value of this message.
+     */
     public final double value;
+
+    /**
+     * Sender of this message.
+     */
     public final Factor sender;
 
+    /**
+     * Builds a new max-sum message.
+     *
+     * @param sender factor sending the value.
+     * @param value message value.
+     */
     public Message(Factor sender, double value) {
         this.value = value;
         this.sender = sender;

@@ -37,9 +37,9 @@
 package es.csic.iiia.planes.maxsum.algo;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -51,14 +51,9 @@ public abstract class AbstractFactor implements Factor {
     public static final AtomicInteger idGenerator = new AtomicInteger();
     private final int id = idGenerator.incrementAndGet();
 
-    private Map<Factor, Message> newMessages = new TreeMap<Factor, Message>();
-    private Map<Factor, Message> curMessages = new TreeMap<Factor, Message>();
+    private Map<Factor, Message> newMessages = new HashMap<Factor, Message>();
+    private Map<Factor, Message> curMessages = new HashMap<Factor, Message>();
     private List<Factor> neighbors = new ArrayList<Factor>();
-
-    @Override
-    public int getId() {
-        return id;
-    }
 
     @Override
     public void addNeighbor(Factor factor) {
@@ -92,16 +87,10 @@ public abstract class AbstractFactor implements Factor {
         Map<Factor, Message> tmp = curMessages;
         curMessages = newMessages;
         newMessages = tmp;
-        newMessages.clear();
     }
 
     protected Message buildMessage(double value) {
         return new Message(this, value);
-    }
-
-    @Override
-    public int compareTo(Factor t) {
-        return id - t.getId();
     }
 
 }

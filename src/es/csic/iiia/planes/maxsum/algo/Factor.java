@@ -42,9 +42,7 @@ import java.util.List;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Factor extends Comparable<Factor> {
-
-    public int getId();
+public interface Factor {
 
     public void addNeighbor(Factor factor);
 
