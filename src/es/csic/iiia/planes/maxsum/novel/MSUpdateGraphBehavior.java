@@ -100,11 +100,11 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             return;
         }
 
-        Map<Task, MSPlane> planeEdges = plane.getPlaneFunction().getEdges();
-        planeEdges.clear();
+        final MSPlaneNode pn = plane.getPlaneFunction();
+        pn.clearNeighbors();
         for (Task t : plane.getTasks()) {
             MSTaskNode f = plane.getTaskFunction(t);
-            f.getEdges().clear();
+            f.clearNeighbors();
         }
 
         // Track tasks from our neighbors
@@ -115,12 +115,12 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             neighbors.add(p);
 
             for (Task t : p.getTasks()) {
-                planeEdges.put(t, p);
+                pn.addNeighbor(t, plane);
             }
 
             for (Task t : plane.getTasks()) {
                 MSTaskNode f = plane.getTaskFunction(t);
-                f.getEdges().put(p, p);
+                f.addNeighbor(plane);
             }
 
             if (LOG.isLoggable(Level.FINEST)) {
@@ -135,9 +135,9 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
         if (LOG.isLoggable(Level.FINEST)) {
             for (Task t : plane.getTasks()) {
                 MSTaskNode f = plane.getTaskFunction(t);
-                LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{f, f.getDomain()});
+                LOG.log(Level.FINEST, "Task factor: {0}", f);
             }
-            LOG.log(Level.FINEST, "{0} domain: {1}", new Object[]{plane, planeEdges});
+            LOG.log(Level.FINEST, "Plane factor: {1}", pn);
         }
 
     }

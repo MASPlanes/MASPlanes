@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2013 Expression application is undefined on line 6, column 57 in Templates/Licenses/license-bsd.txt..
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -16,11 +16,11 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of Expression application is undefined on line 21, column 41 in Templates/Licenses/license-bsd.txt.
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
- *   Expression application is undefined on line 25, column 21 in Templates/Licenses/license-bsd.txt.
+ *   IIIA-CSIC, Artificial Intelligence Research Institute
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -37,52 +37,15 @@
 package es.csic.iiia.planes.maxsum.novel;
 
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.maxsum.algo.CostFactor;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSPlaneNode {
+public class MSTask2Plane extends MSMessage<Task, MSPlane> {
 
-    private CostFactor factor;
-    private MSPlane plane;
-    private Map<Task, ProxyFactor<MSPlane, Task>> proxies = new HashMap<Task, ProxyFactor<MSPlane, Task>>();
-
-    public MSPlaneNode(MSPlane plane) {
-        factor = new CostFactor();
-        this.plane = plane;
+    public MSTask2Plane(double value) {
+        super(value);
     }
-
-    public void addNeighbor(Task t, MSPlane location) {
-        ProxyFactor<MSPlane, Task> proxy = new ProxyFactor<MSPlane, Task>(plane, t, plane, location);
-        factor.addNeighbor(proxy);
-        factor.setPotential(proxy, plane.getCost(t));
-        proxies.put(t, proxy);
-    }
-
-    public void clearNeighbors() {
-        proxies.clear();
-        factor.getNeighbors().clear();
-        factor.clearPotentials();
-    }
-
-    public void removeNeighbor(Task t) {
-        ProxyFactor<MSPlane, Task> proxy = proxies.remove(t);
-        factor.removePotential(proxy);
-    }
-
-    public void receive(MSMessage<Task, MSPlane> message) {
-        proxies.get(message.getLogicalSender()).receive(message);
-    }
-
-    public void run() {
-        factor.tick();
-        factor.run();
-    }
-
-
 
 }

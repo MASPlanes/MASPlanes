@@ -52,16 +52,24 @@ public class CostFactor extends AbstractFactor {
 
     private CostFactorFunction function;
 
-    public void setPotential(Factor factor, double value) {
-        potential.put(factor, value);
-    }
-
     public void setFunction(CostFactorFunction f) {
         function = f;
     }
 
-    private double getPotential(Factor f) {
+    public void setPotential(Factor factor, double value) {
+        potential.put(factor, value);
+    }
+
+    public double getPotential(Factor f) {
         return potential.get(f);
+    }
+
+    public Double removePotential(Factor f) {
+        return potential.remove(f);
+    }
+
+    public void clearPotentials() {
+        potential.clear();
     }
 
     @Override

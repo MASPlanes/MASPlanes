@@ -60,6 +60,22 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
         this.toLocation = toLocation;
     }
 
+    public LocalType getFrom() {
+        return from;
+    }
+
+    public RemoteType getTo() {
+        return to;
+    }
+
+    public MSPlane getFromLocation() {
+        return fromLocation;
+    }
+
+    public MSPlane getToLocation() {
+        return toLocation;
+    }
+
     /**
      * Receive a logical message, forwarding it to the remote location.
      *

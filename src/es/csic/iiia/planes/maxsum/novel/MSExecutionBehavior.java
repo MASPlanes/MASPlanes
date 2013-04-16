@@ -79,7 +79,7 @@ public class MSExecutionBehavior extends AbstractBehavior {
      * @param msg message to collect.
      */
     public void on(MSPlane2Task msg) {
-        MSTaskNode recipient = getAgent().getTaskFunction(msg.getTask());
+        MSTaskNode recipient = getAgent().getTaskFunction(msg.getLogicalRecipient());
         if (recipient != null) {
             recipient.receive(msg);
         }
@@ -109,9 +109,9 @@ public class MSExecutionBehavior extends AbstractBehavior {
         final Map<Task, MSTaskNode> functions = getAgent().getTaskFunctions();
 
         // Everyone gather
-        variable.iter();
+        variable.run();
         for (MSTaskNode f : functions.values()) {
-            f.iter();
+            f.run();
         }
     }
 

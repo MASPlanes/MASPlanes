@@ -66,6 +66,11 @@ public class MSTaskNode {
         proxies.put(remote, proxy);
     }
 
+    public void clearNeighbors() {
+        proxies.clear();
+        factor.getNeighbors().clear();
+    }
+
     public void receive(MSMessage<MSPlane, Task> message) {
         proxies.get(message.getLogicalSender()).receive(message);
     }
@@ -75,6 +80,13 @@ public class MSTaskNode {
         factor.run();
     }
 
-
+    public MSPlane makeDecision() {
+        Factor choice = factor.select();
+        if (choice instanceof ProxyFactor) {
+            ProxyFactor<Task, MSPlane> f = (ProxyFactor<Task, MSPlane>)choice;
+            return f.getTo();
+        }
+        throw new RuntimeException("Unreachable code");
+    }
 
 }
