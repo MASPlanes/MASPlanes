@@ -110,6 +110,7 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
 
         // Fetch the assignments
         assignmentMap.clear();
+        reverseMap.clear();
         for (Task t : w.getTasks()) {
             final SelectorFactor s = selectors.get(t);
             final OmniscientPlane p = cost2plane.get(s.select());
@@ -120,6 +121,7 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
                || p.getCost(assignmentMap.get(p)) > p.getCost(t) )
             {
                 assignmentMap.put(p, t);
+                reverseMap.put(t, p);
             }
         }
 
