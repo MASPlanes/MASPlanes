@@ -36,7 +36,6 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
-import es.csic.iiia.planes.maxsum.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 

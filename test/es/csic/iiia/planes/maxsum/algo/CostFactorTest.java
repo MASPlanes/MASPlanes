@@ -77,8 +77,8 @@ public class CostFactorTest {
 
         // Setup incoming messages
         SelectorFactor[] sfs = new SelectorFactor[values.length];
-        CostFactor c = new CostFactor();
-        c.setFunction(new WorkloadFunction(K, ALPHA));
+        WorkloadFactor c = new WorkloadFactor();
+        c.setFunction(new KAlphaFunction(K, ALPHA));
 
         for (int i=0; i<sfs.length; i++) {
             sfs[i] = new SelectorFactor();

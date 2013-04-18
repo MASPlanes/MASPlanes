@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.maxsum.algo.Factor;
 import es.csic.iiia.planes.maxsum.algo.Message;
 import java.util.ArrayList;
@@ -49,11 +50,11 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
 
     private LocalType from;
     private RemoteType to;
-    private MSPlane fromLocation;
-    private MSPlane toLocation;
+    private Plane fromLocation;
+    private Plane toLocation;
     private Factor factor;
 
-    public ProxyFactor(LocalType from, RemoteType to, MSPlane fromLocation, MSPlane toLocation) {
+    public ProxyFactor(LocalType from, RemoteType to, Plane fromLocation, Plane toLocation) {
         this.from = from;
         this.to = to;
         this.fromLocation = fromLocation;
@@ -68,11 +69,11 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
         return to;
     }
 
-    public MSPlane getFromLocation() {
+    public Plane getFromLocation() {
         return fromLocation;
     }
 
-    public MSPlane getToLocation() {
+    public Plane getToLocation() {
         return toLocation;
     }
 
@@ -87,6 +88,7 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
         msg.setLogicalRecipient(to);
         msg.setLogicalSender(from);
         msg.setRecipient(toLocation);
+        System.err.println(msg);
         fromLocation.send(msg);
     }
 

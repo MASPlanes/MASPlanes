@@ -36,13 +36,14 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSPlane2Task extends MSMessage<MSPlane, Task> {
+public class MSPlane2Task extends MSMessage<Plane, Task> {
 
     public MSPlane2Task(double value) {
         super(value);

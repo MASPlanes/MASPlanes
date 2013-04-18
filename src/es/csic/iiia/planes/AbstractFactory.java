@@ -40,6 +40,8 @@ import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.idle.IdleStrategy;
+import es.csic.iiia.planes.maxsum.algo.CostFactor;
+import es.csic.iiia.planes.maxsum.algo.WorkloadFactor;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.logging.Level;
@@ -128,6 +130,11 @@ public abstract class AbstractFactory implements Factory {
         initialize(t);
         world.addTask(t);
         return t;
+    }
+
+    @Override
+    public CostFactor buildCostFactor(Plane plane) {
+        return config.getMsCostFactorFactory().build(plane);
     }
 
     /**

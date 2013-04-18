@@ -36,8 +36,8 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.maxsum.algo.CostFactor;
 import es.csic.iiia.planes.maxsum.algo.Factor;
 import es.csic.iiia.planes.maxsum.algo.SelectorFactor;
 import java.util.HashMap;
@@ -51,17 +51,18 @@ public class MSTaskNode {
 
     private SelectorFactor factor;
     private Task task;
-    private MSPlane plane;
-    private Map<MSPlane, ProxyFactor<Task, MSPlane>> proxies = new HashMap<MSPlane, ProxyFactor<Task, MSPlane>>();
+    private Plane plane;
+    private Map<Plane, ProxyFactor<Task, Plane>> proxies = new HashMap<Plane, ProxyFactor<Task, Plane>>();
 
-    public MSTaskNode(MSPlane plane, Task task) {
+    public MSTaskNode(Plane plane, Task task) {
         factor = new SelectorFactor();
         this.plane = plane;
         this.task = task;
     }
 
-    public void addNeighbor(MSPlane remote) {
-        ProxyFactor<Task, MSPlane> proxy = new ProxyFactor<Task, MSPlane>(task, remote, plane, remote);
+    public void addNeighbor(Plane remote) {
+        ProxyFactor<Task, Plane> proxy = new ProxyFactor<Task, Plane>(task, remote, plane, remote);
+        proxy.addNeighbor(factor);
         factor.addNeighbor(proxy);
         proxies.put(remote, proxy);
     }
@@ -71,7 +72,7 @@ public class MSTaskNode {
         factor.getNeighbors().clear();
     }
 
-    public void receive(MSMessage<MSPlane, Task> message) {
+    public void receive(MSMessage<Plane, Task> message) {
         proxies.get(message.getLogicalSender()).receive(message);
     }
 
@@ -80,13 +81,19 @@ public class MSTaskNode {
         factor.run();
     }
 
-    public MSPlane makeDecision() {
+    public Plane makeDecision() {
         Factor choice = factor.select();
         if (choice instanceof ProxyFactor) {
-            ProxyFactor<Task, MSPlane> f = (ProxyFactor<Task, MSPlane>)choice;
+            ProxyFactor<Task, Plane> f = (ProxyFactor<Task, Plane>)choice;
             return f.getTo();
         }
+        System.err.println(choice);
         throw new RuntimeException("Unreachable code");
+    }
+
+    @Override
+    public String toString() {
+        return "TaskFactor(" + task.getId() + ")";
     }
 
 }

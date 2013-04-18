@@ -50,10 +50,12 @@ import es.csic.iiia.planes.idle.DoNothing;
 import es.csic.iiia.planes.idle.FlyTowardsOperator;
 import es.csic.iiia.planes.idle.FlyTowardsOperatorP;
 import es.csic.iiia.planes.idle.IdleStrategy;
-import es.csic.iiia.planes.maxsum.MSIndependentPlaneNode;
-import es.csic.iiia.planes.maxsum.MSPlane;
-import es.csic.iiia.planes.maxsum.MSPlaneNode;
-import es.csic.iiia.planes.maxsum.MSWorkloadPlaneNode;
+import es.csic.iiia.planes.maxsum.algo.CostFactorFactory;
+import es.csic.iiia.planes.maxsum.algo.IndependentFactory;
+import es.csic.iiia.planes.maxsum.algo.KAlphaFactory;
+import es.csic.iiia.planes.maxsum.algo.WorkloadFactory;
+import es.csic.iiia.planes.maxsum.algo.WorkloadFunctionFactory;
+import es.csic.iiia.planes.maxsum.novel.MSPlane;
 import es.csic.iiia.planes.omniscient.AllocationStrategy;
 import es.csic.iiia.planes.omniscient.HungarianMethodAllocation;
 import es.csic.iiia.planes.omniscient.IncrementalSSIAllocation;
@@ -81,7 +83,7 @@ import org.codehaus.jackson.map.ObjectMapper;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Configuration {
+public final class Configuration {
 
     /**
      * True if running with a graphical display, false otherwise.
@@ -145,11 +147,12 @@ public class Configuration {
     /* MAXSUM specific stuff */
     private int msIterations;
     private int msStartEvery;
-    private Class<? extends MSPlaneNode> msPlaneNodeType;
     private double msWorkloadK;
     private double msWorkloadAlpha;
 
     private LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
+    private CostFactorFactory msCostFactorFactory;
+    private WorkloadFunctionFactory msWorkloadFunctionFactory;
 
     private <T> T fetch(Properties settings, Map<String, T> map, String key) {
         String value = settings.getProperty(key).toLowerCase();
@@ -201,36 +204,28 @@ public class Configuration {
         }
 
         // Max-sum settings
-        if (values.get("planes").equals("maxsum")) {
+        if (  values.get("planes").equals("maxsum")
+           || (  values.get("planes").equals("omniscient")
+              && values.get("omniscient-allocation").equals("maxsum") )
+           )
+        {
             msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
             values.put("maxsum-iterations", String.valueOf(msIterations));
             msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
             values.put("maxsum-start-every", String.valueOf(msStartEvery));
             String value = settings.getProperty("maxsum-planes-function");
-            values.put("maxsum-planes-function", value.toLowerCase());
-            if (value.equalsIgnoreCase("independent")) {
-                msPlaneNodeType = MSIndependentPlaneNode.class;
-            } else if (value.equalsIgnoreCase("workload")) {
-                msPlaneNodeType = MSWorkloadPlaneNode.class;
-                msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
-                values.put("maxsum-workload-k", String.valueOf(msWorkloadK));
-                msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
-                values.put("maxsum-workload-alpha", String.valueOf(msWorkloadAlpha));
-            } else {
-                throw new IllegalArgumentException("Illegal maxsum planes function type \"" + value + "\".");
-            }
-        }
 
-        // Omniscient max-sum settings
-        if (  values.get("planes").equals("omniscient")
-           && values.get("omniscient-allocation").equals("maxsum") )
-        {
-            msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
-            values.put("maxsum-iterations", String.valueOf(msIterations));
-            msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
-            values.put("maxsum-workload-k", String.valueOf(msWorkloadK));
-            msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
-            values.put("maxsum-workload-alpha", String.valueOf(msWorkloadAlpha));
+            msCostFactorFactory = fetch(settings, getCostFactorFactories(), "maxsum-planes-function");
+            if (values.get("maxsum-planes-function").equals("workload")) {
+                msWorkloadFunctionFactory = fetch(settings, getWorkloadFunctionFactories(), "maxsum-workload-function");
+
+                if (values.get("maxsum-workload-function").equals("k-alpha")) {
+                    msWorkloadK = Double.valueOf(settings.getProperty("maxsum-workload-k"));
+                    values.put("maxsum-workload-k", String.valueOf(msWorkloadK));
+                    msWorkloadAlpha = Double.valueOf(settings.getProperty("maxsum-workload-alpha"));
+                    values.put("maxsum-workload-alpha", String.valueOf(msWorkloadAlpha));
+                }
+            }
         }
 
     }
@@ -337,13 +332,6 @@ public class Configuration {
     }
 
     /**
-     * @return the msPlaneNodeType
-     */
-    public Class<? extends MSPlaneNode> getMsPlaneNodeType() {
-        return msPlaneNodeType;
-    }
-
-    /**
      * @return the msWorkloadK
      */
     public double getMsWorkloadK() {
@@ -362,6 +350,20 @@ public class Configuration {
      */
     public LinkedHashMap<String, String> getValues() {
         return values;
+    }
+
+    /**
+     * @return the CostFactor factory
+     */
+    public CostFactorFactory getMsCostFactorFactory() {
+        return msCostFactorFactory;
+    }
+
+    /**
+     * @return the workload functionf actory.
+     */
+    public WorkloadFunctionFactory getMsWorkloadFunctionFactory() {
+        return msWorkloadFunctionFactory;
     }
 
     private Map<String, OperatorStrategy> getOperatorStrategies() {
@@ -424,6 +426,19 @@ public class Configuration {
            put("false", false);
            put("no", false);
            put("0", false);
+        }};
+    }
+
+    private Map<String, CostFactorFactory> getCostFactorFactories() {
+        return new HashMap<String, CostFactorFactory>() {{
+           put("independent", new IndependentFactory());
+           put("workload", new WorkloadFactory());
+        }};
+    }
+
+    private Map<String, WorkloadFunctionFactory> getWorkloadFunctionFactories() {
+        return new HashMap<String, WorkloadFunctionFactory>() {{
+           put("k-alpha", new KAlphaFactory());
         }};
     }
 

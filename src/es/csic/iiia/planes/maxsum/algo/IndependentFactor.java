@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,31 +34,28 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum;
-
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.messaging.AbstractMessage;
+package es.csic.iiia.planes.maxsum.algo;
 
 /**
- * Message to delegate reponsibility of a task to another plane.
- * 
+ * Factor representing an independent cost for each of its constituent
+ * variables.
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class HandTaskMessage extends AbstractMessage {
-
-    private final Task task;
-
-    public HandTaskMessage(Task t) {
-        this.task = t;
-    }
+public class IndependentFactor extends CostFactor {
 
     /**
-     * Get the task being handed.
-     * 
-     * @return task being handed.
+     * Run an iteration of this factor.
+     *
+     * In this case, this amounts to sending the cost associated to each
+     * of its neighbors out.
      */
-    public Task getTask() {
-        return task;
+    @Override
+    public void run() {
+        for (Factor f : getNeighbors()) {
+            Message message = new Message(this, getCost(f));
+            send(message, f);
+        }
     }
 
 }

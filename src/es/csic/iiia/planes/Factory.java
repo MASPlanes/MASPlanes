@@ -38,6 +38,7 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.definition.DTask;
+import es.csic.iiia.planes.maxsum.algo.CostFactor;
 import java.util.List;
 
 /**
@@ -111,5 +112,11 @@ public interface Factory {
      * @return newly built World;
      */
     public World buildWorld();
+
+    /**
+     * Builds a new {@link  CostFactor} for a plane.
+     * @return newly build cost factor.
+     */
+    public CostFactor buildCostFactor(Plane plane);
 
 }

@@ -44,6 +44,7 @@ import es.csic.iiia.planes.definition.DStation;
 import es.csic.iiia.planes.messaging.Message;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
 
 /**
  * Base implementation of a World, leaving some details to be implemented by the
@@ -52,6 +53,8 @@ import java.util.List;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public abstract class AbstractWorld implements World {
+    private static final Logger LOG = Logger.getLogger(AbstractWorld.class.getName());
+
     private Space space = null;
     private List<Agent> agents = new ArrayList<Agent>();
     private List<Plane> planes = new ArrayList<Plane>();
@@ -181,7 +184,7 @@ public abstract class AbstractWorld implements World {
         }
 
         for (time=0; time<duration || tasks.size() > 0; time++) {
-
+            LOG.fine("----------     TICK     ----------");
             computeStep();
             displayStep();
 

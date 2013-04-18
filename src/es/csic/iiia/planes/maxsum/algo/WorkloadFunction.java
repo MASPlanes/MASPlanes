@@ -37,22 +37,18 @@
 package es.csic.iiia.planes.maxsum.algo;
 
 /**
+ * Interface of a workload function f
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class WorkloadFunction implements CostFactorFunction {
+public interface WorkloadFunction {
 
-    private double k;
-    private double alpha;
-
-    public WorkloadFunction(double k, double alpha) {
-        this.k = k;
-        this.alpha = alpha;
-    }
-
-    @Override
-    public double getCost(int i) {
-        return k * Math.pow(i, alpha);
-    }
+    /**
+     * Get the cost of activating n_tasks variables.
+     *
+     * @param n_tasks number of active variables
+     * @return cost of activating that many variables
+     */
+    public double getCost(int n_tasks);
 
 }

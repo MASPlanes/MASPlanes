@@ -36,24 +36,56 @@
  */
 package es.csic.iiia.planes.maxsum.algo;
 
+import es.csic.iiia.planes.cli.Configuration;
 import java.util.List;
 
 /**
+ * Basic definition of a MaxSum factor.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface Factor {
 
+    /**
+     * Adds a new neighbor of this factor (graph link).
+     *
+     * @param factor new neighbor.
+     */
     public void addNeighbor(Factor factor);
 
+    /**
+     * Get the neighbors of this factor.
+     *
+     * @return neighbors of this factor
+     */
     public List<Factor> getNeighbors();
 
+    /**
+     * Receive a message.
+     *
+     * The message sender is available within the message itself.
+     *
+     * @see Message#sender
+     * @param message message to receive
+     */
     public void receive(Message message);
 
+    /**
+     * Send a message to a neighboring factor.
+     *
+     * @param message message to send
+     * @param recipient intended recipient
+     */
     public void send(Message message, Factor recipient);
 
+    /**
+     * Perform any actions necessary when the clock advances one tick.
+     */
     public void tick();
 
+    /**
+     * Run an iteration of this factor.
+     */
     public void run();
 
 }

@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -16,7 +16,7 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute 
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
@@ -34,8 +34,19 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
+package es.csic.iiia.planes.maxsum.algo;
+
+import es.csic.iiia.planes.Plane;
 
 /**
- * Implementaiton of planes that coordinate by using max-sum.
+ *
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-package es.csic.iiia.planes.maxsum;
+public class IndependentFactory implements CostFactorFactory {
+
+    @Override
+    public CostFactor build(Plane plane) {
+        return new IndependentFactor();
+    }
+
+}

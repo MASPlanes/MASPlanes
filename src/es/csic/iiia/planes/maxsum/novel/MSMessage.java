@@ -81,7 +81,7 @@ public class MSMessage<LocalType, RemoteType> extends AbstractMessage {
 
     @Override
     public String toString() {
-        return logicalSender + "[" + getSender() + "] -> " + logicalRecipient + "[" + getRecipient() + "]";
+        return logicalSender + "[" + getSender() + "] -> " + logicalRecipient + "[" + getRecipient() + "] : " + getValue();
     }
 
 }

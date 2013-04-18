@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,29 +34,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum;
+package es.csic.iiia.planes.maxsum.algo;
 
-import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.cli.Configuration;
 
 /**
- * Max-sum plane node that just introduces the cost for each task as specified 
- * by the plane's {@link MSPlane#getCost(es.csic.iiia.planes.Task)}.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSIndependentPlaneNode extends MSPlaneNode {
-
-    public MSIndependentPlaneNode(MSPlane plane) {
-        super(plane);
-    }
+public class WorkloadFactory implements CostFactorFactory {
 
     @Override
-    public void iter() {
+    public WorkloadFactor build(Plane plane) {
+        Configuration c = plane.getWorld().getFactory().getConfiguration();
 
-        for (Task t : getDomain()) {
-            MSPlane2Task msg = new MSPlane2Task(getPlane(), t, getPotential(t));
-            send(msg, t);
-        }
-
+        WorkloadFactor f = new WorkloadFactor();
+        WorkloadFunction ff = c.getMsWorkloadFunctionFactory().build(plane);
+        f.setFunction(ff);
+        return f;
     }
+
 }

@@ -120,7 +120,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
             for (Task t : plane.getTasks()) {
                 MSTaskNode f = plane.getTaskFunction(t);
-                f.addNeighbor(plane);
+                f.addNeighbor(p);
             }
 
             if (LOG.isLoggable(Level.FINEST)) {
@@ -137,7 +137,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
                 MSTaskNode f = plane.getTaskFunction(t);
                 LOG.log(Level.FINEST, "Task factor: {0}", f);
             }
-            LOG.log(Level.FINEST, "Plane factor: {1}", pn);
+            LOG.log(Level.FINEST, "Plane factor: {0}", pn);
         }
 
     }

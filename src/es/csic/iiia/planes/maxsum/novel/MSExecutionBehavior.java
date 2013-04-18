@@ -36,7 +36,6 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
-import es.csic.iiia.planes.maxsum.*;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import java.util.Map;

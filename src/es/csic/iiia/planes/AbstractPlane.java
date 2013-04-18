@@ -48,6 +48,7 @@ import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -326,8 +327,10 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      */
     protected void setNextTask(Task t) {
         if (t != null && state == State.NORMAL) {
+            LOG.log(Level.FINE, "{0} heads towards {1}", new Object[]{this, t});
             setDestination(t.getLocation());
         } else if (state == State.NORMAL) {
+            LOG.log(Level.FINE, "{0} heads towards {1}", new Object[]{this, getWorld().getNearestOperator(getLocation())});
             setDestination(getWorld().getNearestOperator(getLocation()).getLocation());
         }
         nextTask = t;
@@ -339,6 +342,7 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      * @param t task that has been completed
      */
     private void triggerTaskCompleted(Task t) {
+        LOG.log(Level.FINE, "{0} completes {1}", new Object[]{this, t});
         completedLocations.add(t.getLocation());
         getWorld().removeTask(t);
         removeTask(t);

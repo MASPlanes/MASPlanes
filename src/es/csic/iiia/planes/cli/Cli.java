@@ -37,28 +37,16 @@
  */
 package es.csic.iiia.planes.cli;
 
-import es.csic.iiia.planes.DefaultPlane;
-import es.csic.iiia.planes.auctions.AuctionPlane;
-import es.csic.iiia.planes.definition.DProblem;
-import es.csic.iiia.planes.maxsum.MSPlane;
-import es.csic.iiia.planes.operator_behavior.Nearest;
-import es.csic.iiia.planes.operator_behavior.Random;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 import org.apache.commons.cli.*;
-import org.codehaus.jackson.map.ObjectMapper;
 
 /**
  * Main class for the CLI interface.

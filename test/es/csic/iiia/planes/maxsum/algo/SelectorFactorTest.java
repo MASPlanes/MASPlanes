@@ -71,10 +71,10 @@ public class SelectorFactorTest {
     private void run(double[] values, double[] results) {
 
         // Setup incoming messages
-        CostFactor[] cfs = new CostFactor[values.length];
+        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
         SelectorFactor s = new SelectorFactor();
         for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new CostFactor();
+            cfs[i] = new WorkloadFactor();
             s.addNeighbor(cfs[i]);
             s.receive(new Message(cfs[i], values[i]));
         }

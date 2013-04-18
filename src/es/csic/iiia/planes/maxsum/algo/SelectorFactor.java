@@ -36,8 +36,6 @@
  */
 package es.csic.iiia.planes.maxsum.algo;
 
-import es.csic.iiia.planes.maxsum.Minimizer;
-
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>

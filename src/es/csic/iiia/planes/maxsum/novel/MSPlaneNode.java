@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.maxsum.algo.CostFactor;
 import java.util.HashMap;
@@ -48,33 +49,34 @@ import java.util.Map;
 public class MSPlaneNode {
 
     private CostFactor factor;
-    private MSPlane plane;
-    private Map<Task, ProxyFactor<MSPlane, Task>> proxies = new HashMap<Task, ProxyFactor<MSPlane, Task>>();
+    private Plane plane;
+    private Map<Task, ProxyFactor<Plane, Task>> proxies = new HashMap<Task, ProxyFactor<Plane, Task>>();
 
-    public MSPlaneNode(MSPlane plane) {
-        factor = new CostFactor();
+    public MSPlaneNode(Plane plane) {
+        factor = plane.getWorld().getFactory().buildCostFactor(plane);
         this.plane = plane;
     }
 
-    public void addNeighbor(Task t, MSPlane location) {
-        ProxyFactor<MSPlane, Task> proxy = new ProxyFactor<MSPlane, Task>(plane, t, plane, location);
+    public void addNeighbor(Task t, Plane location) {
+        ProxyFactor<Plane, Task> proxy = new ProxyFactor<Plane, Task>(plane, t, plane, location);
         factor.addNeighbor(proxy);
         factor.setPotential(proxy, plane.getCost(t));
+        proxy.addNeighbor(factor);
         proxies.put(t, proxy);
     }
 
     public void clearNeighbors() {
         proxies.clear();
         factor.getNeighbors().clear();
-        factor.clearPotentials();
+        factor.clearCosts();
     }
 
     public void removeNeighbor(Task t) {
-        ProxyFactor<MSPlane, Task> proxy = proxies.remove(t);
-        factor.removePotential(proxy);
+        ProxyFactor<Plane, Task> proxy = proxies.remove(t);
+        factor.removeCost(proxy);
     }
 
-    public void receive(MSMessage<Task, MSPlane> message) {
+    public void receive(MSMessage<Task, Plane> message) {
         proxies.get(message.getLogicalSender()).receive(message);
     }
 
@@ -83,6 +85,9 @@ public class MSPlaneNode {
         factor.run();
     }
 
-
+    @Override
+    public String toString() {
+        return "PlaneFactor(" + plane + ")";
+    }
 
 }

@@ -36,10 +36,12 @@
  */
 package es.csic.iiia.planes.maxsum.algo;
 
+import es.csic.iiia.planes.Plane;
+
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface CostFactorFunction {
-    public double getCost(int i);
+public interface WorkloadFunctionFactory {
+    public WorkloadFunction build(Plane plane);
 }

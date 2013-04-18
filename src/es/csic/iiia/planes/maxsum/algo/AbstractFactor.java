@@ -48,9 +48,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public abstract class AbstractFactor implements Factor {
 
-    public static final AtomicInteger idGenerator = new AtomicInteger();
-    private final int id = idGenerator.incrementAndGet();
-
     private Map<Factor, Message> newMessages = new HashMap<Factor, Message>();
     private Map<Factor, Message> curMessages = new HashMap<Factor, Message>();
     private List<Factor> neighbors = new ArrayList<Factor>();

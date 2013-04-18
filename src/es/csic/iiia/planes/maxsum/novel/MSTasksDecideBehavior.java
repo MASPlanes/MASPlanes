@@ -40,9 +40,11 @@ import es.csic.iiia.planes.maxsum.*;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.MessagingAgent;
+import es.csic.iiia.planes.Plane;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import sun.net.www.content.text.plain;
 
 /**
  * Behavior that implements the decisions of tasks.
@@ -111,7 +113,7 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
         for (int i=tasks.size()-1; i>=0; i--) {
             final Task t = tasks.get(i);
             final MSTaskNode f = p.getTaskFunction(t);
-            final MSPlane choice = f.makeDecision();
+            final Plane choice = f.makeDecision();
             LOG.log(Level.FINE, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f, choice, getAgent().getWorld().getTime(), getAgent()});
             if (choice != p && choice != null) {
                 relocateTask(t, choice);
@@ -126,10 +128,11 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
      * @param t task being sent.
      * @param choice plane that will be the new owner of the given task.
      */
-    private void relocateTask(Task t, MSPlane choice) {
+    private void relocateTask(Task t, Plane choice) {
         getAgent().removeTask(t);
         HandTaskMessage msg = new HandTaskMessage(t);
         msg.setRecipient(choice);
+        LOG.log(Level.FINER, "{0} hands {1} to {2}", new Object[]{this.getAgent(), t, choice});
         getAgent().send(msg);
     }
 

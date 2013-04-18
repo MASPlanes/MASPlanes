@@ -94,7 +94,9 @@ public class MSPlane extends AbstractPlane {
     @Override
     protected void taskAdded(Task t) {
         // Create a function node for this task
-        taskFunctions.put(t, new MSTaskNode(this, t));
+        MSTaskNode node = new MSTaskNode(this, t);
+        node.addNeighbor(this);
+        taskFunctions.put(t, node);
         replan(t);
     }
 

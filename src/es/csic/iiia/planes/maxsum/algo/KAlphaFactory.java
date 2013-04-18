@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2013 Expression application is undefined on line 6, column 57 in Templates/Licenses/license-bsd.txt..
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -16,11 +16,11 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of Expression application is undefined on line 21, column 41 in Templates/Licenses/license-bsd.txt.
+ *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
- *   Expression application is undefined on line 25, column 21 in Templates/Licenses/license-bsd.txt.
+ *   IIIA-CSIC, Artificial Intelligence Research Institute
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -34,24 +34,21 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum;
+package es.csic.iiia.planes.maxsum.algo;
 
-import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.cli.Configuration;
 
 /**
- * Message sent from a {@link MSTaskNode} to a {@link MSPlaneNode}.
  *
- * @author Marc Pujol <mpujol at iiia.csic.es>
+ * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSPlane2Task extends MSMessage {
-
-    public MSPlane2Task(MSPlane plane, Task task, double value) {
-        super(plane, task, value);
-    }
+public class KAlphaFactory implements WorkloadFunctionFactory {
 
     @Override
-    public String toString() {
-        return "P(" + getSender() + ") -> T(" + getTask().getId() + ") : " + getValue();
+    public WorkloadFunction build(Plane plane) {
+        Configuration c = plane.getWorld().getFactory().getConfiguration();
+        return new KAlphaFunction(c.getMsWorkloadK(), c.getMsWorkloadAlpha());
     }
 
 }

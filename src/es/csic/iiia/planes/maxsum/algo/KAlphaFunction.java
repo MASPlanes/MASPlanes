@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,51 +34,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum;
-
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.messaging.AbstractMessage;
+package es.csic.iiia.planes.maxsum.algo;
 
 /**
- * Skeletal implementation of a message exchanged by the max-sum algorithm in
- * this application domain.
- * 
+ * Workload function that computes the extra cost of activating <em>n</em>
+ * variables (servicing <em>n</em> requests) as <em>k*n^alpha</em>.
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class MSMessage extends AbstractMessage {
+public class KAlphaFunction implements WorkloadFunction {
 
-    private final Task task;
-    private final MSPlane plane;
-    private final double value;
+    private double k;
+    private double alpha;
 
     /**
-     * Build a new message.
-     * 
-     * @param plane 
-     * @param task
-     * @param value 
+     * Build a new k-alpha workload function.
+     *
+     * @param k k value to employ
+     * @param alpha alpha value to employ
      */
-    public MSMessage(MSPlane plane, Task task, double value) {
-        this.plane = plane;
-        this.task = task;
-        this.value = value;
+    public KAlphaFunction(double k, double alpha) {
+        this.k = k;
+        this.alpha = alpha;
     }
 
-    public MSPlane getPlane() {
-        return plane;
-    }
-
-    public Task getTask() {
-        return task;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
+    /**
+     * Get the cost of activating <em>n</em> variables.
+     *
+     * @param n number of variables to activate
+     * @return cost associated to activating <em>n</em> variables
+     */
     @Override
-    public MSPlane getSender() {
-        return (MSPlane)super.getSender();
+    public double getCost(int n) {
+        return k * Math.pow(n, alpha);
     }
 
 }
