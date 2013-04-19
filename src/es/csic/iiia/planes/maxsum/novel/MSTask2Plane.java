@@ -40,11 +40,18 @@ import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 
 /**
- *
+ * Message sent from a {@link MSTaskNode} to a (possibly remote)
+ * {@link MSPlaneNode}.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSTask2Plane extends MSMessage<Task, Plane> {
 
+    /**
+     * Build a new message carrying the specified value.
+     * 
+     * @param value value in this message.
+     */
     public MSTask2Plane(double value) {
         super(value);
     }

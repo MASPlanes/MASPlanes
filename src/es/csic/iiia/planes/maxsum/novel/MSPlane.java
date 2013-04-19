@@ -93,9 +93,10 @@ public class MSPlane extends AbstractPlane {
 
     @Override
     protected void taskAdded(Task t) {
-        // Create a function node for this task
+        // Create a node for this task
         MSTaskNode node = new MSTaskNode(this, t);
         node.addNeighbor(this);
+        planeFunction.addNeighbor(t, this);
         taskFunctions.put(t, node);
         replan(t);
     }
@@ -103,7 +104,10 @@ public class MSPlane extends AbstractPlane {
     @Override
     protected void taskRemoved(Task t) {
         // Cleanup any actions done at taskAdded...
+        MSTaskNode n = taskFunctions.get(t);
+        n.clearNeighbors();
         taskFunctions.remove(t);
+        planeFunction.removeNeighbor(t);
 
         // And replan if necessary
         setNextTask(getNearest(getLocation(), getTasks()));
@@ -188,6 +192,9 @@ public class MSPlane extends AbstractPlane {
     }
 
     public void setInactive(boolean inactive) {
+        if (inactive) {
+            LOG.log(Level.FINEST, "{0} is inactive.", this);
+        }
         this.inactive = inactive;
     }
 

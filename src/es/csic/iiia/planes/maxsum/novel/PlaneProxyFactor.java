@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2013 Expression application is undefined on line 6, column 57 in Templates/Licenses/license-bsd.txt..
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -16,11 +16,11 @@
  *   following disclaimer in the documentation and/or other
  *   materials provided with the distribution.
  *
- *   Neither the name of IIIA-CSIC, Artificial Intelligence Research Institute
+ *   Neither the name of Expression application is undefined on line 21, column 41 in Templates/Licenses/license-bsd.txt.
  *   nor the names of its contributors may be used to
  *   endorse or promote products derived from this
  *   software without specific prior written permission of
- *   IIIA-CSIC, Artificial Intelligence Research Institute
+ *   Expression application is undefined on line 25, column 21 in Templates/Licenses/license-bsd.txt.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
@@ -34,54 +34,25 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.behaviors;
+package es.csic.iiia.planes.maxsum.novel;
 
-import es.csic.iiia.planes.MessagingAgent;
-import es.csic.iiia.planes.cli.Configuration;
+import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.Task;
 
 /**
- * Skeletal implementation of a behavior.
- *
- * @author Marc Pujol <mpujol@iiia.csic.es>
+ * Proxy factor for {@link MSPlane}s.
+ * 
+ * @author Marc Pujol <mpujol at iiia.csic.es>
  */
-public abstract class AbstractBehavior implements Behavior {
+public class PlaneProxyFactor extends ProxyFactor<Plane, Task> {
 
-    private MessagingAgent agent;
-
-    /**
-     * Builds a new behavior.
-     *
-     * @param agent that will exhibit this behavior.
-     */
-    public AbstractBehavior(MessagingAgent agent) {
-        this.agent = agent;
+    public PlaneProxyFactor(Plane from, Task to, Plane toLocation) {
+        super(from, to, from, toLocation);
     }
     
-    /**
-     * Behaviors are not promiscuous by default
-     * 
-     * @return <em>false</em>
-     */
     @Override
-    public boolean isPromiscuous() {
-        return false;
+    protected MSPlane2Task buildMessage(double value) {
+        return new MSPlane2Task(value);
     }
-
-    @Override
-    public void initialize() {}
-
-    @Override
-    public MessagingAgent getAgent() {
-        return agent;
-    }
-
-    /**
-     * Get the configuraton of the simulator.
-     * 
-     * @return configuration of the simulator.
-     */
-    protected Configuration getConfiguration() {
-        return agent.getWorld().getFactory().getConfiguration();
-    }
-
+    
 }

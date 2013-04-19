@@ -43,10 +43,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Proxy factor that connects two (possibly) remotely running factors through
+ * the plane's network layer.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class ProxyFactor<LocalType, RemoteType> implements Factor {
+public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
 
     private LocalType from;
     private RemoteType to;
@@ -54,6 +56,14 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
     private Plane toLocation;
     private Factor factor;
 
+    /**
+     * Build a new proxy
+     *
+     * @param from logical origin (task or plane) of this proxy
+     * @param to logical destination (task or plane) of this proxy
+     * @param fromLocation physical location (plane) where this factor runs
+     * @param toLocation physical location (plane) where the remote factor runs
+     */
     public ProxyFactor(LocalType from, RemoteType to, Plane fromLocation, Plane toLocation) {
         this.from = from;
         this.to = to;
@@ -61,39 +71,64 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
         this.toLocation = toLocation;
     }
 
+    /**
+     * Get the logical origin (task or plane) of this proxy.
+     * @return logical origin of this proxy.
+     */
     public LocalType getFrom() {
         return from;
     }
 
+    /**
+     * Get the logical destination (task or plane) of this proxy.
+     * @return logical destination of this proxy.
+     */
     public RemoteType getTo() {
         return to;
     }
 
+    /**
+     * Get the physical location (plane) where this factor is running.
+     * @return plane where this factor is running.
+     */
     public Plane getFromLocation() {
         return fromLocation;
     }
 
+    /**
+     * Get the physical location (plane) where the remote factor is running.
+     * @return plane where the remote factor is running.
+     */
     public Plane getToLocation() {
         return toLocation;
     }
+    
+    /**
+     * Builds an outgoing message of a specific type.
+     * @return specific outgoing message
+     */
+    protected abstract MSMessage buildMessage(double value);
 
     /**
-     * Receive a logical message, forwarding it to the remote location.
+     * Receive a logical message, forwarding it to the remote location
+     * encapsulated in a "physical" message.
      *
      * @param message message to forward.
      */
     @Override
     public void receive(Message message) {
-        MSMessage msg = new MSMessage(message.value);
+        MSMessage msg = buildMessage(message.value);
         msg.setLogicalRecipient(to);
         msg.setLogicalSender(from);
         msg.setRecipient(toLocation);
-        System.err.println(msg);
+        msg.setSender(fromLocation);
         fromLocation.send(msg);
     }
 
     /**
-     * Receive an external message, forwarding it to the local max-sum node.
+     * Receive a network message, forwarding it to the local max-sum node as a
+     * logical message.
+     * 
      * @param message message to receive.
      */
     public void receive(MSMessage message) {
@@ -101,6 +136,11 @@ public class ProxyFactor<LocalType, RemoteType> implements Factor {
         send(msg, factor);
     }
 
+    /**
+     * Set the neighbor (logical factor for which we are proxying) of this proxy
+     * 
+     * @param factor logical factor
+     */
     @Override
     public void addNeighbor(Factor factor) {
         this.factor = factor;

@@ -42,12 +42,13 @@ import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.cli.Configuration;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Behavior that re-builds the Max-Sum graph to represent the current planes,
+ * tasks and their connections.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class MSUpdateGraphBehavior extends AbstractBehavior {
@@ -57,16 +58,21 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
     final private MSPlane plane;
 
+    /**
+     * Build a new max-sum graph updating behavior.
+     * 
+     * @param plane plane that will exhibit this behavior.
+     */
     public MSUpdateGraphBehavior(MSPlane plane) {
         super(plane);
         this.plane = plane;
     }
 
-    @Override
-    public boolean isPromiscuous() {
-        return false;
-    }
-
+    /**
+     * Get the dependencies of this behavior.
+     * 
+     * @return an array with {@link NeighborTracking} as its only entry.
+     */
     @Override
     public Class[] getDependencies() {
         return new Class[]{NeighborTracking.class};
@@ -100,6 +106,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             return;
         }
 
+        // Cleanup the previous graph
         final MSPlaneNode pn = plane.getPlaneFunction();
         pn.clearNeighbors();
         for (Task t : plane.getTasks()) {
@@ -107,7 +114,8 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             f.clearNeighbors();
         }
 
-        // Track tasks from our neighbors
+        // We are a neighbor of ourselves
+        int nPendingTasks = 0;
         List<MSPlane> neighbors = plane.getNeighbors();
         neighbors.clear();
         for (MessagingAgent a : tracker.getNeighbors(getConfiguration().getMsIterations())) {
@@ -116,6 +124,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
             for (Task t : p.getTasks()) {
                 pn.addNeighbor(t, plane);
+                nPendingTasks++;
             }
 
             for (Task t : plane.getTasks()) {
@@ -130,7 +139,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
         // Disable the plane if it has no neighbors (the plane itself is always in the
         // neighbors list)
-        plane.setInactive(neighbors.size()<2);
+        plane.setInactive(neighbors.size()<2 || nPendingTasks == 0);
 
         if (LOG.isLoggable(Level.FINEST)) {
             for (Task t : plane.getTasks()) {

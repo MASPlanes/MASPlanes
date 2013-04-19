@@ -46,7 +46,8 @@ import es.csic.iiia.planes.messaging.Message;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;
 import org.jmock.Expectations;
-import org.jmock.Mockery;
+import org.jmock.integration.junit4.JUnitRuleMockery;
+import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -54,19 +55,19 @@ import org.junit.Test;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSPlaneNodeTest {
+    
+    @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 
     /**
      * Test of receive method, of class MSPlaneNode.
      */
     @Test
     public void testReceive() {
-        Mockery context = new Mockery();
-
         final World world = context.mock(World.class);
         final Factory factory = context.mock(Factory.class);
         final CostFactor factor = new IndependentFactor();
 
-        final Plane plane = context.mock(Plane.class);
+        final Plane plane = context.mock(Plane.class, "Plane 1");
         final Task task1 = new Task(null);
         final Task task2 = new Task(null);
         final Task task3 = new Task(null);
@@ -77,14 +78,14 @@ public class MSPlaneNodeTest {
         message1.setLogicalRecipient(plane);
         message1.setRecipient(plane);
 
-        Plane sender1 = context.mock(Plane.class, "plane2");
+        Plane sender1 = context.mock(Plane.class, "Plane 2");
         MSMessage<Task, Plane> message2 = new MSTask2Plane(0);
         message2.setSender(sender1);
         message2.setLogicalSender(task2);
         message2.setLogicalRecipient(plane);
         message2.setRecipient(plane);
 
-        Plane sender2 = context.mock(Plane.class, "plane3");
+        Plane sender2 = context.mock(Plane.class, "Plane 3");
         MSMessage<Task, Plane> message3 = new MSTask2Plane(0);
         message3.setSender(sender2);
         message3.setLogicalSender(task3);
@@ -96,16 +97,20 @@ public class MSPlaneNodeTest {
             oneOf(world).getFactory(); will(returnValue(factory));
             oneOf(factory).buildCostFactor(plane); will(returnValue(factor));
 
-            oneOf(plane).getCost(task1); will(returnValue(0d));
+            oneOf(plane).getCost(task1); will(returnValue(1d));
             oneOf(plane).getCost(task2); will(returnValue(0d));
-            oneOf(plane).getCost(task3); will(returnValue(0d));
+            oneOf(plane).getCost(task3); will(returnValue(3d));
 
             //exactly(3).of(plane).send(with(any(Message.class)));
-            //oneOf(plane).send(with(Matchers.any(Message.class)));
-            exactly(3).of(plane).send(with(Matchers.allOf(
-                    any(MSMessage.class),
-                    Matchers.hasProperty("value", equal(0))
-            )));
+            exactly(1).of(Matchers.is(plane)).method("send").with(
+                    matchMessageValue(1d)
+            );
+            exactly(1).of(Matchers.is(plane)).method("send").with(
+                    matchMessageValue(0d)
+            );
+            exactly(1).of(Matchers.is(plane)).method("send").with(
+                    matchMessageValue(3d)
+            );
         }});
 
         MSPlaneNode instance = new MSPlaneNode(plane);
@@ -119,6 +124,13 @@ public class MSPlaneNodeTest {
         instance.run();
 
         context.assertIsSatisfied();
+    }
+    
+    private Matcher matchMessageValue(double value) {
+        return Matchers.allOf(
+            Matchers.any(Message.class), 
+            Matchers.hasProperty("value", Matchers.equalTo(value))
+        );
     }
 
 }

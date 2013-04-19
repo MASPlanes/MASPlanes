@@ -36,7 +36,6 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
-import es.csic.iiia.planes.maxsum.*;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.MessagingAgent;
@@ -44,13 +43,12 @@ import es.csic.iiia.planes.Plane;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import sun.net.www.content.text.plain;
 
 /**
  * Behavior that implements the decisions of tasks.
  * <p/>
- * Using this behavior, the decision made by {@link MSTaskNode}s are translated
- * into actual movements of tasks between the planes.
+ * Using this behavior, the decisions made by {@link MSTaskNode}s are translated
+ * into actual changes of task ownership between planes.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -67,19 +65,12 @@ public class MSTasksDecideBehavior extends AbstractBehavior {
     }
 
     @Override
-    public boolean isPromiscuous() {
-        return false;
-    }
-
-    @Override
     public MSPlane getAgent() {
         return (MSPlane)super.getAgent();
     }
 
     @Override
-    public void beforeMessages() {
-
-    }
+    public void beforeMessages() {}
 
     /**
      * Receive a task from a neighboring plane.

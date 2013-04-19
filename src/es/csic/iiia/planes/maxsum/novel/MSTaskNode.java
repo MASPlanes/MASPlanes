@@ -42,53 +42,92 @@ import es.csic.iiia.planes.maxsum.algo.Factor;
 import es.csic.iiia.planes.maxsum.algo.SelectorFactor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
+ * Max-sum task node to run inside a plane.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSTaskNode {
+    private static final Logger LOG = Logger.getLogger(MSTaskNode.class.getName());
 
     private SelectorFactor factor;
     private Task task;
     private Plane plane;
-    private Map<Plane, ProxyFactor<Task, Plane>> proxies = new HashMap<Plane, ProxyFactor<Task, Plane>>();
+    private Map<Plane, TaskProxyFactor> proxies = new HashMap<Plane, TaskProxyFactor>();
 
+    /**
+     * Build a new node for the given task, running inside the specified plane.
+     * 
+     * @param plane plane where this node runs
+     * @param task task that this node represents
+     */
     public MSTaskNode(Plane plane, Task task) {
         factor = new SelectorFactor();
         this.plane = plane;
         this.task = task;
     }
 
+    /**
+     * Add a new candidate plane to service this node's task.
+     * 
+     * @param remote candidate plane
+     */
     public void addNeighbor(Plane remote) {
-        ProxyFactor<Task, Plane> proxy = new ProxyFactor<Task, Plane>(task, remote, plane, remote);
+        TaskProxyFactor proxy = new TaskProxyFactor(task, remote, plane, remote);
         proxy.addNeighbor(factor);
         factor.addNeighbor(proxy);
         proxies.put(remote, proxy);
     }
 
+    /**
+     * Remove all candidate planes.
+     */
     public void clearNeighbors() {
         proxies.clear();
         factor.getNeighbors().clear();
     }
 
+    /**
+     * Receive a network message.
+     * 
+     * @param message message to receive
+     */
     public void receive(MSMessage<Plane, Task> message) {
+        LOG.log(Level.FINER, "{0} receives {1}", new Object[]{this, message});
         proxies.get(message.getLogicalSender()).receive(message);
     }
 
+    /**
+     * Run a single iteration of this node.
+     */
     public void run() {
         factor.tick();
         factor.run();
     }
 
+    /**
+     * Pick the most suitable plane to become the new owner of this node's
+     * task.
+     * 
+     * @return most suitable plane to service this task (at the current time)
+     */
     public Plane makeDecision() {
         Factor choice = factor.select();
+        
+        // This task has not been negotiated yet
+        if (choice == null) {
+            return plane;
+        }
+        
         if (choice instanceof ProxyFactor) {
             ProxyFactor<Task, Plane> f = (ProxyFactor<Task, Plane>)choice;
             return f.getTo();
         }
-        System.err.println(choice);
-        throw new RuntimeException("Unreachable code");
+        
+        throw new RuntimeException("Unreachable code.");
     }
 
     @Override

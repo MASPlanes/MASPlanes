@@ -34,7 +34,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.novel;
+package es.csic.iiia.planes.maxsum.algo.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,7 +45,7 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class Minimizer<T> {
+class Minimizer<T> {
     private static final Logger LOG = Logger.getLogger(Minimizer.class.getName());
 
     private final double[] values;
@@ -57,6 +57,9 @@ public class Minimizer<T> {
         objects = new Object[2];
     }
 
+    /**
+     * Reset this minimizer object, deleting all previous object-value entries.
+     */
     public void reset() {
         LOG.finest("Minimizing start");
         values[0] = Double.MAX_VALUE; values[1] = Double.MAX_VALUE;
@@ -64,36 +67,53 @@ public class Minimizer<T> {
         count = 0;
     }
 
-    public double getComplementary(T t) {
+    /**
+     * Get the object with minimum value, excluding the given one.
+     * 
+     * @param object
+     * @return object with minimum value, excluding the given one.
+     */
+    public double getComplementary(T object) {
         if (count == 0) {
             return 0;
         }
 
-        if (t == objects[0]) {
+        if (object == objects[0]) {
             return count == 1 ? 0 : values[1];
         }
 
         return count > 0 ? values[0] : 0;
     }
 
+    /**
+     * Get the object with minimum value.
+     * 
+     * @return object with minimum value.
+     */
     public T getBest() {
         return (T)objects[0];
     }
 
-    public void track(T t, double value) {
+    /**
+     * Track a new object and its associated value.
+     * 
+     * @param object object to track.
+     * @param value object's value.
+     */
+    public void track(T object, double value) {
         count++;
 
         LOG.log(Level.FINEST, "Minimizer tracking {0}", value);
 
         if (value < values[0]) {
             values[1]  = values[0];     values[0]  = value;
-            objects[1] = objects[0];    objects[0] = t;
+            objects[1] = objects[0];    objects[0] = object;
             return;
         }
 
         if (value < values[1]) {
             values[1]  = value;
-            objects[1] = t;
+            objects[1] = object;
         }
 
     }

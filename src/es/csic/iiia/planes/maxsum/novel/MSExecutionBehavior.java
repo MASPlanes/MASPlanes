@@ -57,11 +57,6 @@ public class MSExecutionBehavior extends AbstractBehavior {
     }
 
     @Override
-    public boolean isPromiscuous() {
-        return false;
-    }
-
-    @Override
     public Class[] getDependencies() {
         return new Class[]{MSUpdateGraphBehavior.class};
     }

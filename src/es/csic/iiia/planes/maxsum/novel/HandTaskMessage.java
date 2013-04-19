@@ -36,12 +36,11 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
-import es.csic.iiia.planes.maxsum.*;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- * Message to delegate reponsibility of a task to another plane.
+ * Message to delegate ownership of a task to another plane.
  * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -49,6 +48,11 @@ public class HandTaskMessage extends AbstractMessage {
 
     private final Task task;
 
+    /**
+     * Build a new message to delegate ownership of the given task.
+     * 
+     * @param t task to delegate.
+     */
     public HandTaskMessage(Task t) {
         this.task = t;
     }

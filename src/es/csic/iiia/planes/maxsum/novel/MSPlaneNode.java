@@ -41,45 +41,81 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.maxsum.algo.CostFactor;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- *
+ * Max-sum plane node.
+ * 
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSPlaneNode {
+    private static final Logger LOG = Logger.getLogger(MSPlaneNode.class.getName());
 
     private CostFactor factor;
     private Plane plane;
-    private Map<Task, ProxyFactor<Plane, Task>> proxies = new HashMap<Task, ProxyFactor<Plane, Task>>();
+    private Map<Task, PlaneProxyFactor> proxies = new HashMap<Task, PlaneProxyFactor>();
 
+    /**
+     * Build a new plane node for the given plane.
+     * 
+     * @param plane plane that this node represents.
+     */
     public MSPlaneNode(Plane plane) {
         factor = plane.getWorld().getFactory().buildCostFactor(plane);
         this.plane = plane;
     }
 
-    public void addNeighbor(Task t, Plane location) {
-        ProxyFactor<Plane, Task> proxy = new ProxyFactor<Plane, Task>(plane, t, plane, location);
+    /**
+     * Add a new task that can be serviced by this plane.
+     * 
+     * @param task task that can be serviced by this plane.
+     * @param location plane where this task's node is running (its current owner)
+     */
+    public void addNeighbor(Task task, Plane location) {
+        PlaneProxyFactor proxy = new PlaneProxyFactor(plane, task, location);
         factor.addNeighbor(proxy);
-        factor.setPotential(proxy, plane.getCost(t));
+        factor.setPotential(proxy, plane.getCost(task));
         proxy.addNeighbor(factor);
-        proxies.put(t, proxy);
+        proxies.put(task, proxy);
     }
 
+    /**
+     * Remove all candidate tasks to service.
+     */
     public void clearNeighbors() {
         proxies.clear();
         factor.getNeighbors().clear();
         factor.clearCosts();
     }
 
-    public void removeNeighbor(Task t) {
-        ProxyFactor<Plane, Task> proxy = proxies.remove(t);
+    /**
+     * Remove the given candidate task.
+     * @param task to remove
+     */
+    public void removeNeighbor(Task task) {
+        ProxyFactor<Plane, Task> proxy = proxies.remove(task);
         factor.removeCost(proxy);
     }
 
+    /**
+     * Receive a network message, and deliver it through the corresponding
+     * proxy.
+     * 
+     * @param message message to receive
+     */
     public void receive(MSMessage<Task, Plane> message) {
-        proxies.get(message.getLogicalSender()).receive(message);
+        LOG.log(Level.FINER, "{0} receives {1}", new Object[]{this, message});
+        PlaneProxyFactor f = proxies.get(message.getLogicalSender());
+        if (f == null) {
+            throw new RuntimeException("Fatal: can't find plane node.");
+        }
+        f.receive(message);
     }
 
+    /**
+     * Run a single iteration of this node.
+     */
     public void run() {
         factor.tick();
         factor.run();

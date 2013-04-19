@@ -58,11 +58,6 @@ public class MSMessage<LocalType, RemoteType> extends AbstractMessage {
         return value;
     }
 
-    @Override
-    public MSPlane getSender() {
-        return (MSPlane)super.getSender();
-    }
-
     public LocalType getLogicalSender() {
         return logicalSender;
     }
