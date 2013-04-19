@@ -211,9 +211,11 @@ public final class Configuration {
         {
             msIterations = Integer.valueOf(settings.getProperty("maxsum-iterations"));
             values.put("maxsum-iterations", String.valueOf(msIterations));
-            msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
-            values.put("maxsum-start-every", String.valueOf(msStartEvery));
-            String value = settings.getProperty("maxsum-planes-function");
+
+            if ( values.get("planes").equals("maxsum")) {
+                msStartEvery = Integer.valueOf(settings.getProperty("maxsum-start-every"));
+                values.put("maxsum-start-every", String.valueOf(msStartEvery));
+            }
 
             msCostFactorFactory = fetch(settings, getCostFactorFactories(), "maxsum-planes-function");
             if (values.get("maxsum-planes-function").equals("workload")) {
