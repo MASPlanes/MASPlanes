@@ -34,61 +34,36 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.algo;
-
-import es.csic.iiia.planes.maxsum.centralized.Message;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import static org.junit.Assert.*;
-import org.junit.Test;
+package es.csic.iiia.planes.maxsum.centralized;
 
 /**
+ * Factor representing an independent cost for each of its constituent
+ * variables.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class SelectorFactorTest {
+public class IndependentFactor extends CostFactor {
 
-    private final double DELTA = 0.0001d;
+    /**
+     * This factor ignores incoming messages, so the gather phase is empty.
+     */
+    @Override
+    public void gather() {
 
-    @Test
-    public void testRun1() {
-        double[] values  = new double[]{0, 1, 2};
-        double[] results = new double[]{-1, 0, 0};
-        run(values, results);
     }
 
-    @Test
-    public void testRun2() {
-        double[] values  = new double[]{0, 0, 2};
-        double[] results = new double[]{0, 0, 0};
-        run(values, results);
-    }
-
-    @Test
-    public void testRun3() {
-        double[] values  = new double[]{-1, 2};
-        double[] results = new double[]{-2, 1};
-        run(values, results);
-    }
-
-    private void run(double[] values, double[] results) {
-
-        // Setup incoming messages
-        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
-        SelectorFactor s = new SelectorFactor();
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new WorkloadFactor();
-            s.addNeighbor(cfs[i]);
-            s.receive(new Message(cfs[i], values[i]));
-        }
-
-        // The tick is to make the messages current
-        s.tick();
-        s.gather();
-
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i].tick();
-            assertEquals(cfs[i].getMessage(s).value, results[i], DELTA);
+    /**
+     * Run an iteration of this factor.
+     *
+     * In this case, this amounts to sending the cost associated to each
+     * of its neighbors out.
+     */
+    @Override
+    public void scatter() {
+        for (Factor f : getNeighbors()) {
+            Message message = new Message(this, getCost(f));
+            send(message, f);
         }
     }
+
 }

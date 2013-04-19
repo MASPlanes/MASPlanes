@@ -34,61 +34,14 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.algo;
+package es.csic.iiia.planes.maxsum.centralized;
 
-import es.csic.iiia.planes.maxsum.centralized.Message;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import es.csic.iiia.planes.Plane;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class SelectorFactorTest {
-
-    private final double DELTA = 0.0001d;
-
-    @Test
-    public void testRun1() {
-        double[] values  = new double[]{0, 1, 2};
-        double[] results = new double[]{-1, 0, 0};
-        run(values, results);
-    }
-
-    @Test
-    public void testRun2() {
-        double[] values  = new double[]{0, 0, 2};
-        double[] results = new double[]{0, 0, 0};
-        run(values, results);
-    }
-
-    @Test
-    public void testRun3() {
-        double[] values  = new double[]{-1, 2};
-        double[] results = new double[]{-2, 1};
-        run(values, results);
-    }
-
-    private void run(double[] values, double[] results) {
-
-        // Setup incoming messages
-        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
-        SelectorFactor s = new SelectorFactor();
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new WorkloadFactor();
-            s.addNeighbor(cfs[i]);
-            s.receive(new Message(cfs[i], values[i]));
-        }
-
-        // The tick is to make the messages current
-        s.tick();
-        s.gather();
-
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i].tick();
-            assertEquals(cfs[i].getMessage(s).value, results[i], DELTA);
-        }
-    }
+public interface WorkloadFunctionFactory {
+    public WorkloadFunction build(Plane plane);
 }

@@ -34,61 +34,61 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.algo;
+package es.csic.iiia.planes.maxsum.centralized;
 
-import es.csic.iiia.planes.maxsum.centralized.Message;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
+ * Skeletal factor that includes an independent cost for each of the variables
+ * in its scope.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class SelectorFactorTest {
+public abstract class CostFactor extends AbstractFactor {
 
-    private final double DELTA = 0.0001d;
+    private Map<Factor, Double> potential = new HashMap<Factor, Double>();
 
-    @Test
-    public void testRun1() {
-        double[] values  = new double[]{0, 1, 2};
-        double[] results = new double[]{-1, 0, 0};
-        run(values, results);
+    /**
+     * Remove all potential costs.
+     */
+    public void clearCosts() {
+        potential.clear();
     }
 
-    @Test
-    public void testRun2() {
-        double[] values  = new double[]{0, 0, 2};
-        double[] results = new double[]{0, 0, 0};
-        run(values, results);
-    }
-
-    @Test
-    public void testRun3() {
-        double[] values  = new double[]{-1, 2};
-        double[] results = new double[]{-2, 1};
-        run(values, results);
-    }
-
-    private void run(double[] values, double[] results) {
-
-        // Setup incoming messages
-        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
-        SelectorFactor s = new SelectorFactor();
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new WorkloadFactor();
-            s.addNeighbor(cfs[i]);
-            s.receive(new Message(cfs[i], values[i]));
+    /**
+     * Get the cost of activating the variable shared with the given factor.
+     *
+     * @param f factor to consider
+     * @return cost of activating the given factor
+     */
+    public double getCost(Factor f) {
+        if (!potential.containsKey(f)) {
+            throw new IllegalArgumentException("Requested potential for a non-existant factor");
         }
-
-        // The tick is to make the messages current
-        s.tick();
-        s.gather();
-
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i].tick();
-            assertEquals(cfs[i].getMessage(s).value, results[i], DELTA);
-        }
+        return potential.get(f);
     }
+
+    /**
+     * Remove the cost associated to activating the given factor.
+     *
+     * @param f factor to consider
+     * @return previous cost of activating the given factor
+     */
+    public Double removeCost(Factor f) {
+        return potential.remove(f);
+    }
+
+    /**
+     * Set the independent cost of activating the variable that corresponds to
+     * the given factor.
+     *
+     * @param factor neighboring factor with which this one shares a binary
+     *               variable
+     * @param value
+     */
+    public void setPotential(Factor factor, double value) {
+        potential.put(factor, value);
+    }
+
 }

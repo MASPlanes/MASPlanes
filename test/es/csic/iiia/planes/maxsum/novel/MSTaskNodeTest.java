@@ -36,6 +36,9 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.maxsum.distributed.MSTaskNode;
+import es.csic.iiia.planes.maxsum.distributed.MSMessage;
+import es.csic.iiia.planes.maxsum.distributed.MSPlane2Task;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.messaging.Message;

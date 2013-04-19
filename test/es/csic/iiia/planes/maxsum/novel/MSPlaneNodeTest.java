@@ -36,12 +36,15 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.maxsum.distributed.MSPlaneNode;
+import es.csic.iiia.planes.maxsum.distributed.MSTask2Plane;
+import es.csic.iiia.planes.maxsum.distributed.MSMessage;
 import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
-import es.csic.iiia.planes.maxsum.algo.CostFactor;
-import es.csic.iiia.planes.maxsum.algo.IndependentFactor;
+import es.csic.iiia.planes.maxsum.centralized.CostFactor;
+import es.csic.iiia.planes.maxsum.centralized.IndependentFactor;
 import es.csic.iiia.planes.messaging.Message;
 import org.hamcrest.Matcher;
 import org.hamcrest.Matchers;

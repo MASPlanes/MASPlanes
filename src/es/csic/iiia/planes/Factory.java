@@ -38,7 +38,7 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.definition.DTask;
-import es.csic.iiia.planes.maxsum.algo.CostFactor;
+import es.csic.iiia.planes.maxsum.centralized.CostFactor;
 import java.util.List;
 
 /**

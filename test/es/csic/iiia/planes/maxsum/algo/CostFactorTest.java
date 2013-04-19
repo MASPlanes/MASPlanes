@@ -36,6 +36,10 @@
  */
 package es.csic.iiia.planes.maxsum.algo;
 
+import es.csic.iiia.planes.maxsum.centralized.Message;
+import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
+import es.csic.iiia.planes.maxsum.centralized.KAlphaFunction;
+import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
 import static org.junit.Assert.*;
 import org.junit.Test;
 

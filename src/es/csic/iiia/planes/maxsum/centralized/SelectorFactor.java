@@ -34,61 +34,40 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.algo;
-
-import es.csic.iiia.planes.maxsum.centralized.Message;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import static org.junit.Assert.*;
-import org.junit.Test;
+package es.csic.iiia.planes.maxsum.centralized;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class SelectorFactorTest {
+public class SelectorFactor extends AbstractFactor {
 
-    private final double DELTA = 0.0001d;
+    private Minimizer<Factor> minimizer = new Minimizer<Factor>();
 
-    @Test
-    public void testRun1() {
-        double[] values  = new double[]{0, 1, 2};
-        double[] results = new double[]{-1, 0, 0};
-        run(values, results);
-    }
+    @Override
+    public void gather() {
 
-    @Test
-    public void testRun2() {
-        double[] values  = new double[]{0, 0, 2};
-        double[] results = new double[]{0, 0, 0};
-        run(values, results);
-    }
-
-    @Test
-    public void testRun3() {
-        double[] values  = new double[]{-1, 2};
-        double[] results = new double[]{-2, 1};
-        run(values, results);
-    }
-
-    private void run(double[] values, double[] results) {
-
-        // Setup incoming messages
-        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
-        SelectorFactor s = new SelectorFactor();
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new WorkloadFactor();
-            s.addNeighbor(cfs[i]);
-            s.receive(new Message(cfs[i], values[i]));
+        // Compute the minimums
+        minimizer.reset();
+        for (Factor f : getNeighbors()) {
+            Message msg = getMessage(f);
+            minimizer.track(f, msg.value);
         }
 
-        // The tick is to make the messages current
-        s.tick();
-        s.gather();
+    }
 
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i].tick();
-            assertEquals(cfs[i].getMessage(s).value, results[i], DELTA);
+    @Override
+    public void scatter() {
+        // Send messages
+        for (Factor f : getNeighbors()) {
+            final double value = - minimizer.getComplementary(f);
+            Message msg = buildMessage(value);
+            send(msg, f);
         }
     }
+
+    public Factor select() {
+        return minimizer.getBest();
+    }
+
 }

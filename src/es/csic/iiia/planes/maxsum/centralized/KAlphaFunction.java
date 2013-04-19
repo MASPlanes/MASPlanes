@@ -34,61 +34,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.algo;
-
-import es.csic.iiia.planes.maxsum.centralized.Message;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import static org.junit.Assert.*;
-import org.junit.Test;
+package es.csic.iiia.planes.maxsum.centralized;
 
 /**
+ * Workload function that computes the extra cost of activating <em>n</em>
+ * variables (servicing <em>n</em> requests) as <em>k*n^alpha</em>.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class SelectorFactorTest {
+public class KAlphaFunction implements WorkloadFunction {
 
-    private final double DELTA = 0.0001d;
+    private double k;
+    private double alpha;
 
-    @Test
-    public void testRun1() {
-        double[] values  = new double[]{0, 1, 2};
-        double[] results = new double[]{-1, 0, 0};
-        run(values, results);
+    /**
+     * Build a new k-alpha workload function.
+     *
+     * @param k k value to employ
+     * @param alpha alpha value to employ
+     */
+    public KAlphaFunction(double k, double alpha) {
+        this.k = k;
+        this.alpha = alpha;
     }
 
-    @Test
-    public void testRun2() {
-        double[] values  = new double[]{0, 0, 2};
-        double[] results = new double[]{0, 0, 0};
-        run(values, results);
+    /**
+     * Get the cost of activating <em>n</em> variables.
+     *
+     * @param n number of variables to activate
+     * @return cost associated to activating <em>n</em> variables
+     */
+    @Override
+    public double getCost(int n) {
+        return k * Math.pow(n, alpha);
     }
 
-    @Test
-    public void testRun3() {
-        double[] values  = new double[]{-1, 2};
-        double[] results = new double[]{-2, 1};
-        run(values, results);
-    }
-
-    private void run(double[] values, double[] results) {
-
-        // Setup incoming messages
-        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
-        SelectorFactor s = new SelectorFactor();
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new WorkloadFactor();
-            s.addNeighbor(cfs[i]);
-            s.receive(new Message(cfs[i], values[i]));
-        }
-
-        // The tick is to make the messages current
-        s.tick();
-        s.gather();
-
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i].tick();
-            assertEquals(cfs[i].getMessage(s).value, results[i], DELTA);
-        }
-    }
 }

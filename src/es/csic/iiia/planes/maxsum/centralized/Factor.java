@@ -34,61 +34,63 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.algo;
+package es.csic.iiia.planes.maxsum.centralized;
 
-import es.csic.iiia.planes.maxsum.centralized.Message;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import static org.junit.Assert.*;
-import org.junit.Test;
+import es.csic.iiia.planes.cli.Configuration;
+import java.util.List;
 
 /**
+ * Basic definition of a MaxSum factor.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class SelectorFactorTest {
+public interface Factor {
 
-    private final double DELTA = 0.0001d;
+    /**
+     * Adds a new neighbor of this factor (graph link).
+     *
+     * @param factor new neighbor.
+     */
+    public void addNeighbor(Factor factor);
 
-    @Test
-    public void testRun1() {
-        double[] values  = new double[]{0, 1, 2};
-        double[] results = new double[]{-1, 0, 0};
-        run(values, results);
-    }
+    /**
+     * Get the neighbors of this factor.
+     *
+     * @return neighbors of this factor
+     */
+    public List<Factor> getNeighbors();
 
-    @Test
-    public void testRun2() {
-        double[] values  = new double[]{0, 0, 2};
-        double[] results = new double[]{0, 0, 0};
-        run(values, results);
-    }
+    /**
+     * Receive a message.
+     *
+     * The message sender is available within the message itself.
+     *
+     * @see Message#sender
+     * @param message message to receive
+     */
+    public void receive(Message message);
 
-    @Test
-    public void testRun3() {
-        double[] values  = new double[]{-1, 2};
-        double[] results = new double[]{-2, 1};
-        run(values, results);
-    }
+    /**
+     * Send a message to a neighboring factor.
+     *
+     * @param message message to send
+     * @param recipient intended recipient
+     */
+    public void send(Message message, Factor recipient);
 
-    private void run(double[] values, double[] results) {
+    /**
+     * Perform any actions necessary when the clock advances one tick.
+     */
+    public void tick();
 
-        // Setup incoming messages
-        WorkloadFactor[] cfs = new WorkloadFactor[values.length];
-        SelectorFactor s = new SelectorFactor();
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i] = new WorkloadFactor();
-            s.addNeighbor(cfs[i]);
-            s.receive(new Message(cfs[i], values[i]));
-        }
+    /**
+     * Run the gather phase of this factor (integrate incoming messages).
+     */
+    public void gather();
 
-        // The tick is to make the messages current
-        s.tick();
-        s.gather();
+    /**
+     * Run the scatter phase of this factor (send outgoing messages).
+     */
+    public void scatter();
 
-        for (int i=0; i<cfs.length; i++) {
-            cfs[i].tick();
-            assertEquals(cfs[i].getMessage(s).value, results[i], DELTA);
-        }
-    }
 }
