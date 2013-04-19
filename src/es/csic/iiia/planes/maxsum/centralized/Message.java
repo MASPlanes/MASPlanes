@@ -37,6 +37,7 @@
 package es.csic.iiia.planes.maxsum.centralized;
 
 /**
+ * Single-valued message exchanged by the max-sum factors.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */

@@ -34,7 +34,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.centralized.util;
+package es.csic.iiia.planes.util;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

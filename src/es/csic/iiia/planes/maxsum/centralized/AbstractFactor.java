@@ -42,6 +42,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
+ * Skeletal implementation of a Max-Sum factor.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -51,16 +52,31 @@ public abstract class AbstractFactor implements Factor {
     private Map<Factor, Message> curMessages = new HashMap<Factor, Message>();
     private List<Factor> neighbors = new ArrayList<Factor>();
 
+    /**
+     * Add a neighbor (edge) of this factor.
+     *
+     * @param factor new neighbor.
+     */
     @Override
     public void addNeighbor(Factor factor) {
         neighbors.add(factor);
     }
 
+    /**
+     * Get the list of neighbors (edges) of this factor.
+     * @return list of edges of this factor.
+     */
     @Override
     public List<Factor> getNeighbors() {
         return neighbors;
     }
 
+    /**
+     * Get the message received from the given neighor.
+     *
+     * @param neighbor neighbor whose message to get.
+     * @return message received from the given neighbor.
+     */
     public Message getMessage(Factor neighbor) {
         if (curMessages.containsKey(neighbor)) {
             return curMessages.get(neighbor);
@@ -84,10 +100,6 @@ public abstract class AbstractFactor implements Factor {
         curMessages = newMessages;
         newMessages = tmp;
         newMessages.clear();
-    }
-
-    protected Message buildMessage(double value) {
-        return new Message(this, value);
     }
 
 }

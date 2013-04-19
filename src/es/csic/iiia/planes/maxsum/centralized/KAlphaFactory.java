@@ -40,7 +40,9 @@ import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.cli.Configuration;
 
 /**
- *
+ * Cost function factory that builds K-Alpha functions (with fixed k and alpha
+ * taken from the simulator's configuration).
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class KAlphaFactory implements WorkloadFunctionFactory {

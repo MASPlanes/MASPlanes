@@ -39,9 +39,20 @@ package es.csic.iiia.planes.maxsum.centralized;
 import es.csic.iiia.planes.Plane;
 
 /**
+ * Factory that builds the appropiate workload function, according to the
+ * configuration.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface WorkloadFunctionFactory {
+
+    /**
+     * Builds a new workload function, according to the simulator's
+     * configuration.
+     *
+     * @param plane Plane that will employ this workload function.
+     * @return newly built workload function.
+     */
     public WorkloadFunction build(Plane plane);
+
 }

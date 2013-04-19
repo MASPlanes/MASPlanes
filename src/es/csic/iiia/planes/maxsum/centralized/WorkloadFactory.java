@@ -40,7 +40,8 @@ import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.cli.Configuration;
 
 /**
- *
+ * CostFactor factory that builds Workload factors.
+ * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class WorkloadFactory implements CostFactorFactory {

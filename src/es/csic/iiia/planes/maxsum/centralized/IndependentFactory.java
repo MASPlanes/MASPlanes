@@ -39,6 +39,7 @@ package es.csic.iiia.planes.maxsum.centralized;
 import es.csic.iiia.planes.Plane;
 
 /**
+ * CostFactor factory that builds independent cost factors.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */

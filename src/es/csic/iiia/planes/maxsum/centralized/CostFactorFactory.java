@@ -36,12 +36,32 @@
  */
 package es.csic.iiia.planes.maxsum.centralized;
 
+import es.csic.iiia.planes.Factory;
 import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.World;
 
 /**
+ * Factory that builds the CostFactor factors.
+ * <p/>
+ * The exact CostFactor used depends on the simulator's configuration, that is
+ * retrieved through the plane.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface CostFactorFactory {
+
+    /**
+     * Build a new {@link CostFactor}
+     * <p>
+     * The type of CostFactor used depends on the simulator's configuration,
+     * that is accessed through the plane.
+     *
+     * @see Plane#getWorld()
+     * @see World#getFactory()
+     * @see Factory#getConfiguration()
+     * @param plane plane that this CostFactor represents
+     * @return newly build CostFactor.
+     */
     public CostFactor build(Plane plane);
+    
 }

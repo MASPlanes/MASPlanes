@@ -152,7 +152,7 @@ public class WorkloadFactor extends CostFactor {
 
             final Factor f = vals_and_indices.get(pos).factor;
             double value = msg1 - msg0 + getCost(f);
-            Message msg = buildMessage(value);
+            Message msg = new Message(this, value);
             send(msg, f);
         }
 

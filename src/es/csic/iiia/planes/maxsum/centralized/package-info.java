@@ -1,7 +1,7 @@
 /*
  * Software License Agreement (BSD License)
  *
- * Copyright 2013 Marc Pujol <mpujol@iiia.csic.es>.
+ * Copyright 2012 Marc Pujol <mpujol@iiia.csic.es>.
  *
  * Redistribution and use of this software in source and binary forms, with or
  * without modification, are permitted provided that the following conditions
@@ -34,46 +34,9 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.maxsum.centralized;
 
 /**
- * Max-sum selector factor (s_r in the paper).
- *
- * @author Marc Pujol <mpujol@iiia.csic.es>
+ * Implementaiton of the max-sum algorithm as interactions between factors,
+ * without any relationship to planes and tasks.
  */
-public class SelectorFactor extends AbstractFactor {
-
-    private Minimizer<Factor> minimizer = new Minimizer<Factor>();
-
-    @Override
-    public void gather() {
-
-        // Compute the minimums
-        minimizer.reset();
-        for (Factor f : getNeighbors()) {
-            Message msg = getMessage(f);
-            minimizer.track(f, msg.value);
-        }
-
-    }
-
-    @Override
-    public void scatter() {
-        // Send messages
-        for (Factor f : getNeighbors()) {
-            final double value = - minimizer.getComplementary(f);
-            Message msg = new Message(this, value);
-            send(msg, f);
-        }
-    }
-
-    /**
-     * Pick the "winning" neighboring factor.
-     *
-     * @return the best fitting neighbor factor.
-     */
-    public Factor select() {
-        return minimizer.getBest();
-    }
-
-}
+package es.csic.iiia.planes.maxsum.centralized;
