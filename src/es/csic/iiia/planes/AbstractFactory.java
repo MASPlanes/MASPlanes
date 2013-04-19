@@ -41,10 +41,8 @@ import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.idle.IdleStrategy;
 import es.csic.iiia.planes.maxsum.algo.CostFactor;
-import es.csic.iiia.planes.maxsum.algo.WorkloadFactor;
 import java.lang.reflect.Constructor;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**

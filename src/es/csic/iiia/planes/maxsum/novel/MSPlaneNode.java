@@ -46,7 +46,7 @@ import java.util.logging.Logger;
 
 /**
  * Max-sum plane node.
- * 
+ *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSPlaneNode {
@@ -58,7 +58,7 @@ public class MSPlaneNode {
 
     /**
      * Build a new plane node for the given plane.
-     * 
+     *
      * @param plane plane that this node represents.
      */
     public MSPlaneNode(Plane plane) {
@@ -68,14 +68,13 @@ public class MSPlaneNode {
 
     /**
      * Add a new task that can be serviced by this plane.
-     * 
+     *
      * @param task task that can be serviced by this plane.
      * @param location plane where this task's node is running (its current owner)
      */
     public void addNeighbor(Task task, Plane location) {
         PlaneProxyFactor proxy = new PlaneProxyFactor(plane, task, location);
         factor.addNeighbor(proxy);
-        factor.setPotential(proxy, plane.getCost(task));
         proxy.addNeighbor(factor);
         proxies.put(task, proxy);
     }
@@ -96,12 +95,13 @@ public class MSPlaneNode {
     public void removeNeighbor(Task task) {
         ProxyFactor<Plane, Task> proxy = proxies.remove(task);
         factor.removeCost(proxy);
+        factor.getNeighbors().remove(proxy);
     }
 
     /**
      * Receive a network message, and deliver it through the corresponding
      * proxy.
-     * 
+     *
      * @param message message to receive
      */
     public void receive(MSMessage<Task, Plane> message) {
@@ -114,11 +114,23 @@ public class MSPlaneNode {
     }
 
     /**
-     * Run a single iteration of this node.
+     * Run the gather phase of this node.
      */
-    public void run() {
+    public void gather() {
         factor.tick();
-        factor.run();
+        factor.gather();
+    }
+
+    /**
+     * Run the scatter phase of this node.
+     */
+    public void scatter() {
+        // Set the potentials first
+        for (Task t : proxies.keySet()) {
+            factor.setPotential(proxies.get(t), plane.getCost(t));
+        }
+
+        factor.scatter();
     }
 
     @Override

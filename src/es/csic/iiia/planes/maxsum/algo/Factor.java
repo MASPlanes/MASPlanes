@@ -84,8 +84,13 @@ public interface Factor {
     public void tick();
 
     /**
-     * Run an iteration of this factor.
+     * Run the gather phase of this factor (integrate incoming messages).
      */
-    public void run();
+    public void gather();
+
+    /**
+     * Run the scatter phase of this factor (send outgoing messages).
+     */
+    public void scatter();
 
 }

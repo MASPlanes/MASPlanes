@@ -55,7 +55,7 @@ import org.junit.Test;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSPlaneNodeTest {
-    
+
     @Rule public JUnitRuleMockery context = new JUnitRuleMockery();
 
     /**
@@ -121,14 +121,13 @@ public class MSPlaneNodeTest {
         instance.receive(message2);
         instance.receive(message3);
 
-        instance.run();
-
-        context.assertIsSatisfied();
+        instance.gather();
+        instance.scatter();
     }
-    
+
     private Matcher matchMessageValue(double value) {
         return Matchers.allOf(
-            Matchers.any(Message.class), 
+            Matchers.any(Message.class),
             Matchers.hasProperty("value", Matchers.equalTo(value))
         );
     }

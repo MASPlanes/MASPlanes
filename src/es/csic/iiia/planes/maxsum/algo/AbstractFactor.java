@@ -40,7 +40,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
@@ -84,6 +83,7 @@ public abstract class AbstractFactor implements Factor {
         Map<Factor, Message> tmp = curMessages;
         curMessages = newMessages;
         newMessages = tmp;
+        newMessages.clear();
     }
 
     protected Message buildMessage(double value) {

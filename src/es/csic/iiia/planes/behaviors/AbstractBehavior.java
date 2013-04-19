@@ -56,10 +56,10 @@ public abstract class AbstractBehavior implements Behavior {
     public AbstractBehavior(MessagingAgent agent) {
         this.agent = agent;
     }
-    
+
     /**
      * Behaviors are not promiscuous by default
-     * 
+     *
      * @return <em>false</em>
      */
     @Override
@@ -71,13 +71,25 @@ public abstract class AbstractBehavior implements Behavior {
     public void initialize() {}
 
     @Override
+    public void preStep() {}
+
+    @Override
+    public void beforeMessages() {}
+
+    @Override
+    public void afterMessages() {}
+
+    @Override
+    public void postStep() {}
+
+    @Override
     public MessagingAgent getAgent() {
         return agent;
     }
 
     /**
      * Get the configuraton of the simulator.
-     * 
+     *
      * @return configuration of the simulator.
      */
     protected Configuration getConfiguration() {

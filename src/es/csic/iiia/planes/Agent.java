@@ -63,4 +63,14 @@ public interface Agent extends Element {
      */
     public void step();
 
+    /**
+     * Post-action method for the Agents.
+     * <p/>
+     * This method is also called every tenth of second. However, all of the
+     * <em>postStep</em> calls are made after any {@link #step()} call is done
+     * in the current iteration. This allows agents to perform some sort
+     * of "finalization" after each step.
+     */
+    public void postStep();
+
 }

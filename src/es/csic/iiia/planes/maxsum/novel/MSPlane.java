@@ -94,6 +94,7 @@ public class MSPlane extends AbstractPlane {
     @Override
     protected void taskAdded(Task t) {
         // Create a node for this task
+        LOG.log(Level.FINE, "{0} now owns {1}", new Object[]{this, t});
         MSTaskNode node = new MSTaskNode(this, t);
         node.addNeighbor(this);
         planeFunction.addNeighbor(t, this);
@@ -104,6 +105,7 @@ public class MSPlane extends AbstractPlane {
     @Override
     protected void taskRemoved(Task t) {
         // Cleanup any actions done at taskAdded...
+        LOG.log(Level.FINE, "{0} is no longer the owner of {1}", new Object[]{this, t});
         MSTaskNode n = taskFunctions.get(t);
         n.clearNeighbors();
         taskFunctions.remove(t);

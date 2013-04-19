@@ -45,7 +45,7 @@ public class SelectorFactor extends AbstractFactor {
     private Minimizer<Factor> minimizer = new Minimizer<Factor>();
 
     @Override
-    public void run() {
+    public void gather() {
 
         // Compute the minimums
         minimizer.reset();
@@ -54,13 +54,16 @@ public class SelectorFactor extends AbstractFactor {
             minimizer.track(f, msg.value);
         }
 
+    }
+
+    @Override
+    public void scatter() {
         // Send messages
         for (Factor f : getNeighbors()) {
             final double value = - minimizer.getComplementary(f);
             Message msg = buildMessage(value);
             send(msg, f);
         }
-
     }
 
     public Factor select() {

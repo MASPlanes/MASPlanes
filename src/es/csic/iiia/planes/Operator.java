@@ -155,6 +155,12 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
     }
 
     /**
+     * Do nothing, because no step finalization is needed by the operator.
+     */
+    @Override
+    public void postStep() {}
+
+    /**
      * Create a simulation Task from the given Task definition.
      *
      * @param task definition.

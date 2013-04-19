@@ -218,6 +218,9 @@ public abstract class AbstractWorld implements World {
         for (Agent a : agents) {
             a.step();
         }
+        for (Agent a : agents) {
+            a.postStep();
+        }
     }
 
     /**

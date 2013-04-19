@@ -37,7 +37,7 @@
 package es.csic.iiia.planes.util;
 
 import es.csic.iiia.planes.behaviors.Behavior;
-import es.csic.iiia.planes.messaging.AbstractBehaviorAgent;
+import es.csic.iiia.planes.behaviors.AbstractBehaviorAgent;
 import java.util.ArrayList;
 import java.util.List;
 import org.jgrapht.graph.DefaultDirectedGraph;

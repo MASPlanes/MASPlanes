@@ -89,7 +89,7 @@ public class CostFactorTest {
 
         // The tick is to make the messages current
         c.tick();
-        c.run();
+        c.gather();
 
         double[] results = new double[expected.length];
         for (int i=0; i<sfs.length; i++) {

@@ -42,7 +42,7 @@ import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.idle.IdleStrategy;
-import es.csic.iiia.planes.messaging.AbstractBehaviorAgent;
+import es.csic.iiia.planes.behaviors.AbstractBehaviorAgent;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;

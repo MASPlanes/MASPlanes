@@ -81,7 +81,7 @@ public class SelectorFactorTest {
 
         // The tick is to make the messages current
         s.tick();
-        s.run();
+        s.gather();
 
         for (int i=0; i<cfs.length; i++) {
             cfs[i].tick();

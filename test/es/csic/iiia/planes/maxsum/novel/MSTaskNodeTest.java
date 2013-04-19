@@ -131,8 +131,9 @@ public class MSTaskNodeTest {
             exactly(2).of(recipient).send(with(any(Message.class)));
         }});
 
-        instance.run();
+        instance.gather();
         assertEquals(sender2, instance.makeDecision());
+        instance.scatter();
     }
 
 //    /**

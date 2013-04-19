@@ -39,6 +39,7 @@ package es.csic.iiia.planes.maxsum.novel;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import java.util.Map;
+import java.util.logging.Logger;
 
 /**
  * Behavior that implements the actual max-sum algorithm.
@@ -46,6 +47,7 @@ import java.util.Map;
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class MSExecutionBehavior extends AbstractBehavior {
+    private static final Logger LOG = Logger.getLogger(MSExecutionBehavior.class.getName());
 
     public MSExecutionBehavior(MSPlane plane) {
         super(plane);
@@ -74,7 +76,11 @@ public class MSExecutionBehavior extends AbstractBehavior {
      */
     public void on(MSPlane2Task msg) {
         MSTaskNode recipient = getAgent().getTaskFunction(msg.getLogicalRecipient());
-        if (recipient != null) {
+        if (recipient == null) {
+            if (getAgent().getTasks().contains(msg.getLogicalRecipient())) {
+                throw new RuntimeException("Unreachable code.");
+            }
+        } else {
             recipient.receive(msg);
         }
     }
@@ -103,10 +109,29 @@ public class MSExecutionBehavior extends AbstractBehavior {
         final Map<Task, MSTaskNode> functions = getAgent().getTaskFunctions();
 
         // Everyone gather
-        variable.run();
+        variable.gather();
         for (MSTaskNode f : functions.values()) {
-            f.run();
+            f.gather();
         }
     }
+
+    @Override
+    public void postStep() {
+        final long remainder = getAgent().getWorld().getTime() % getConfiguration().getMsStartEvery();
+        if (getAgent().isInactive() || remainder < 1 || remainder >= getConfiguration().getMsIterations()) {
+            return;
+        }
+
+        final MSPlaneNode variable = getAgent().getPlaneFunction();
+        final Map<Task, MSTaskNode> functions = getAgent().getTaskFunctions();
+
+        // Everyone scatter
+        variable.scatter();
+        for (MSTaskNode f : functions.values()) {
+            f.scatter();
+        }
+    }
+
+
 
 }

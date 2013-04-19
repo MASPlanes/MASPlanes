@@ -45,7 +45,7 @@ import java.util.List;
 /**
  * Proxy factor that connects two (possibly) remotely running factors through
  * the plane's network layer.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
@@ -102,7 +102,7 @@ public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
     public Plane getToLocation() {
         return toLocation;
     }
-    
+
     /**
      * Builds an outgoing message of a specific type.
      * @return specific outgoing message
@@ -128,7 +128,7 @@ public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
     /**
      * Receive a network message, forwarding it to the local max-sum node as a
      * logical message.
-     * 
+     *
      * @param message message to receive.
      */
     public void receive(MSMessage message) {
@@ -138,7 +138,7 @@ public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
 
     /**
      * Set the neighbor (logical factor for which we are proxying) of this proxy
-     * 
+     *
      * @param factor logical factor
      */
     @Override
@@ -181,6 +181,12 @@ public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
      * Do nothing, since this is not a "real" factor.
      */
     @Override
-    public void run() {}
+    public void gather() {}
+
+    /**
+     * Do nothing, since this is not a "real" factor.
+     */
+    @Override
+    public void scatter() {}
 
 }

@@ -89,15 +89,27 @@ public interface Behavior {
     public boolean isPromiscuous();
 
     /**
-     * Implements actions to be performed by this behavior *before* receiving
-     * any messages from the current iteration.
+     * Implements actions to be performed by this behavior *before* any other
+     * agent has started processing messages.
+     */
+    public void preStep();
+
+    /**
+     * Implements actions to be performed by this behavior *before* this agent
+     * has processed any messages from the current iteration.
      */
     public void beforeMessages();
 
     /**
-     * Implements action to be performed *after* receiving all the messages
-     * from the current iteration.
+     * Implements action to be performed *after* this agent has processed all
+     * the messages from the current iteration.
      */
     public void afterMessages();
+
+    /**
+     * Implements actions to be performed by this behavior *after* all other
+     * agents have finished processing messages.
+     */
+    public void postStep();
 
 }

@@ -45,13 +45,21 @@ package es.csic.iiia.planes.maxsum.algo;
 public class IndependentFactor extends CostFactor {
 
     /**
+     * This factor ignores incoming messages, so the gather phase is empty.
+     */
+    @Override
+    public void gather() {
+
+    }
+
+    /**
      * Run an iteration of this factor.
      *
      * In this case, this amounts to sending the cost associated to each
      * of its neighbors out.
      */
     @Override
-    public void run() {
+    public void scatter() {
         for (Factor f : getNeighbors()) {
             Message message = new Message(this, getCost(f));
             send(message, f);

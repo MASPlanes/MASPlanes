@@ -34,12 +34,13 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.messaging;
+package es.csic.iiia.planes.behaviors;
 
 import es.csic.iiia.planes.AbstractMessagingAgent;
 import es.csic.iiia.planes.AbstractPositionedElement;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.behaviors.Behavior;
+import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.util.DependencyResolver;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -173,6 +174,9 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
      * <p/>
      * In this case, the step initialization is to turn the "future" messages
      * of the previous iteration into the "current" ones for this iteration.
+     * <p/>
+     * Additionally, it gives the opportunity for behaviors to initialize
+     * themselves.
      */
     @Override
     public void preStep() {
@@ -180,6 +184,10 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
         tmp.clear();
         currentMessages = futureMessages;
         futureMessages = tmp;
+
+        for (Behavior b : behaviors) {
+            b.preStep();
+        }
     }
 
     /**
@@ -199,6 +207,19 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
             b.afterMessages();
         }
 
+    }
+
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * In this case, it gives the opportunity for behaviors to finalize the
+     * current iteration.
+     */
+    @Override
+    public void postStep() {
+        for (Behavior b : behaviors) {
+            b.postStep();
+        }
     }
 
     @Override

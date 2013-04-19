@@ -47,7 +47,7 @@ import java.util.logging.Logger;
 
 /**
  * Max-sum task node to run inside a plane.
- * 
+ *
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class MSTaskNode {
@@ -60,7 +60,7 @@ public class MSTaskNode {
 
     /**
      * Build a new node for the given task, running inside the specified plane.
-     * 
+     *
      * @param plane plane where this node runs
      * @param task task that this node represents
      */
@@ -72,7 +72,7 @@ public class MSTaskNode {
 
     /**
      * Add a new candidate plane to service this node's task.
-     * 
+     *
      * @param remote candidate plane
      */
     public void addNeighbor(Plane remote) {
@@ -92,41 +92,56 @@ public class MSTaskNode {
 
     /**
      * Receive a network message.
-     * 
+     *
      * @param message message to receive
      */
     public void receive(MSMessage<Plane, Task> message) {
-        LOG.log(Level.FINER, "{0} receives {1}", new Object[]{this, message});
-        proxies.get(message.getLogicalSender()).receive(message);
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "{0} receives {1}", new Object[]{this, message});
+        }
+
+        final Plane p = message.getLogicalSender();
+        if (p == null || !proxies.containsKey(p)) {
+            LOG.severe("A task node just received a message from an unknown neighbor.");
+            throw new RuntimeException("Unreachable code.");
+        }
+        proxies.get(p).receive(message);
     }
 
     /**
-     * Run a single iteration of this node.
+     * Run the gather phase of this node.
      */
-    public void run() {
+    public void gather() {
         factor.tick();
-        factor.run();
+        factor.gather();
+    }
+
+    /**
+     * Run the scatter phase of this node.
+     */
+    public void scatter() {
+        factor.scatter();
     }
 
     /**
      * Pick the most suitable plane to become the new owner of this node's
      * task.
-     * 
+     *
      * @return most suitable plane to service this task (at the current time)
      */
     public Plane makeDecision() {
         Factor choice = factor.select();
-        
+
         // This task has not been negotiated yet
         if (choice == null) {
             return plane;
         }
-        
+
         if (choice instanceof ProxyFactor) {
             ProxyFactor<Task, Plane> f = (ProxyFactor<Task, Plane>)choice;
             return f.getTo();
         }
-        
+
         throw new RuntimeException("Unreachable code.");
     }
 

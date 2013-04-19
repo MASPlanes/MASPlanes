@@ -36,11 +36,11 @@
  */
 package es.csic.iiia.planes.behaviors.neighbors;
 
-import es.csic.iiia.planes.AbstractPlane;
+import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.AbstractMessage;
-import es.csic.iiia.planes.MessagingAgent;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -156,7 +156,8 @@ public class NeighborTracking extends AbstractBehavior {
 
         // Compute the number of steps that the neighbor is guaranteed to still
         // be in range.
-        final double d = getAgent().getLocation().distance(neighbor.getLocation());
+        LOG.log(Level.FINEST, "My location: {0}, theirs: {1}", new Object[]{getAgent().getLocation(), m.getLocation()});
+        final double d = getAgent().getLocation().getDistance(m.getLocation());
 
         double d_step = getAgent().getSpeed();
         if (neighbor instanceof Plane) {
@@ -166,6 +167,7 @@ public class NeighborTracking extends AbstractBehavior {
         // The objective is max(n) s.t. d + d_step * n < comm_range
         // we compute that as n=int(s) where s = (comm_range - d)/d_step
         final double s = (getAgent().getCommunicationRange() - d) / d_step;
+        LOG.log(Level.FINEST, "d = {0}, d_step = {1}, range = {2}", new Object[]{d, d_step, getAgent().getCommunicationRange()});
         final int n = (int)s;
 
         if (n > 0) {
@@ -185,18 +187,28 @@ public class NeighborTracking extends AbstractBehavior {
      * and every new agent detected or lost.
      */
     @Override
-    public void afterMessages() {
+    public void postStep() {
         MessagingAgent a = getAgent();
         if (LOG.isLoggable(Level.FINER)) {
             LOG.log(Level.FINER, "{0} sending beacon.", new Object[]{a});
         }
-        a.send(new TrackingMessage());
+        a.send(new TrackingMessage(a.getLocation()));
     }
 
     /**
      * Beacon message sent by agents that keep track of their neighbors.
      */
     public class TrackingMessage extends AbstractMessage {
+
+        private final Location location;
+
+        public TrackingMessage(Location location) {
+            this.location = new Location(location);
+        }
+
+        public Location getLocation() {
+            return location;
+        }
 
         @Override
         public String toString() {

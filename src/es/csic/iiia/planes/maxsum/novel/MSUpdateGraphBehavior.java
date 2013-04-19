@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.maxsum.novel;
 
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
@@ -48,7 +49,7 @@ import java.util.logging.Logger;
 /**
  * Behavior that re-builds the Max-Sum graph to represent the current planes,
  * tasks and their connections.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 class MSUpdateGraphBehavior extends AbstractBehavior {
@@ -60,7 +61,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
     /**
      * Build a new max-sum graph updating behavior.
-     * 
+     *
      * @param plane plane that will exhibit this behavior.
      */
     public MSUpdateGraphBehavior(MSPlane plane) {
@@ -70,7 +71,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
 
     /**
      * Get the dependencies of this behavior.
-     * 
+     *
      * @return an array with {@link NeighborTracking} as its only entry.
      */
     @Override
@@ -123,7 +124,7 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             neighbors.add(p);
 
             for (Task t : p.getTasks()) {
-                pn.addNeighbor(t, plane);
+                pn.addNeighbor(t, p);
                 nPendingTasks++;
             }
 
@@ -148,7 +149,6 @@ class MSUpdateGraphBehavior extends AbstractBehavior {
             }
             LOG.log(Level.FINEST, "Plane factor: {0}", pn);
         }
-
     }
 
 }

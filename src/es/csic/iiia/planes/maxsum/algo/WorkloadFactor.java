@@ -60,7 +60,10 @@ public class WorkloadFactor extends CostFactor {
     }
 
     @Override
-    public void run() {
+    public void gather() {}
+
+    @Override
+    public void scatter() {
 
         final int size = getNeighbors().size();
 

@@ -104,7 +104,8 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         final int n = w.getFactory().getConfiguration().getMsIterations();
         for (int i=0; i<n; i++) {
             for (Factor f : factors) f.tick();
-            for (Factor f : factors) f.run();
+            for (Factor f : factors) f.gather();
+            for (Factor f : factors) f.scatter();
         }
 
         // Fetch the assignments
