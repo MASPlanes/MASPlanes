@@ -40,6 +40,7 @@ import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.maxsum.centralized.CostFactor;
+import es.csic.iiia.planes.maxsum.centralized.CostFactorFactory;
 import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
 import es.csic.iiia.planes.maxsum.centralized.WorkloadFunction;
 import es.csic.iiia.planes.maxsum.centralized.Factor;
@@ -67,10 +68,7 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         TreeMap<Task, OmniscientPlane> reverseMap)
     {
         // Create the workload cost function
-        WorkloadFunction workloadFunction = new KAlphaFunction(
-                w.getFactory().getConfiguration().getMsWorkloadK(),
-                w.getFactory().getConfiguration().getMsWorkloadAlpha()
-        );
+        CostFactorFactory factory = w.getFactory().getConfiguration().getMsCostFactorFactory();
 
         List<Factor> factors = new ArrayList<Factor>();
 
@@ -83,11 +81,10 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         }
 
         // Create a cost factor for each plane
-        Map<WorkloadFactor, OmniscientPlane> cost2plane =
-                new HashMap<WorkloadFactor, OmniscientPlane>();
+        Map<CostFactor, OmniscientPlane> cost2plane =
+                new HashMap<CostFactor, OmniscientPlane>();
         for (OmniscientPlane p : planes) {
-            final WorkloadFactor c = new WorkloadFactor();
-            c.setFunction(workloadFunction);
+            final CostFactor c = factory.build(p);
             factors.add(c);
             cost2plane.put(c, p);
 
