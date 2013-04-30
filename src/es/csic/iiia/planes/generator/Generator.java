@@ -75,6 +75,7 @@ public class Generator {
      */
     public void run() {
         DProblem p = createProblemDefinition();
+        p.setGeneratorSettings(config.getGeneratorSettings());
         addPlanes(p);
         addOperators(p);
         addTasks(p);

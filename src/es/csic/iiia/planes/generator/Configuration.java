@@ -197,6 +197,10 @@ public class Configuration {
         return hotspotFreedomDegrees;
     }
 
+    public HashMap<String, String> getGeneratorSettings() {
+        return generatorSettings;
+    }
+
     public BufferedWriter getOutputFile() {
         return outputFile;
     }
