@@ -60,20 +60,20 @@ import javax.swing.JPanel;
  * @author Marc Pujol <mpujol at iiia.csic.es>
  */
 public class TimeHistogramPane extends JPanel {
-    
+
     public static final int DEFAULT_HEIGHT = 25;
     public static final int DEFAULT_WIDTH = 1000;
-    
+
     private BufferedImage buffer;
     private final Display display;
     private final DProblem problem;
-    
+
     public TimeHistogramPane(Display display, DProblem p) {
         this.display = display;
         this.problem = p;
         buildBuffer(p);
     }
- 
+
     private void buildBuffer(DProblem p) {
         buffer = new BufferedImage(DEFAULT_WIDTH, DEFAULT_HEIGHT, BufferedImage.TYPE_INT_RGB);
         double[][] bins = new double[p.getnCrisis()][DEFAULT_WIDTH];
@@ -101,7 +101,7 @@ public class TimeHistogramPane extends JPanel {
             }
         }
 
-        System.err.println(Arrays.deepToString(bins));
+        //System.err.println(Arrays.deepToString(bins));
 
         // Fetch the colors, without alpha
         Color[] colors = new Color[p.getnCrisis()];
@@ -128,18 +128,18 @@ public class TimeHistogramPane extends JPanel {
             }
         }
     }
-    
+
     @Override
     public void paint(Graphics grphcs) {
         super.paint(grphcs);
-        
+
         Graphics2D g = (Graphics2D)grphcs;
         Dimension d = getSize();
         double xscale = d.width  / (double)DEFAULT_WIDTH;
         double yscale = d.height / (double)DEFAULT_HEIGHT;
         AffineTransform t = AffineTransform.getScaleInstance(xscale, yscale);
         g.drawImage(buffer, t, null);
-        
+
         // Time
         int time = (int)(display.getTime() * d.width / problem.getDuration());
         g.setColor(Color.BLUE);
@@ -147,5 +147,5 @@ public class TimeHistogramPane extends JPanel {
         g.draw(new Line2D.Double(time, 0, time, d.height));
     }
 
-    
+
 }

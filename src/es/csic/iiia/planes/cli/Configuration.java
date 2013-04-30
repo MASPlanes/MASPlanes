@@ -192,6 +192,10 @@ public final class Configuration {
         values.put("problem", problemFile);
         try {
             d = mapper.readValue(new File(getProblemFile()), DProblem.class);
+            // Register the generator settings used to generate this problem
+            for (String key : d.getGeneratorSettings().keySet()) {
+                values.put("g-" + key, d.getGeneratorSettings().get(key));
+            }
         } catch (IOException ex) {
             throw new IllegalArgumentException("Error reading problem file \"" + getProblemFile() + "\"");
         }

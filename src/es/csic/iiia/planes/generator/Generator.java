@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.generator;
 
+import es.csic.iiia.planes.util.MultivariateUniformDistribution;
 import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.definition.DProblem;
@@ -46,13 +47,10 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.math3.distribution.MultivariateNormalDistribution;
 import org.apache.commons.math3.distribution.MultivariateRealDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.random.EmpiricalDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.codehaus.jackson.map.ObjectMapper;
@@ -64,43 +62,12 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class Generator {
 
-    // Duration in tenths of second (10us/s * 60s/m * 60m/h * 24h/d * 30d/month)
-    private long duration = 10L * 60L * 60L * 24L * 30L;
-    private int width = 10000;
-    private int height = 10000;
-    private int num_planes = 10;
-    private int num_operators = 1;
-    // 1 task per minute
-    private int num_tasks = 60*24*30;
-    private int num_stations = 1;
-    private int num_crisis = 5;
-
-    private int[][] colorList = new int[][]{
-        new int[]{0, 0, 0}, new int[]{233, 222, 187}, new int[]{173, 35, 35},
-        new int[]{255, 238, 51}, new int[]{255, 146, 51}, new int[]{255, 205, 243},
-        new int[]{42, 75, 215}, new int[]{29, 105, 20}, new int[]{129, 74, 25},
-        new int[]{129, 38, 192}, new int[]{160, 160, 160}, new int[]{129, 197, 122},
-        new int[]{157, 175, 255}, new int[]{41, 208, 208}, new int[]{87, 87, 87},
-    };
+    private Configuration config;
 
     private Random r = new Random();
 
-    /**
-     * Entry point of the execution of this generator.
-     *
-     * @param args list of command line arguments (ignored)
-     */
-    public static void main(String[] args) {
-        Generator t = new Generator();
-        if (args.length >= 1 && args[0].equalsIgnoreCase("short")) {
-            t.shorten();
-        }
-        t.run();
-    }
-
-    private void shorten() {
-        duration /= 10;
-        num_tasks /= 10;
+    public Generator(Configuration config) {
+        this.config = config;
     }
 
     /**
@@ -117,9 +84,10 @@ public class Generator {
     }
 
     private void writeProblem(DProblem p) {
+        // Open output file
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writeValue(System.out, p);
+            mapper.writeValue(config.getOutputFile(), p);
         } catch (IOException ex) {
             Logger.getLogger(Generator.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -128,38 +96,38 @@ public class Generator {
     private DProblem createProblemDefinition() {
         DProblem p = new DProblem();
 
-        p.setDuration(duration);
-        p.setnCrisis(num_crisis);
-        p.setWidth(width);
-        p.setHeight(height);
+        p.setDuration(config.getDuration());
+        p.setnCrisis(config.getNum_crisis());
+        p.setWidth(config.getWidth());
+        p.setHeight(config.getHeight());
 
         return p;
     }
 
     private void addPlanes(DProblem p) {
         ArrayList<DPlane> planes = p.getPlanes();
-        for (int i=0;i<num_planes;i++) {
+        for (int i=0;i<config.getNum_planes();i++) {
             DPlane pl = new DPlane();
             // Speed in meters per tenth of second
-            pl.setSpeed(50d/36);
+            pl.setSpeed(config.getPlaneSpeed());
             pl.setX(r.nextInt(p.getWidth()));
             pl.setY(r.nextInt(p.getHeight()));
             // battery capacity in tenths of second
-            pl.setBatteryCapacity(3600*3*10);
+            pl.setBatteryCapacity(config.getBatteryCapacity());
             pl.setInitialBattery((long)(pl.getBatteryCapacity()*r.nextDouble()));
-            pl.setCommunicationRange(2000);
-            pl.setColor(colorList[i]);
+            pl.setCommunicationRange(config.getCommunicationRange());
+            pl.setColor(config.getColor(i));
             planes.add(pl);
         }
     }
 
     private void addOperators(DProblem p) {
         ArrayList<DOperator> operators = p.getOperators();
-        for (int i=0;i<num_operators;i++) {
+        for (int i=0;i<config.getNum_operators();i++) {
             DOperator o = new DOperator();
             o.setX(r.nextInt(p.getWidth()));
             o.setY(r.nextInt(p.getHeight()));
-            o.setCommunicationRange(2000);
+            o.setCommunicationRange(config.getCommunicationRange());
             operators.add(o);
         }
     }
@@ -168,59 +136,52 @@ public class Generator {
         ArrayList<DTask> tasks = new ArrayList<DTask>();
 
         // Create the tasks, randomly located
-        for (int i=0;i<num_tasks;i++) {
+        for (int i=0;i<config.getNum_tasks();i++) {
             DTask t = new DTask();
             t.setX(r.nextInt(p.getWidth()));
             t.setY(r.nextInt(p.getHeight()));
             tasks.add(t);
-            p.getOperators().get(r.nextInt(num_operators)).getTasks().add(t);
+            p.getOperators().get(r.nextInt(config.getNum_operators())).getTasks().add(t);
         }
 
         // Set task times. Use the crisis model for now.
 
         // How is it done?
+
         // 1.a Create a "base" uniform distribution between 0 and duration
-        RealDistribution[] timeDistributions = new RealDistribution[num_crisis];
-        timeDistributions[0] = new UniformRealDistribution(0, duration);
+        RealDistribution[] timeDistributions = new RealDistribution[config.getNum_crisis()];
+        timeDistributions[0] = new UniformRealDistribution(0, config.getDuration());
         timeDistributions[0].reseedRandomGenerator(r.nextLong());
+
         // 1.b Create a "base" uniform distribution for the 2d space
         MultivariateRealDistribution[] spaceDistributions =
-                new MultivariateRealDistribution[num_crisis];
+                new MultivariateRealDistribution[config.getNum_crisis()];
         spaceDistributions[0] = new MultivariateUniformDistribution(
                 new double[]{0, 0}, new double[]{p.getWidth(), p.getHeight()} );
         spaceDistributions[0].reseedRandomGenerator(r.nextLong());
 
         // 2.a Create one gaussian distribution for each crisis, trying to
         //    spread them out through time.
-        for (int i=1; i<num_crisis; i++) {
-            double mean = r.nextDouble()*duration;
-            double std = (duration/(double)num_crisis)*0.05;
+        for (int i=1; i<config.getNum_crisis(); i++) {
+            double mean = r.nextDouble()*config.getDuration();
+            double std = (config.getDuration()/(double)config.getNum_crisis())*0.05;
             timeDistributions[i] = new NormalDistribution(mean, std);
             timeDistributions[i].reseedRandomGenerator(r.nextLong());
         }
-        // 2.b Create one multivariate gaussian distribution for each crisis
-        for (int i=1; i<num_crisis; i++) {
-            double[] means = new double[]{
-                r.nextInt(p.getWidth()), r.nextInt(p.getHeight()),
-            };
-//            double [][] covariances = new double[][]{
-//                new double[]{p.getWidth() * r.nextDouble() * 50 + 10, 0},
-//                new double[]{0, p.getHeight() * r.nextDouble() * 50 + 10},
-//            };
-            double[][] covariances = getCovarianceMatrix(p.getWidth(), p.getHeight());
-            spaceDistributions[i] = new MultivariateNormalDistribution(
-                    means, covariances);
-            spaceDistributions[i].reseedRandomGenerator(r.nextLong());
+
+        // 2.b Create one distribution for each crisis
+        for (int i=1; i<config.getNum_crisis(); i++) {
+            spaceDistributions[i] = config.getTaskDistributionFactory().buildDistribution(config, r);
         }
 
-        // 3. Uniformly sample task times from these distributions
+        // 3. Uniformly sample tasks from these distributions
         for (DTask t : tasks) {
-            final int i = (int)(r.nextDouble()*(num_crisis));
+            final int i = (int)(r.nextDouble()*(config.getNum_crisis()));
             t.setnCrisis(i);
 
             // Time sampling
             long time = (long)timeDistributions[i].sample();
-            while (time < 0 || time > duration) {
+            while (time < 0 || time > config.getDuration()) {
                 time = (long)timeDistributions[i].sample();
             }
             t.setTime(time);
@@ -237,19 +198,7 @@ public class Generator {
         }
 
         // 4. Debug stuff
-        printTaskHistogram(tasks);
-    }
-
-    private double[][] getCovarianceMatrix(int width, int height) {
-        double scale = .01 + .05*r.nextDouble();
-        double w = width * scale;
-        double h = width * scale;
-        RealMatrix m = new Array2DRowRealMatrix(new double[][]{
-                new double[]{w + w, r.nextDouble() * h + w},
-                new double[]{0, h + h},
-        });
-        RealMatrix result = m.multiply(m.transpose());
-        return result.getData();
+        //printTaskHistogram(tasks);
     }
 
     private void printTaskHistogram(ArrayList<DTask> tasks) {
@@ -273,7 +222,7 @@ public class Generator {
 
     private void addStations(DProblem p) {
         ArrayList<DStation> stations = p.getStations();
-        for (int i=0; i<num_stations; i++) {
+        for (int i=0; i<config.getNum_stations(); i++) {
             DStation st = new DStation();
             st.setX(r.nextInt(p.getWidth()));
             st.setY(r.nextInt(p.getHeight()));

@@ -37,6 +37,7 @@
 package es.csic.iiia.planes.definition;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Definition of a problem.
@@ -60,6 +61,7 @@ public class DProblem {
     private ArrayList<DOperator> operators = new ArrayList<DOperator>();
     private ArrayList<DPlane> planes = new ArrayList<DPlane>();
     private ArrayList<DStation> stations = new ArrayList<DStation>();
+    private HashMap<String, String> generatorSettings = new HashMap<String, String>();
 
     /**
      * Get the width of the simulation space.
@@ -108,7 +110,7 @@ public class DProblem {
 
     /**
      * Get the number of crisis in this problem.
-     * 
+     *
      * @return number of crisis in this problem.
      */
     public int getnCrisis() {
@@ -117,7 +119,7 @@ public class DProblem {
 
     /**
      * Set the number of crisis in this problem.
-     * 
+     *
      * @param nCrisis number of crisis.
      */
     public void setnCrisis(int nCrisis) {
@@ -186,5 +188,23 @@ public class DProblem {
      */
     public void setStations(ArrayList<DStation> stations) {
         this.stations = stations;
+    }
+
+    /**
+     * Get the generator settings used to generate this problem.
+     *
+     * @return generator settings used to generate this problem.
+     */
+    public HashMap<String, String> getGeneratorSettings() {
+        return generatorSettings;
+    }
+
+    /**
+     * Set the generator settings used to generate this problem.
+     *
+     * @param generatorSettings generator settings used to generate this problem.
+     */
+    public void setGeneratorSettings(HashMap<String, String> generatorSettings) {
+        this.generatorSettings = generatorSettings;
     }
 }

@@ -34,7 +34,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.generator;
+package es.csic.iiia.planes.util;
 
 import org.apache.commons.math3.distribution.AbstractMultivariateRealDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
