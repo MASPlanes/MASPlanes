@@ -79,6 +79,7 @@ public class Display extends JFrame {
     private Color[] colors;
     private final TimeHistogramPane histogramPane;
     private final DProblem problemDefinition;
+    private final JPanel top;
 
     public Display(GUIWorld w) {
         this.world = w;
@@ -112,7 +113,7 @@ public class Display extends JFrame {
 
         //viewer = new TaskDistributionViewer(w.getFactory().getConfiguration().problemDefinition);
 
-        JPanel top = new JPanel(new FlowLayout());
+        top = new JPanel(new FlowLayout());
         JToggleButton b = new JToggleButton("Tasks");
         b.addActionListener(new AbstractAction("Tasks") {
 
@@ -136,7 +137,6 @@ public class Display extends JFrame {
                 if (!source.getValueIsAdjusting()) {
                     int speed = (int)source.getValue();
                     speed = (int)Math.pow(10f, speed/10f);
-                    System.err.println("New speed: " + speed);
                     world.setSpeed(speed);
                 }
             }
@@ -150,12 +150,6 @@ public class Display extends JFrame {
 
         this.pack();
         this.setVisible(true);
-
-        System.err.println("Insets: " + this.getInsets());
-        Insets insets = this.getInsets();
-        insetsVertical = insets.bottom + insets.top;
-        insetsHorizontal = insets.left + insets.right;
-        System.err.println(this.getSize());
 
         // Observador que s'encarrega de finalitzar el programa en
         // tancar la finestra principal.
@@ -171,23 +165,26 @@ public class Display extends JFrame {
             public void componentResized(ComponentEvent ce) {
 
                 // Bloquegem l'aspect ratio
-                Dimension d  = Display.this.getSize();
-                int width = d.width;
-                int height = d.height;
-                double ratio = (width-insetsHorizontal)/(double)(height-insetsVertical);
+                Dimension innerD = Display.this.layers.getSize();
+                Dimension outerD = Display.this.getSize();
+                int innerWidth  = innerD.width;
+                int innerHeight = innerD.height;
+                int outerWidth  = outerD.width;
+                int outerHeight = outerD.height;
+
+                double ratio = innerWidth/(double)(innerHeight);
                 ratio = Math.round(ratio*100f) / 100f;
                 System.err.println("Ratio: " + ratio);
                 if (ratio > 1) {
-                    Display.this.setSize((int) (width / ratio), height);
+                    Display.this.setSize((int) (outerWidth / ratio), outerHeight);
                 } else if (ratio < 1) {
-                    Display.this.setSize(width, (int) (height * ratio));
+                    Display.this.setSize(outerWidth, (int) (outerHeight * ratio));
                 } else {
                     super.componentResized(ce);
-                    Dimension dim = Display.this.getContentPane().getSize();
-                    displayPane.setBounds(new Rectangle(d));
-                    tasksPane.changeSize(width, height);
-                    tasksPane.setBounds(new Rectangle(d));
-                    System.err.println(dim);
+                    displayPane.setBounds(new Rectangle(innerD));
+                    tasksPane.changeSize(innerWidth, innerHeight);
+                    tasksPane.setBounds(new Rectangle(innerD));
+                    System.err.println(innerD);
                 }
             }
 
