@@ -51,8 +51,6 @@ import org.apache.commons.math3.linear.RealMatrix;
  */
 public class HotspotFactory implements TaskDistributionFactory {
 
-    private static double freedomDegrees = 2.5;
-
     private InverseWishartDistribution covDistribution = null;
 
     BicubicSplineInterpolatingFunction interpolator = null;
@@ -104,7 +102,7 @@ public class HotspotFactory implements TaskDistributionFactory {
                 {factor, 0},
                 {0, factor}
             });
-            covDistribution = new InverseWishartDistribution(m, freedomDegrees);
+            covDistribution = new InverseWishartDistribution(m, config.getHotspotFreedomDegrees());
         }
 
         double[] means = new double[]{
