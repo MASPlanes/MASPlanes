@@ -43,7 +43,6 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
-import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ComponentAdapter;
@@ -69,8 +68,6 @@ public class Display extends JFrame {
     private static int DEFAULT_WIDTH = 500;
     private static int DEFAULT_HEIGHT = 500;
 
-    private int insetsVertical;
-    private int insetsHorizontal;
     private GUIWorld world;
     private DisplayPane displayPane;
     private JLabel time;
@@ -116,12 +113,10 @@ public class Display extends JFrame {
         top = new JPanel(new FlowLayout());
         JToggleButton b = new JToggleButton("Tasks");
         b.addActionListener(new AbstractAction("Tasks") {
-
             @Override
             public void actionPerformed(ActionEvent ae) {
                 tasksPane.toggle();
             }
-
         });
         top.add(b);
 
@@ -130,17 +125,15 @@ public class Display extends JFrame {
         JSlider s = new JSlider(1, 50, 25);
 
         s.addChangeListener(new ChangeListener() {
-
             @Override
             public void stateChanged(ChangeEvent ce) {
-                JSlider source = (JSlider)ce.getSource();
+                JSlider source = (JSlider) ce.getSource();
                 if (!source.getValueIsAdjusting()) {
-                    int speed = (int)source.getValue();
-                    speed = (int)Math.pow(10f, speed/10f);
+                    int speed = (int) source.getValue();
+                    speed = (int) Math.pow(10f, speed / 10f);
                     world.setSpeed(speed);
                 }
             }
-
         });
 
         top.add(s);
@@ -154,9 +147,10 @@ public class Display extends JFrame {
         // Observador que s'encarrega de finalitzar el programa en
         // tancar la finestra principal.
         this.addWindowListener(new WindowAdapter() {
-          public void windowClosing(WindowEvent e) {
-            System.exit(0);
-          }
+            @Override
+            public void windowClosing(WindowEvent e) {
+              System.exit(0);
+            }
         });
 
         this.addComponentListener(new ComponentAdapter() {
