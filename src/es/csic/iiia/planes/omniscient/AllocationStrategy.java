@@ -45,13 +45,28 @@ import java.util.Set;
 import java.util.TreeMap;
 
 /**
+ * Interface that defines an allocation strategy for the omniscient
+ * "God".
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public interface AllocationStrategy {
 
+    /**
+     * Compute an allocation of planes to requests.
+     *
+     * @param world simulation world state.
+     * @param planes list of all planes in the simulation.
+     * @param visibilityMap map that represents the plane's knowledge about tasks. Each key in
+     *                      this map is a plane, and the corresponding entry is a set of all the
+     *                      tasks of which the pane is aware.
+     * @param assignmentMap map of plane to task assignments. This must be filled by the
+     *                      implementing class (however it sees fit).
+     * @param reverseMap map of task to plane assigments. This is the reverse of
+     *                   <em>assignmentMap</em> and has also to be filled by the implementor.
+     */
     public void allocate(
-            World w,
+            World world,
             OmniscientPlane[] planes,
             TreeMap<MessagingAgent, Set<Task>> visibilityMap,
             TreeMap<OmniscientPlane, Task>      assignmentMap,
