@@ -125,8 +125,8 @@ strategy by running the simulator as follows::
   java -jar dist/planes.jar problem -o operator-strategy=nearest
 
 
-GUI
----
+Graphical User Interface
+------------------------
 
 The simulator includes a simple GUI to visualize what is happening in the
 simulation while it runs. The GUI has three distinct sections, as shown in this
@@ -138,7 +138,7 @@ figure:
 
     Simulator's GUI screenshot.
 
-First, theire is a top bar that contains a few controls:
+First, there is a top bar that contains a few controls:
 
 - The *Tasks* button toggles the displaying of all tasks (past, present and 
   future) in the simulation area. This is useful to quickly see how the tasks 
@@ -153,10 +153,27 @@ Second, there is a bottom bar that displays some time-related information about
 tasks. The whole bar is actually a histogram displaying how many tasks are
 introduced at each point in time. Moreover, the histogram's bars are colored
 according to which crisis period introduces those tasks. For example, the
-leftmost (purple) mountain shows that there is a crisis period at the beginning
+leftmost (purple) peakshows that there is a crisis period at the beginning
 of the simulation. Additionally, it shows that tasks from this crisis are
-gaussian distributed along a short time period. The strong blue vertical line is i
+gaussian distributed along a short time period. The strong blue vertical line is
 not related to the tasks. Instead, it marks the current point in time.
 
 Third, there is the simulator's main display area, that depicts the simulated
-world. 
+world. In this area you can see the planes moving as they try to service tasks.
+Each plane is painted in a different color, and surrounded by a circle that
+represents its communication range. Likewise, the light blue circular area in 
+the lower-center of the display represents the range of an operator, depicted
+here as a big strong blue dot. Tasks are repented as smaller dots, painted in 
+the same color than the plane that currently owns them. 
+
+By default, the display shows the complete plan (sequence of requests to service)
+of each plane, provided that the coordination algorithm computes such plan. When the
+algorithm does not compute the full plan, only the next task to be serviced is shown 
+for each plane. The plans are visualized by connecting the plane to its next request, 
+then that request to the next one, and so on and so forth.
+
+However, you can click on any plane to *focus* on that
+plane. When a plane is focused, all other planes and their tasks are painted grey, 
+so that your focused plane stands out of the rest. Additionally, you can no longer 
+see the full plans of other planes. Instead, you can see the focused plane's plan 
+as well as a trail of the last tasks it has serviced.

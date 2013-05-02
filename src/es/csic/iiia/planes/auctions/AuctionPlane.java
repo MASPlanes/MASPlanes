@@ -67,16 +67,6 @@ public class AuctionPlane extends AbstractPlane {
     }
 
     @Override
-    public List<Location> getPlannedLocations() {
-        replan(getLocation(), localTasks);
-        List<Location> locations = new ArrayList<Location>();
-        for (Task t : localTasks) {
-            locations.add(t.getLocation());
-        }
-        return locations;
-    }
-
-    @Override
     protected void taskCompleted(Task t) {}
 
     @Override

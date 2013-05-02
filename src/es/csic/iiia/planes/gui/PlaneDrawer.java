@@ -93,8 +93,16 @@ public class PlaneDrawer implements Drawable {
     }
 
     private void drawFutureLocations(Graphics2D g) {
+        g.setColor(plane.getColor());
         List<Location> plannedLocations = plane.getPlannedLocations();
         if (plannedLocations == null || plannedLocations.isEmpty()) {
+            Task nextTask = plane.getNextTask();
+            if (nextTask != null) {
+                int x = getLocation().getXInt();
+                int y = getLocation().getYInt();
+                final Location l = nextTask.getLocation();
+                g.drawLine(x, y, l.getXInt(), l.getYInt());
+            }
             return;
         }
 
@@ -138,10 +146,6 @@ public class PlaneDrawer implements Drawable {
 
     private void drawSelected(Graphics2D g) {
         Color previous = g.getColor();
-
-        // Line to destination (if exists)
-        final int x = getLocation().getXInt();
-        final int y = getLocation().getYInt();
 
         drawFutureLocations(g);
         drawPastLocations(g);
@@ -232,16 +236,6 @@ public class PlaneDrawer implements Drawable {
 
     private void drawNormal(Graphics2D g) {
         Color previous = g.getColor();
-
-        // Line to destination (if exists)
-        int x = getLocation().getXInt();
-        int y = getLocation().getYInt();
-        Task nextTask = plane.getNextTask();
-        if (nextTask != null) {
-            g.setColor(Color.RED);
-            final Location l = nextTask.getLocation();
-            g.drawLine(x, y, l.getXInt(), l.getYInt());
-        }
 
         drawTasks(g, plane.getColor());
         drawPlane(g, Color.DARK_GRAY, plane.getColor());

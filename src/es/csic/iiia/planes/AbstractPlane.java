@@ -224,6 +224,18 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     }
 
     @Override
+    public List<Location> getPlannedLocations() {
+        List<Location> plannedLocations = new ArrayList<Location>();
+        List<Task> pendingLocations = new ArrayList<Task>(tasks);
+        while (!pendingLocations.isEmpty()) {
+            Task best = getNearest(pendingLocations);
+            pendingLocations.remove(best);
+            plannedLocations.add(best.getLocation());
+        }
+        return plannedLocations;
+    }
+
+    @Override
     public void step() {
         if (state == State.CHARGING) {
             battery.recharge(rechargeRatio);

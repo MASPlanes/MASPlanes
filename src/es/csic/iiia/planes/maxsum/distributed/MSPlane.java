@@ -115,11 +115,6 @@ public class MSPlane extends AbstractPlane {
         setNextTask(getNearest(getLocation(), getTasks()));
     }
 
-    @Override
-    public List<Location> getPlannedLocations() {
-        return null;
-    }
-
     MSTaskNode getTaskFunction(Task task) {
         return taskFunctions.get(task);
     }
