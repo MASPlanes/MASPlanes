@@ -4,11 +4,14 @@ Planes
 
 *Planes* is a very simple UAV simulator, desgined to aid in the development and
 testing of UAV coordination mechanisms. The goal of the simulator is to acquire
-and report statistics about the time it taskes for the given UAVs to visit a
-number of Targets. This time will vary depending on the strategy used by the
-planes, hence empirically showing which algorithm performs best on a given
-scenario.
+and report statistics about the time it taskes for the UAVs to service a number
+of requests. This time will vary depending on the strategy used by the planes, 
+hence empirically showing which algorithm performs best on a given scenario.
 
+A detailed explanation of the problem tackled by this simulator can be found in
+Section 1 of the technical report at TechReport_.
+
+.. _TechReport: http://bit.ly/
 
 Development
 ===========
@@ -46,7 +49,7 @@ This command generates an example scenario using defaults for all settings, and 
 file named `problem`. You can obtain a commented copy of all the generator's settings by dumping
 the default generator configuration to a file::
 
-  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli problem > generator.settings
+  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli -d > generator.settings
 
 This will create a text file `generator.settings` containing all the default settings plus a small
 explanation of their effects. At this point, you can edit any setting in the file using a text
