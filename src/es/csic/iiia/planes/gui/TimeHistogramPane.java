@@ -79,12 +79,12 @@ public class TimeHistogramPane extends JPanel {
         double[][] bins = new double[p.getnCrisis()][DEFAULT_WIDTH];
         double[] sums = new double[DEFAULT_WIDTH];
 
-        // Compute the histogram, along with the maximum number of elements in
-        // a bin
+        // Compute the histogram, along with the maximum number of elements in a bin
         double max = 0;
         for (DOperator o : p.getOperators()) {
             for (DTask t : o.getTasks()) {
-                final int bin = (int) (t.getTime() * DEFAULT_WIDTH / p.getDuration());
+                final int bin = Math.min((int) (t.getTime() * DEFAULT_WIDTH / p.getDuration()),
+                        DEFAULT_WIDTH-1);
                 final int n = t.getnCrisis();
                 bins[n][bin]++;
                 sums[bin]++;
@@ -100,8 +100,6 @@ public class TimeHistogramPane extends JPanel {
                 bins[n][x] = bins[n][x] * DEFAULT_HEIGHT / max;
             }
         }
-
-        //System.err.println(Arrays.deepToString(bins));
 
         // Fetch the colors, without alpha
         Color[] colors = new Color[p.getnCrisis()];

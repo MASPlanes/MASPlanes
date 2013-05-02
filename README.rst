@@ -167,13 +167,14 @@ here as a big strong blue dot. Tasks are repented as smaller dots, painted in
 the same color than the plane that currently owns them. 
 
 By default, the display shows the complete plan (sequence of requests to service)
-of each plane, provided that the coordination algorithm computes such plan. When the
-algorithm does not compute the full plan, only the next task to be serviced is shown 
-for each plane. The plans are visualized by connecting the plane to its next request, 
-then that request to the next one, and so on and so forth.
+of each plane, provided that the coordination algorithm computes such plan. When
+the algorithm does not compute the full plan, only the next task to be serviced
+is shown for each plane. The plans are visualized by connecting the plane to its
+next request, then that request to the next one, and so on and so forth.
 
-However, you can click on any plane to *focus* on that
-plane. When a plane is focused, all other planes and their tasks are painted grey, 
-so that your focused plane stands out of the rest. Additionally, you can no longer 
-see the full plans of other planes. Instead, you can see the focused plane's plan 
-as well as a trail of the last tasks it has serviced.
+Additionally, you can click on any plane to *focus* on that plane. When a plane
+is focused, all other planes and their tasks are painted grey, so that your
+focused plane stands out of the rest. Additionally, you can no longer see the
+full plans of other planes. Instead, you can see the focused plane's plan as
+well as a trail of the last tasks it has serviced. When in focused mode, click
+any empty space of the display to go back to the normal mode.
