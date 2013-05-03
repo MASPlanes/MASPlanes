@@ -53,6 +53,7 @@ public class OmniscientPlane extends AbstractPlane {
 
     @Override
     public void initialize() {
+        super.initialize();
         Omniscient.initialize(getWorld());
     }
 
