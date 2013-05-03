@@ -39,6 +39,7 @@ package es.csic.iiia.planes;
 import es.csic.iiia.planes.definition.DPlane;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.idle.IdleStrategy;
 import java.awt.Color;
 import java.util.List;
@@ -243,6 +244,11 @@ public interface Plane extends MessagingAgent {
      * Get the drawer for this plane.
      */
     public Drawable getDrawer();
+
+    /**
+     * Get the drawer for this plane.
+     */
+    public void setDrawer(PlaneDrawer drawer);
 
     /**
      * Get the plane's color.

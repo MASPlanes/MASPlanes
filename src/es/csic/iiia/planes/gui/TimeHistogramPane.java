@@ -117,11 +117,11 @@ public class TimeHistogramPane extends JPanel {
 //        g.setColor(Color.BLACK);
 //        g.draw(new Line2D.Double(0, 0, DEFAULT_WIDTH, 0));
         for (int x = 0; x < DEFAULT_WIDTH; x++) {
-            double y = 0;
-            for (int n = 1; n < p.getnCrisis(); n++) {
+            double y = DEFAULT_HEIGHT;
+            for (int n = 0; n < p.getnCrisis(); n++) {
                 g.setColor(colors[n]);
-                double yend = y + bins[n][x];
-                g.draw(new Line2D.Double(x, DEFAULT_HEIGHT, x, DEFAULT_HEIGHT-bins[n][x]));
+                double yend = y - bins[n][x];
+                g.draw(new Line2D.Double(x, y, x, yend));
                 y = yend;
             }
         }

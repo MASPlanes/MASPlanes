@@ -133,6 +133,8 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
 
     private Location.MoveStep currentDestination;
 
+    private PlaneDrawer drawer = null;
+
     /**
      * Default constructor
      *
@@ -147,7 +149,10 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     @Override
     public void initialize() {
         super.initialize();
-        drawer.initialize();
+        
+        if (drawer != null) {
+            drawer.initialize();
+        }
     }
 
     @Override
@@ -404,10 +409,14 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         return tasks;
     }
 
-    private PlaneDrawer drawer = new PlaneDrawer(this);
     @Override
     public Drawable getDrawer() {
         return drawer;
+    }
+
+    @Override
+    public void setDrawer(PlaneDrawer drawer) {
+        this.drawer = drawer;
     }
 
     @Override

@@ -38,8 +38,9 @@
 package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.AbstractFactory;
+import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.cli.Configuration;
-import es.csic.iiia.planes.AbstractWorld;
 
 /**
  * Factory that will be used to create most elements.
@@ -64,6 +65,14 @@ public class GUIFactory extends AbstractFactory {
         w.setDisplay(d);
         world = w;
         return w;
+    }
+
+    @Override
+    public Plane buildPlane(Location location) {
+        Plane p = super.buildPlane(location);
+        PlaneDrawer drawer = new PlaneDrawer(p);
+        p.setDrawer(drawer);
+        return p;
     }
 
 }
