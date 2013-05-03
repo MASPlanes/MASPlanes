@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.util.TimeTracker;
 import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 
 /**
@@ -77,7 +78,10 @@ class StatsCollector {
            .append("plane_max=").append((long)(planeStats.getMax()/1000)).append("\n")
            .append("plane_p25=").append((long)(planeStats.getPercentile(25)/1000)).append("\n")
            .append("plane_median=").append((long)(planeStats.getPercentile(50)/1000)).append("\n")
-           .append("plane_p75=").append((long)(planeStats.getPercentile(75)/1000)).append("\n");
+           .append("plane_p75=").append((long)(planeStats.getPercentile(75)/1000)).append("\n")
+           .append("\n");
+
+        buf.append("time=").append(TimeTracker.getUserTime()/1e6d);
 
         System.out.println(buf);
     }
