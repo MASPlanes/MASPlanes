@@ -116,7 +116,8 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
 
         Color previous = g.getColor();
         g.setColor(Color.BLUE);
-        g.fillOval(x-10, y-10, 20, 20);
+        int dim = (int)(30 * getWorld().getSpace().getWidth() / 10000f);
+        g.fillOval(x-dim/2, y-dim/2, dim, dim);
 
 
         Font f = new Font(Font.SANS_SERIF, Font.BOLD, 8);

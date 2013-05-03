@@ -42,6 +42,7 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.gui.graphics.PlaneGraphic;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -59,18 +60,44 @@ public class PlaneDrawer implements Drawable {
 
     private Plane plane;
 
+    private double scale;
+
     /**
      * Stroke used to paint stuff
      */
-    private static final Stroke normalStroke = new BasicStroke(10f);
+    private Stroke normalStroke;
+    private BasicStroke batteryStroke;
+    private Font batteryFont;
+    private Stroke planeStroke;
+    private Stroke pastLocationsStroke;
 
     public PlaneDrawer(Plane p) {
         this.plane = p;
     }
 
+    public void initialize() {
+        Dimension dim = plane.getWorld().getSpace().getDimension();
+        scale = dim.getWidth() / 10000f;
+
+        normalStroke = new BasicStroke(scale(10f));
+        batteryStroke = new BasicStroke(scale(10f));
+        batteryFont = new Font(Font.SANS_SERIF, Font.BOLD, scale(160));
+        planeStroke = new BasicStroke(.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
+        pastLocationsStroke = new BasicStroke(scale(10f), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[]{scale(100f),scale(100f)}, 0.0f);
+    }
+
+    private int scale(int size) {
+        return (int)(size * scale);
+    }
+
+    private float scale(float size) {
+        return size * (float)scale;
+    }
+
     @Override
     public void draw(Graphics2D g) {
         GUIWorld w = (GUIWorld)plane.getWorld();
+
 
         Plane selectedPlane = w.getSelectedPlane();
         if (selectedPlane == plane) {
@@ -139,7 +166,7 @@ public class PlaneDrawer implements Drawable {
         }
         p.lineTo(plane.getLocation().getX(), plane.getLocation().getY());
         g.setColor(Color.RED);
-        g.setStroke(new BasicStroke(10f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[]{100f,100f}, 0.0f));
+        g.setStroke(pastLocationsStroke);
         g.draw(p);
         g.setStroke(normalStroke);
     }
@@ -182,7 +209,8 @@ public class PlaneDrawer implements Drawable {
         g.setColor(c);
         for (Task t : plane.getTasks()) {
             final Location l = t.getLocation();
-            g.fillOval(l.getXInt()-50, l.getYInt()-50, 100, 100);
+            int dim = scale(50);
+            g.fillOval(l.getXInt()-dim, l.getYInt()-dim, dim*2, dim*2);
         }
     }
 
@@ -192,17 +220,16 @@ public class PlaneDrawer implements Drawable {
 
         AffineTransform oldt = g.getTransform();
         AffineTransform newt = new AffineTransform(oldt);
-        newt.translate(x-175, y-175);
-        //g.setColor(Color.RED);
-        //g.draw(PlaneGraphic.getImage(400, 400));
-        newt.rotate(plane.getAngle(), 175, 175);
-        newt.rotate(3*Math.PI/2., 175, 175);
-        newt.scale(350,350);
+
+        int dim = scale(350);
+        newt.translate(x-dim/2, y-dim/2);
+        newt.rotate(plane.getAngle(), dim/2, dim/2);
+        newt.rotate(3*Math.PI/2., dim/2, dim/2);
+        newt.scale(dim, dim);
         g.setTransform(newt);
         g.setColor(lineColor);
         Stroke olds = g.getStroke();
-        Stroke news = new BasicStroke(.15f,BasicStroke.CAP_ROUND,BasicStroke.JOIN_ROUND);
-        g.setStroke(news);
+        g.setStroke(planeStroke);
         g.draw(PlaneGraphic.getImage());
         g.setColor(planeColor);
         g.fill(PlaneGraphic.getImage());
@@ -216,22 +243,28 @@ public class PlaneDrawer implements Drawable {
     }
 
     private void drawBattery(Graphics2D g) {
+//        if (plane.getBattery() instanceof InfiniteBattery) {
+//            return;
+//        }
+
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
 
-        Font f = new Font(Font.SANS_SERIF, Font.BOLD, 160);
-        g.setFont(f);
+        g.setFont(batteryFont);
         String sid = String.valueOf(plane.getId());
-        FontMetrics m = g.getFontMetrics(f);
+        FontMetrics m = g.getFontMetrics(batteryFont);
         int w = m.stringWidth(sid);
         int h = m.getHeight();
         double percent = plane.getBattery().getEnergy()/(double)plane.getBattery().getCapacity();
         String bat =  MessageFormat.format("{0,number,#.##%}", percent);
+
+        int offset = scale(200);
         g.setColor(new Color(240,240,240));
-        g.fillRect(x-(w/2), y+200, (int)(w*percent), h);
+        g.fillRect(x-(w/2), y+offset, (int)(w*percent), h);
         g.setColor(Color.DARK_GRAY);
-        g.drawRect(x-(w/2), y+200, w, h);
-        g.drawString(bat, x-(w/2), y+200+h-25);
+        g.setStroke(batteryStroke);
+        g.drawRect(x-(w/2), y+offset, w, h);
+        g.drawString(bat, x-(w/2), y+offset+h-offset/8);
     }
 
     private void drawNormal(Graphics2D g) {

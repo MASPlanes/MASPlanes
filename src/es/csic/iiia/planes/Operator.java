@@ -179,7 +179,8 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
 
         Color previous = g.getColor();
         g.setColor(Color.BLUE);
-        g.fillOval(x-100, y-100, 200, 200);
+        int dim = (int)(200 * getWorld().getSpace().getWidth() / 10000f);
+        g.fillOval(x-dim/2, y-dim/2, dim, dim);
 
         g.setColor(new Color(200,200,255,50));
         final int r = (int)getCommunicationRange();

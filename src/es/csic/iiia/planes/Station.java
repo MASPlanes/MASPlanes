@@ -78,24 +78,34 @@ public class Station extends AbstractPositionedElement implements Drawable {
         AffineTransform previousTransform = g.getTransform();
 
         // The background circle
+        double xscale = getWorld().getSpace().getWidth() / 10000;
+        double yscale = getWorld().getSpace().getHeight() / 10000;
         g.setColor(Color.DARK_GRAY);
         g.setStroke(new BasicStroke(40f));
-        g.fillOval(x-250,y-250,500,500);
+        int width  = scale(500, xscale);
+        int height = scale(500, yscale);
+        g.fillOval(x-width/2,y-height/2, width, height);
 
         // The inner circle
+        width  = scale(380, xscale);
+        height = scale(380, yscale);
         g.setColor(new Color(255,210,0));
-        g.drawOval(x-190, y-190, 380, 380);
+        g.drawOval(x-width/2,y-height/2, width, height);
 
         // The power graphic
         AffineTransform t = new AffineTransform(previousTransform);
-        t.translate(x-250, y-250);
-        t.scale(500, 500);
+        t.translate(x-width/2, y-width/2);
+        t.scale(width, height);
         g.setTransform(t);
         g.fill(StationGraphic.getImage());
 
         g.setTransform(previousTransform);
         g.setColor(previousColor);
         g.setStroke(previousStroke);
+    }
+
+    private int scale(int size, double scale) {
+        return (int)(size*scale);
     }
 
 }

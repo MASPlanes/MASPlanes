@@ -37,12 +37,12 @@
  */
 package es.csic.iiia.planes;
 
+import es.csic.iiia.planes.behaviors.AbstractBehaviorAgent;
 import es.csic.iiia.planes.evaluation.EvaluationStrategy;
 import es.csic.iiia.planes.evaluation.IndependentDistanceEvaluation;
 import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.PlaneDrawer;
 import es.csic.iiia.planes.idle.IdleStrategy;
-import es.csic.iiia.planes.behaviors.AbstractBehaviorAgent;
 import es.csic.iiia.planes.util.RotatingList;
 import java.awt.Color;
 import java.util.ArrayList;
@@ -142,6 +142,12 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         super(location);
         tasks = new ArrayList<Task>();
         completedLocations = new RotatingList<Location>(Plane.NUM_COMPLETED_TASKS);
+    }
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        drawer.initialize();
     }
 
     @Override
@@ -398,7 +404,7 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         return tasks;
     }
 
-    private Drawable drawer = new PlaneDrawer(this);
+    private PlaneDrawer drawer = new PlaneDrawer(this);
     @Override
     public Drawable getDrawer() {
         return drawer;
