@@ -1,0 +1,29 @@
+# 1 hour
+duration = 36000
+
+# 2x2 km
+width = 2000
+height = 2000
+
+# Only 2 planes
+planes = 2
+
+# This covers all space, so the planes can always communicate between them
+communication-range = 2000
+
+# 50 km/h
+plane-speed = 1.388888888888889
+
+# 1 day
+battery-capacity = 864000
+
+# 5 tasks/min
+task-frequency = 0.008333333333333
+
+# 1 crisis
+crises = 1
+
+# Pretty different hotspots, with a median radius of 500m
+task-distribution = hotspot
+hotspot-radius = 500
+hotspot-freedom-degrees = 3
