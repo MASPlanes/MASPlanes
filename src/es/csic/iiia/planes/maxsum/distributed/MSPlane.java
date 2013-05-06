@@ -87,6 +87,7 @@ public class MSPlane extends AbstractPlane {
 
     @Override
     protected void taskCompleted(Task t) {
+        LOG.log(Level.FINE, "{0} completes {1}", new Object[]{this, t});
         getPlaneFunction().removeNeighbor(t);
         replan();
     }
@@ -164,28 +165,6 @@ public class MSPlane extends AbstractPlane {
         if (newd < curd) {
             setNextTask(newt);
         }
-    }
-
-    /**
-     * Retrieve the task from the candidates list that is nearest to the given
-     * position
-     *
-     * @param position
-     * @param candidates
-     * @return
-     */
-    protected static Task getNearest(Location position, List<Task> candidates) {
-        double max = Double.MAX_VALUE;
-        Task result = null;
-        for (Task candidate : candidates) {
-            double d = position.distance(candidate.getLocation());
-            if (d < max) {
-                max = d;
-                result = candidate;
-            }
-        }
-
-        return result;
     }
 
     public void setInactive(boolean inactive) {

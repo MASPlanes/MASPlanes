@@ -74,22 +74,6 @@ public class DefaultPlane extends AbstractPlane {
         setNextTask(getNearestTask());
     }
 
-    @Override
-    public List<Location> getPlannedLocations() {
-        List<Location> plannedLocations = new ArrayList<Location>();
-        // Add all the tasks to a list
-        ArrayList<Task> candidateTasks = new ArrayList<Task>(getTasks());
-        Location nextLocation = getLocation();
-        while (!candidateTasks.isEmpty()) {
-            Task next = getNearest(nextLocation, candidateTasks);
-            candidateTasks.remove(next);
-            nextLocation = next.getLocation();
-            plannedLocations.add(nextLocation);
-        }
-
-        return plannedLocations;
-    }
-
     /**
      * Retrieve the nearest task among the ones owned by this plane
      *
@@ -97,28 +81,6 @@ public class DefaultPlane extends AbstractPlane {
      */
     private Task getNearestTask() {
         return getNearest(getLocation(), getTasks());
-    }
-
-    /**
-     * Retrieve the task from the candidates list that is nearest to the given
-     * position
-     *
-     * @param position
-     * @param candidates
-     * @return
-     */
-    private static Task getNearest(Location position, List<Task> candidates) {
-        double max = Double.MAX_VALUE;
-        Task result = null;
-        for (Task candidate : candidates) {
-            double d = position.distance(candidate.getLocation());
-            if (d < max) {
-                max = d;
-                result = candidate;
-            }
-        }
-
-        return result;
     }
 
 }

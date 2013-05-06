@@ -149,7 +149,7 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     @Override
     public void initialize() {
         super.initialize();
-        
+
         if (drawer != null) {
             drawer.initialize();
         }
@@ -237,13 +237,39 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     @Override
     public List<Location> getPlannedLocations() {
         List<Location> plannedLocations = new ArrayList<Location>();
-        List<Task> pendingLocations = new ArrayList<Task>(tasks);
-        while (!pendingLocations.isEmpty()) {
-            Task best = getNearest(pendingLocations);
-            pendingLocations.remove(best);
-            plannedLocations.add(best.getLocation());
+        // Add all the tasks to a list
+        ArrayList<Task> candidateTasks = new ArrayList<Task>(getTasks());
+        Location nextLocation = getLocation();
+        while (!candidateTasks.isEmpty()) {
+            Task next = getNearest(nextLocation, candidateTasks);
+            candidateTasks.remove(next);
+            nextLocation = next.getLocation();
+            plannedLocations.add(nextLocation);
         }
+
         return plannedLocations;
+    }
+
+    /**
+     * Retrieve the task from the candidates list that is nearest to the given
+     * position
+     *
+     * @param position
+     * @param candidates
+     * @return
+     */
+    protected Task getNearest(Location position, List<Task> candidates) {
+        double max = Double.MAX_VALUE;
+        Task result = null;
+        for (Task candidate : candidates) {
+            double d = position.distance(candidate.getLocation());
+            if (d < max) {
+                max = d;
+                result = candidate;
+            }
+        }
+
+        return result;
     }
 
     @Override
