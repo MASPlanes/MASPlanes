@@ -190,7 +190,7 @@ public abstract class AbstractWorld implements World {
 
             // TODO: Replace this maximum duration factor by something that detects if tasks are
             // being completed or not.
-            if (time > duration*2) {
+            if (time > duration*10) {
                 System.err.println("It looks like some tasks will never be completed: ");
                 for (Task t : tasks) {
                     System.err.println("\t" + t);
