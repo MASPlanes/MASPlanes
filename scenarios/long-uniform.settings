@@ -1,0 +1,30 @@
+# These are all default values for the generator. You could run without
+# specifying any setting at all, and a problem of this type would be generated.
+
+# 30 days
+duration = 25920000
+
+# 10x10 km
+width = 10000
+height = 10000
+
+# 10 planes, the default
+planes = 10
+
+# This covers all space, so the planes can always communicate between them
+communication-range = 2000
+
+# 50 km/h
+plane-speed = 1.388888888888889
+
+# 1 day
+battery-capacity = 8640000
+
+# 1 task per minute
+task-frequency = 0.001666666666667
+
+# 4 crises
+crises = 4
+
+# Tasks distributed evenly along space
+task-distribution = uniform

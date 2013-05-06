@@ -1,12 +1,12 @@
-# 1 hour
-duration = 36000
+# 1 day
+duration = 864000
 
-# 2x2 km
-width = 2000
-height = 2000
+# 10x10 km
+width = 10000
+height = 10000
 
-# Only 2 planes
-planes = 2
+# 10 planes, the default
+planes = 10
 
 # This covers all space, so the planes can always communicate between them
 communication-range = 2000
@@ -15,15 +15,13 @@ communication-range = 2000
 plane-speed = 1.388888888888889
 
 # 1 day
-battery-capacity = 864000
+battery-capacity = 8640000
 
-# 5 tasks/min
-task-frequency = 0.008333333333333
+# 1 task per minute
+task-frequency = 0.001666666666667
 
-# 1 crisis
-crises = 1
+# 4 crises
+crises = 4
 
-# Pretty different hotspots, with a median radius of 500m
-task-distribution = hotspot
-hotspot-radius = 500
-hotspot-freedom-degrees = 3
+# Tasks distributed evenly along space
+task-distribution = uniform

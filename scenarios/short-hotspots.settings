@@ -1,0 +1,36 @@
+# 1 day
+duration = 864000
+
+# 10x10 km
+width = 10000
+height = 10000
+
+# 10 planes, the default
+planes = 10
+
+# This covers all space, so the planes can always communicate between them
+communication-range = 2000
+
+# 50 km/h
+plane-speed = 1.388888888888889
+
+# 1 day
+battery-capacity = 8640000
+
+# 1 task per minute
+task-frequency = 0.001666666666667
+
+# 4 crises
+crises = 4
+
+# Tasks distributed in high-variance hotspots
+task-distribution = hotspot
+
+# On average, 90% of each hotspot's tasks will be within 2km from the
+# hotspot center.
+hotspot-radius = 2000
+
+# This controls how much hotspots vary between them. The minimum value
+# is 2, which yields the maximum variance. The higher the value, the
+# more similar hotspots are between them.
+hotspot-freedom-degrees = 3

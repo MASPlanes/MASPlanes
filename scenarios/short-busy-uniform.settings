@@ -1,0 +1,27 @@
+# 1 hour
+duration = 36000
+
+# 2x2 km
+width = 10000
+height = 10000
+
+# Only 2 planes
+planes = 5
+
+# This covers all space, so the planes can always communicate between them
+communication-range = 2000
+
+# 50 km/h
+plane-speed = 1.388888888888889
+
+# 1 day
+battery-capacity = 864000
+
+# 1 task every 5 seconds (1/50)
+task-frequency = 0.02
+
+# 2 crises
+crises = 2
+
+# Tasks distributed uniformly through space
+task-distribution = uniform

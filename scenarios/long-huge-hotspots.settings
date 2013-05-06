@@ -1,0 +1,39 @@
+# These are all default values for the generator. You could run without
+# specifying any setting at all, and a problem of this type would be generated.
+
+# 30 days
+duration = 25920000
+
+# 100x100 km
+width = 100000
+height = 100000
+
+# 50 planes, because the scenario is huge
+planes = 50
+
+# This covers all space, so the planes can always communicate between them
+communication-range = 2000
+
+# 50 km/h
+plane-speed = 1.388888888888889
+
+# 1 day
+battery-capacity = 25920000
+
+# 5 tasks per minute
+task-frequency = 0.0033333333333
+
+# 4 crises
+crises = 4
+
+# Tasks distributed in high-variance hotspots
+task-distribution = hotspot
+
+# On average, 90% of each hotspot's tasks will be within 2km from the
+# hotspot center.
+hotspot-radius = 4000
+
+# This controls how much hotspots vary between them. The minimum value
+# is 2, which yields the maximum variance. The higher the value, the
+# more similar hotspots are between them.
+hotspot-freedom-degrees = 2.5
