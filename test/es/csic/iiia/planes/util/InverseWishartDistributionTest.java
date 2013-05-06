@@ -57,10 +57,11 @@ public class InverseWishartDistributionTest {
     /**
      * Test that generates values for the interpolator.
      */
-    //@Test
+    @Test
     public void testSample() {
         double[] radiuses = new double[]{
-            100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000, 5000, 7000, 10000
+            100, 250, 500, 1000, 1500, 2000, 2500, 3000, 3500, 4000,
+            5000, 7000, 10000, 25000, 50000, 100000
         };
         double[] dfs = new double[]{
              2.0, 4.0, 6.0, 8.0, 10.0, 12.0, 14.0, 16.0, 32.0, 64.0, 128.0
@@ -103,11 +104,12 @@ public class InverseWishartDistributionTest {
             double radius_diff = radius_cur - radius_last;
             double radius_rem  = expRadius - radius_cur;
             scale_last = scale_cur;
+            //System.err.println("radius_rem: " + radius_rem + ", scale_diff: " + scale_diff + ", radius_diff: " + radius_diff + ", alpha: " + alpha);
             scale_cur  += (radius_rem * scale_diff / radius_diff) * alpha;
             radius_last = radius_cur;
             alpha = alpha*0.99;
             //System.err.println("Scale: " + scale_cur + ", radius: " + radius_cur + ", dif: " + scale_diff + ", alpha: " + alpha);
-        } while (Math.abs(expRadius - radius_last) > 1 && Math.abs(scale_diff) > 1);
+        } while (Math.abs(expRadius - radius_last) > expRadius*0.001 && Math.abs(scale_diff) > 1);
 
         return scale_last;
     }
