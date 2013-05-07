@@ -127,11 +127,15 @@ public class SSIAllocationTest {
         w.addTask(t1);
         Task t2 = new Task(new Location(0,2));
         w.addTask(t2);
+        Task t3 = new Task(new Location(-1,1));
+        w.addTask(t3);
+        Task t4 = new Task(new Location(-1,1.9));
+        w.addTask(t4);
 
         // Instantiate the visibility map
         TreeMap<MessagingAgent, Set<Task>> visibilityMap = new TreeMap<MessagingAgent, Set<Task>>();
-        visibilityMap.put(p1, new TreeSet<Task>(Arrays.asList(new Task[]{t1,t2})));
-        visibilityMap.put(p2, new TreeSet<Task>(Arrays.asList(new Task[]{t1,t2})));
+        visibilityMap.put(p1, new TreeSet<Task>(Arrays.asList(new Task[]{t1,t2,t3,t4})));
+        visibilityMap.put(p2, new TreeSet<Task>(Arrays.asList(new Task[]{t1,t2,t3,t4})));
 
         TreeMap<OmniscientPlane, Task> assignmentMap = new TreeMap<OmniscientPlane, Task>();
         TreeMap<Task, OmniscientPlane> reverseMap = new TreeMap<Task, OmniscientPlane>();
@@ -139,8 +143,10 @@ public class SSIAllocationTest {
         SSIAllocation instance = new SSIAllocation();
         instance.allocate(w, planes, visibilityMap, assignmentMap, reverseMap);
 
-        assertEquals(assignmentMap.get(p1), t1);
-        assertEquals(assignmentMap.get(p2), null);
+        assertEquals(instance.getPlannedLocations(p1),
+                Arrays.asList(new Location[]{t1.getLocation(), t3.getLocation()}));
+        assertEquals(instance.getPlannedLocations(p2),
+                Arrays.asList(new Location[]{t2.getLocation(), t4.getLocation()}));
     }
 
 }
