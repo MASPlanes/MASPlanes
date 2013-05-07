@@ -62,6 +62,7 @@ import es.csic.iiia.planes.omniscient.IncrementalSSIAllocation;
 import es.csic.iiia.planes.omniscient.IndependentAuctionAllocation;
 import es.csic.iiia.planes.omniscient.MaxSumAllocation;
 import es.csic.iiia.planes.omniscient.NaiveAdhocAllocation;
+import es.csic.iiia.planes.omniscient.NofirstSSIAllocation;
 import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.omniscient.SSIAllocation;
@@ -398,6 +399,7 @@ public final class Configuration {
            put("hungarian", HungarianMethodAllocation.class);
            put("ssi", SSIAllocation.class);
            put("incremental-ssi", IncrementalSSIAllocation.class);
+           put("nofirst-ssi", NofirstSSIAllocation.class);
            put("maxsum", MaxSumAllocation.class);
         }};
     }
