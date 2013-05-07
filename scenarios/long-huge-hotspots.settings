@@ -1,4 +1,4 @@
-# These are all default values for the generator. You could run without
+# These are all default values for the generator. You could run withou
 # specifying any setting at all, and a problem of this type would be generated.
 
 # 30 days
@@ -31,7 +31,7 @@ task-distribution = hotspot
 
 # On average, 90% of each hotspot's tasks will be within 2km from the
 # hotspot center.
-hotspot-radius = 4000
+hotspot-radius = 20000
 
 # This controls how much hotspots vary between them. The minimum value
 # is 2, which yields the maximum variance. The higher the value, the
