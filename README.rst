@@ -26,52 +26,24 @@ from the included *ant* ``build.xml`` file::
 This command will create a ``dist`` folder, containing the compiled program's jar
 file and the required libs.
 
-
 Usage
 =========
 
 In order to test the algorithm's behavior in a particular scenario, the said
 scenario must be first generated. This is, *Planes* does not randomly generate
-scenarios when running. Instead, it includes a scenario generator, that produces
+scenarios when running. Instead, it includes a scenario generator that produces
 scenario descriptions. These descriptions can be saved to a file and then
-"solved" by *Planes* using any of the implemented strategies.
-
-
-Generator
----------
-
-After compiling the project, you can generate an example scenario by invoking the generator::
-
-  cd /path/to/project
-  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli problem
-
-This command generates an example scenario using defaults for all settings, and saves it to a
-file named ``problem``. You can obtain a commented copy of all the generator's settings by dumping
-the default generator configuration to a file::
-
-  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli -d > generator.settings
-
-This will create a text file ``generator.settings`` containing all the default settings plus a small
-explanation of their effects. At this point, you can edit any setting in the file using a text
-editor. Thereafter, you can generate scenarios using these custom settings by telling the generator
-to employ the (modified) settings file::
-
-  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli problem -s generator.settings problem
+"solved" by *Planes* using any of the implemented strategies. You can get started
+quickly by using the example problems found in the ``scenarios`` folder.
 
 Simulator
 ---------
 
-Once a sample scenario has been generated, we can proceed to actually "solve" it
-using any of the inbuilt UAV coordination algorithms. You can see the simulator
-options by launching it with the ``-h`` option::
+Once you have an example problem, the simulator can "solve" it using any of 
+the inbuilt UAV coordination algorithms.  For instance, to solve the problem
+``scenarios/short-hotspots.hson``, you can execute the following command::
 
-  cd /path/to/project
-  java -jar dist/planes.jar -h
-
-Choose your settings and launch the simulator, specifying which scenario
-description to simulate::
-
-  java -jar dist/planes.jar -g problem
+  java -jar dist/planes.jar -g scenarios/short-hotspots.json
 
 The ``-g`` option here tells the simulator to display a GUI of the simulation
 (see below for more details about the GUI interface). If you remove it, the 
@@ -96,7 +68,7 @@ settings include from the mechanism used by the planes to coordinate betweem
 themselves (the algorithms we are testing!), to how the operator(s) choose to
 which plane to submit each task.
 
-To ease in making experiments of many runs with similar configurations, the
+To simplify the execution of many runs with similar configurations, the
 simulator allows you to specify a settings file using the command line. That is,
 you can instruct the simulator to use the settings described by <file> by running
 it with a special parameter::
@@ -178,3 +150,38 @@ focused plane stands out of the rest. Additionally, you can no longer see the
 full plans of other planes. Instead, you can see the focused plane's plan as
 well as a trail of the last tasks it has serviced. When in focused mode, click
 any empty space of the display to go back to the normal mode.
+
+
+Generator
+---------
+
+At some point, you probably want to generate customized problems that represent
+different scenarios. With *Planes*, you can generate such problems using the 
+included problem generator::
+
+  cd /path/to/project
+  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli problem
+
+This command generates an example scenario using defaults for all settings, and 
+saves it to a file named ``problem``. You can obtain a commented copy of all the 
+generator's settings by dumping the default generator configuration to a file::
+
+  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli -d > generator.settings
+
+This will create a text file ``generator.settings`` containing all the default 
+settings plus a small explanation of their effects. At this point, you can edit 
+any setting in the file using a text editor. Thereafter, you can generate scenarios 
+using these custom settings by telling the generator to employ the (modified) 
+settings file::
+
+  java -cp dist/planes.jar es.csic.iiia.planes.generator.Cli problem -s generator.settings problem
+
+
+Contact
+=======
+
+If you have any questions, problems or suggestions, please contact us at
+Contact_.
+
+.. _Contact: mailto:mpujol@iiia.csic.es
+
