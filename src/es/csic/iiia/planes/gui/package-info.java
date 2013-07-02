@@ -37,6 +37,6 @@
  */
 
 /**
- * Classes that implement the GUI interface.
+ * Classes that implement the Graphical User Interface.
  */
 package es.csic.iiia.planes.gui;

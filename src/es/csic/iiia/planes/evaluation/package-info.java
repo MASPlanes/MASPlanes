@@ -36,7 +36,8 @@
  */
 
 /**
- * Implementations of evaluation strategies.
+ * Available evaluation strategies, that specify the cost for an agent (plane)
+ * to perform a specific task.
  *
  * Evaluation strategies are the means by which planes compute the cost of
  * performing the tasks. Different evaluations may consider entirely different

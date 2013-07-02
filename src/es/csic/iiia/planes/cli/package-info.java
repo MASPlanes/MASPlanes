@@ -37,6 +37,6 @@
  */
 
 /**
- * Classes that implement the CLI interface.
+ * Classes that implement the Command Line Interface.
  */
 package es.csic.iiia.planes.cli;
