@@ -57,16 +57,6 @@ public abstract class AbstractBehavior implements Behavior {
         this.agent = agent;
     }
 
-    /**
-     * Behaviors are not promiscuous by default
-     *
-     * @return <em>false</em>
-     */
-    @Override
-    public boolean isPromiscuous() {
-        return false;
-    }
-
     @Override
     public void initialize() {}
 

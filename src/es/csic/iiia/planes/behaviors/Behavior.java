@@ -76,19 +76,6 @@ public interface Behavior {
     public Class[] getDependencies();
 
     /**
-     * Check if this behaviour uses promiscuous mode to receive messages.
-     *
-     * Behaviors on promiscuous mode receive all messages that arrive to the
-     * agent, even if they are not the intended recipient of the message.<br/>
-     * Behavoirs on normal (non-promiscuous) mode drop all messages that have
-     * an intended recipient set and it is different than themselves.
-     *
-     * @see Message#getRecipient()
-     * @return True if this is a promiscuous behavior, or False otherwise.
-     */
-    public boolean isPromiscuous();
-
-    /**
      * Implements actions to be performed by this behavior *before* any other
      * agent has started processing messages.
      */

@@ -129,17 +129,6 @@ public class NeighborTracking extends AbstractBehavior {
         return neighbors.hasNeighbors(iterations);
     }
 
-    /**
-     * Return True because this behaviour is promiscuous (we want to receive
-     * all messages that we can hear, even if they are not intended for us).
-     *
-     * @return True.
-     */
-    @Override
-    public boolean isPromiscuous() {
-        return true;
-    }
-
     @Override
     public void beforeMessages() {
         neighbors.clear();

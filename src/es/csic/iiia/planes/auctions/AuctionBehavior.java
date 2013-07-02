@@ -83,17 +83,6 @@ public class AuctionBehavior extends AbstractBehavior {
         neighborTracker = getAgent().getBehavior(NeighborTracking.class);
     }
 
-    /**
-     * Return False because this behaviour is <em>not</em> promiscuous (we do
-     * not want to receive any messages that are intended for others).
-     *
-     * @return False.
-     */
-    @Override
-    public boolean isPromiscuous() {
-        return false;
-    }
-
     @Override
     public AuctionPlane getAgent() {
         return (AuctionPlane)super.getAgent();

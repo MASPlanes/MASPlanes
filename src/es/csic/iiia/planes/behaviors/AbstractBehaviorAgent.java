@@ -245,10 +245,8 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
         final Class bClass = b.getClass();
         final Class mClass = m.getClass();
 
-        // Skip messages intended for other agents if the behavior is not
-        // promiscuous (@see Behavior#isPromiscuous())
-        if (!b.isPromiscuous() && m.getRecipient() != null
-                && m.getRecipient() != this) {
+        // Skip messages intended for other agents
+        if (m.getRecipient() != null && m.getRecipient() != this) {
             return;
         }
 
