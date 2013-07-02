@@ -104,11 +104,9 @@ The simulator includes a simple GUI to visualize what is happening in the
 simulation while it runs. The GUI has three distinct sections, as shown in this
 figure:
 
-.. figure:: https://bitbucket.org/mpujol/planes/raw/master/img/sections.png
+..  image:: https://bitbucket.org/mpujol/planes/raw/master/img/sections.png
     :align: center
-    :alt: GUI screenshot
-
-    Simulator's GUI screenshot.
+    :alt: Simulator's GUI screenshot.
 
 First, there is a top bar that contains a few controls:
 
@@ -181,7 +179,7 @@ Contact
 =======
 
 If you have any questions, problems or suggestions, please contact us at
-Contact_.
+`mpujol@iiia.csic.es`_.
 
-.. _Contact: mailto:mpujol@iiia.csic.es
+.. _`mpujol@iiia.csic.es:wq`: mailto:mpujol@iiia.csic.es
 
