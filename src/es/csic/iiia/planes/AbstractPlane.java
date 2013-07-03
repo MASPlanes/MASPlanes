@@ -256,7 +256,7 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      *
      * @param position
      * @param candidates
-     * @return
+     * @return nearest task to the given location.
      */
     protected Task getNearest(Location position, List<Task> candidates) {
         double max = Double.MAX_VALUE;

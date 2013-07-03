@@ -131,7 +131,7 @@ public interface Plane extends MessagingAgent {
      * plane's {@link EvaluationStrategy}.
      *
      * @see #getEvaluationStrategy()
-     * @see #setEvaluationStrategy()
+     * @see #setEvaluationStrategy(EvaluationStrategy) 
      *
      * @param task task to evaluate.
      * @return cost of performing the given task.

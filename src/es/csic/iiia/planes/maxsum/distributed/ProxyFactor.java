@@ -150,7 +150,7 @@ public abstract class ProxyFactor<LocalType, RemoteType> implements Factor {
      * Get the "neighbor" of this factor (the recipient to which this object
      * is proxying).
      *
-     * @return
+     * @return neighbor of this factor.
      */
     @Override
     public List<Factor> getNeighbors() {
