@@ -55,7 +55,7 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class NeighborTracking extends AbstractBehavior {
+public class NeighborTracking extends AbstractBehavior<Plane> {
     private static final Logger LOG = Logger.getLogger(NeighborTracking.class.getName());
 
     private NeighborsCollection neighbors = new NeighborsCollection();
@@ -67,11 +67,6 @@ public class NeighborTracking extends AbstractBehavior {
      */
     public NeighborTracking(Plane agent) {
         super(agent);
-    }
-
-    @Override
-    public Plane getAgent() {
-        return (Plane)super.getAgent();
     }
 
     @Override

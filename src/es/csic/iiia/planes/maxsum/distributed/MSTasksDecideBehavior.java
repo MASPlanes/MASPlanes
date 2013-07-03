@@ -52,21 +52,16 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSTasksDecideBehavior extends AbstractBehavior {
+public class MSTasksDecideBehavior extends AbstractBehavior<MSPlane> {
     private static final Logger LOG = Logger.getLogger(MSTasksDecideBehavior.class.getName());
 
-    public MSTasksDecideBehavior(MessagingAgent agent) {
+    public MSTasksDecideBehavior(MSPlane agent) {
         super(agent);
     }
 
     @Override
     public Class[] getDependencies() {
         return new Class[]{MSExecutionBehavior.class};
-    }
-
-    @Override
-    public MSPlane getAgent() {
-        return (MSPlane)super.getAgent();
     }
 
     @Override

@@ -44,16 +44,16 @@ import es.csic.iiia.planes.cli.Configuration;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class AbstractBehavior implements Behavior {
+public abstract class AbstractBehavior<T extends MessagingAgent> implements Behavior<T> {
 
-    private MessagingAgent agent;
+    private T agent;
 
     /**
      * Builds a new behavior.
      *
      * @param agent that will exhibit this behavior.
      */
-    public AbstractBehavior(MessagingAgent agent) {
+    public AbstractBehavior(T agent) {
         this.agent = agent;
     }
 
@@ -73,7 +73,7 @@ public abstract class AbstractBehavior implements Behavior {
     public void postStep() {}
 
     @Override
-    public MessagingAgent getAgent() {
+    public T getAgent() {
         return agent;
     }
 
