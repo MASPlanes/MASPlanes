@@ -26,43 +26,31 @@
 package es.csic.iiia.planes.tutorial;
 
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- * Behavior that implements the Parallel Single-Item Auctions 
- * coordination mechanism.
+ * Message that signals the opening of an auction.
  * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
-
+public class OpenAuctionMessage extends AbstractMessage {
+    
+    private Task task;
+    
     /**
-     * Build a new Parallel Single Item Auctions behavior.
-     * @param agent plane that will display this behavior.
+     * Build a new open auction message.
+     * @param t task being auctioned.
      */
-    public PSIAuctionBehavior(TutorialPlane agent) {
-        super(agent);
+    public OpenAuctionMessage(Task t) {
+        this.task = t;
     }
     
-    @Override
-    public Class[] getDependencies() {
-        return null;
-    }
-    
-    @Override
-    public void afterMessages() {
-        // Open new auctions only once every four steps
-        if (getAgent().getWorld().getTime() % 4 == 0) {
-            openAuctions();
-        }
-    }
-
-    private void openAuctions() {
-        TutorialPlane plane = getAgent();
-        for (Task t : plane.getTasks()) {
-            OpenAuctionMessage msg = new OpenAuctionMessage(t);
-            plane.send(msg);
-        }
+    /**
+     * Get the task that is being auctioned.
+     * @return task that is being auctioned.
+     */
+    public Task getTask() {
+        return task;
     }
     
 }

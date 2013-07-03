@@ -23,46 +23,8 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package es.csic.iiia.planes.tutorial;
-
-import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.behaviors.AbstractBehavior;
 
 /**
- * Behavior that implements the Parallel Single-Item Auctions 
- * coordination mechanism.
- * 
- * @author Marc Pujol <mpujol@iiia.csic.es>
+ * Code complementing the <em>MASPlanes</em> getting started tutorial.
  */
-public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
-
-    /**
-     * Build a new Parallel Single Item Auctions behavior.
-     * @param agent plane that will display this behavior.
-     */
-    public PSIAuctionBehavior(TutorialPlane agent) {
-        super(agent);
-    }
-    
-    @Override
-    public Class[] getDependencies() {
-        return null;
-    }
-    
-    @Override
-    public void afterMessages() {
-        // Open new auctions only once every four steps
-        if (getAgent().getWorld().getTime() % 4 == 0) {
-            openAuctions();
-        }
-    }
-
-    private void openAuctions() {
-        TutorialPlane plane = getAgent();
-        for (Task t : plane.getTasks()) {
-            OpenAuctionMessage msg = new OpenAuctionMessage(t);
-            plane.send(msg);
-        }
-    }
-    
-}
+package es.csic.iiia.planes.tutorial;
