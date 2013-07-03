@@ -9,6 +9,8 @@ help in solving the coordination problem represented by *MASPlanes*.
 Thereafter, we will jump into the implementation details, until we end up with
 a functioning implementation of this coordination mechanism.
 
+.. contents:: Contents of this tutorial:
+
 Parallel single-item auctions
 -----------------------------
 
@@ -80,28 +82,28 @@ one:
 
 .. sourcecode :: java
 
-	public class TutorialPlane extends AbstractPlane {
+    public class TutorialPlane extends AbstractPlane {
 
-	    public TutorialPlane(Location location) {
-	        super(location);
-	    }
-	 
-	    @Override
-	    protected void taskCompleted(Task t) {
-	        System.out.println(this + " completed " + t);
-	    }
+        public TutorialPlane(Location location) {
+            super(location);
+        }
+     
+        @Override
+        protected void taskCompleted(Task t) {
+            System.out.println(this + " completed " + t);
+        }
 
-	    @Override
-	    protected void taskAdded(Task t) {
-	        System.out.println(t + " is now allocated to " + this);
-	    }
+        @Override
+        protected void taskAdded(Task t) {
+            System.out.println(t + " is now allocated to " + this);
+        }
 
-	    @Override
-	    protected void taskRemoved(Task t) {
-	        System.out.println(t + " is no longer allocated to " + this);
-	    }
-	    
-	}
+        @Override
+        protected void taskRemoved(Task t) {
+            System.out.println(t + " is no longer allocated to " + this);
+        }
+        
+    }
 
 As you can see, extending ``AbstractPlane`` forces us to implement three
 methods. These methods are called by the base class whenever a task is
@@ -138,14 +140,14 @@ the ``es.csic.iiia.planes.cli.settings.properties`` file:
 
 .. sourcecode :: diff
 
-	@@ -22,6 +22,7 @@ operator-strategy=nearest-inrange
-	 #   auction     Planes coordinate with each other using auctions.
-	 #   maxsum      Planes coordinate using max-sum.
-	 #   omniscient  Planes that coordinate through an omniscient entity.
-	+#   tutorial    Use the planes implemented in the MASPlanes tutorial.
-	 planes=none
-	 
-	 # Type of the battery used by the planes.
+    @@ -22,6 +22,7 @@ operator-strategy=nearest-inrange
+     #   auction     Planes coordinate with each other using auctions.
+     #   maxsum      Planes coordinate using max-sum.
+     #   omniscient  Planes that coordinate through an omniscient entity.
+    +#   tutorial    Use the planes implemented in the MASPlanes tutorial.
+     planes=none
+     
+     # Type of the battery used by the planes.
 
 Recompile the project, and check that your changes are actually effective:
 
@@ -153,14 +155,14 @@ Recompile the project, and check that your changes are actually effective:
 when you dump the default settings file:
 
    .. code:: bash
-	
-	java -jar dist/MASPlanes.jar -d
+    
+    java -jar dist/MASPlanes.jar -d
 
 2. Then, run the simulator with your shiny new planes instead of the default ones:
    
    .. code:: bash
 
-	java -jar dist/MASPlanes.jar -o planes=tutorial problem.json -g
+    java -jar dist/MASPlanes.jar -o planes=tutorial problem.json -g
 
 If everything went well, you should see the messages being printed by the
 planes whenever they get and complete tasks. For now, the planes are not
@@ -183,27 +185,123 @@ following action methods, where a plane can initiate some actions (such as
 sending messages):
 
 ``preStep()``     
-	This method is invoked at the beggining of each step. The
-	platform guarantees that this method will be called on **all** behaviors of
-	**all** agents before any other action methods are called. That is, the
-	plaform will never call the ``beforeMessages()`` method of an agent's behavior
-	unless all other agents have already executed their ``preStep()`` operations.
+    This method is invoked at the beggining of each step. The
+    platform guarantees that this method will be called on **all** behaviors of
+    **all** agents before any other action methods are called. That is, the
+    plaform will never call the ``beforeMessages()`` method of an agent's behavior
+    unless all other agents have already executed their ``preStep()`` operations.
 
 ``beforeMessages()``
-	This method is invoked right before processing any messages received in this 
-	step.
+    This method is invoked right before processing any messages received in this 
+    step.
 
 ``on(MessageType)``
- 	You can have as many of these methods as you wish. These methods are invoked 
- 	once for each message of type ``MessageType`` received in this step.
+    You can have as many of these methods as you wish. These methods are invoked 
+    once for each message of type ``MessageType`` received in this step.
 
 ``afterMessage()``
-	Invoked immediately after the plane has processed all the received messages.
+    Invoked immediately after the plane has processed all the received messages.
 
 ``postStep()``
-	Called after **all** behaviors of **all** agents have processed their messages.
+    Called after **all** behaviors of **all** agents have processed their messages.
 
-Knowing this, we can now try to implement the parallel single-item auctions mechanism using a behavior. 
+Knowing this, we can now try to implement the parallel single-item auctions
+mechanism using a behavior. Instead of implementing all of the ``Behavior``
+methods, we will simply extend the ``AbstractBehavior`` class, which gives us
+a default (no action) implementation for all the above methods:
+
+.. sourcecode :: java
+
+    public class PSIAuctionsBehavior extends AbstractBehavior {
+
+        public PSIAuctionsBehavior(TutorialPlane agent) {
+            super(agent);
+        }
+        
+        @Override
+        public Class[] getDependencies() {
+            return null;
+        }
+
+        @Override 
+        public TutorialPlane getAgent() {
+            return (TutorialPlane)super.getAgent();
+        }
+        
+    }
+
+For now you can ignore the ``getDependencies()`` method, whose function we
+will explain later on. Additionally, notice that we also override the
+``getAgent()`` method. This is because 
+
+Before expanding this behavior, let's actually make our
+planes use it. Since we used the ``AbstractPlane`` as a base class for our
+``TutorialPlane``, it is now very easy to incorporate a behavior to our
+planes. In fact, we only have to call the ``addBehavior(Behavior)`` method at
+some point, and the plane will start using it. Typically, the best place where
+to add behaviors is during the plane's initialization function. Therefore, we
+can open our ``TutorialPlane`` class and override its initialization method,
+adding our new behavior
+
+.. sourcecode :: java
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        addBehavior(new PSIAuctionsBehavior(this));
+    }
+
+Our planes will now execute the ``PSIAuctionBehavior``, performing any actions
+defined in their action methods and reacting to messages appropiately.
+
+
+Opening auctions
+^^^^^^^^^^^^^^^^
+
+The next step is to make the planes open an auction for each of their
+currently allocated tasks. Actually, this amounts to sending a (broadcast)
+message to announce the auction. Therefore, we should first define this
+message.
+
+Unsurprisingly, all classes defining a message type must implement the
+``Message`` interface. From that interface's javadoc, it is clear that
+messages must specify a sender and a recipient. However, the recipient of a
+message can be set to ``null``, in which case it will be considered as a
+broadcast message.
+
+Back to our auction opening, we will create an ``OpenAuctionMessage`` class
+defining our messages to open auctions. Instead of directly implementing the
+``Message`` interface, we can extend from the ``AbstractMessage`` class, which
+already implements the facilities to get and set the sender/recipient.
+Messages opening auctions must specify who the auctioneer is, and which Task
+is being auctioned. The auctioneer is always the sender of the message, so
+there's no need to add a specific field for that. However, we do have to add a
+field to specify which Task is being auctioned:
+
+.. sourcecode:: java
+
+    public class OpenAuctionMessage extends AbstractMessage {
+        
+        private Task task;
+        
+        public OpenAuctionMessage(Task t) {
+            this.task = t;
+        }
+        
+        public Task getTask() {
+            return task;
+        }
+        
+    }
+
+Now that we have a message to tell other planes about the auctions we are opening, it is time to actually send those out. Because auction opening messages are not sent in response to other messages, we must use one of the aforementioned action methods of our behavior. Notice that, being a step-based simulator, messages sent by a plane in the current step will not be received by other planes until the next one. Therefore, it does not really matter wether we send these auction opening messages during the ``preStep``, ``beforeMessages``, or ``afterMessages`` phases of a step. In this tutorial, we arbitrarily chose to do in the ``afterMessages`` phase. Thus, we modify our ``PSIAuctionsBehavior`` class, adding the following:
+
+.. sourcecode:: java
+
+
+
+
+
 
 
 
