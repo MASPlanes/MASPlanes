@@ -54,14 +54,14 @@ import es.csic.iiia.planes.MessagingAgent;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface Behavior {
+public interface Behavior<T extends MessagingAgent> {
 
     /**
      * Get the agent that exhibits this behavior.
      *
      * @return agent that exhibits this behavior.
      */
-    public MessagingAgent getAgent();
+    public T getAgent();
 
     /**
      * Initialize this behavior.

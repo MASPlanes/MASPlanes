@@ -46,16 +46,11 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSExecutionBehavior extends AbstractBehavior {
+public class MSExecutionBehavior extends AbstractBehavior<MSPlane> {
     private static final Logger LOG = Logger.getLogger(MSExecutionBehavior.class.getName());
 
     public MSExecutionBehavior(MSPlane plane) {
         super(plane);
-    }
-
-    @Override
-    public MSPlane getAgent() {
-        return (MSPlane)super.getAgent();
     }
 
     @Override
