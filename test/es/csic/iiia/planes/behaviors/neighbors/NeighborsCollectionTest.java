@@ -38,8 +38,6 @@ package es.csic.iiia.planes.behaviors.neighbors;
 
 import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.MessagingAgent;
-import java.util.Collection;
-import java.util.Iterator;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
