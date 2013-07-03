@@ -102,9 +102,10 @@ public class Location extends Point2D {
     }*/
 
     /**
-     * Continue advancing towards a destination previusly specified to
-     * {@link #move(es.csic.iiia.planes.Location, double)}.
-     * @param step
+     * Continue advancing along a MoveStep plan built with 
+     * {@link #buildMoveStep(Location, double)}.
+     * 
+     * @param step movestep plan to follow.
      * @return True if the destination has been reached, or false otherwise.
      */
     public boolean move(MoveStep step) {

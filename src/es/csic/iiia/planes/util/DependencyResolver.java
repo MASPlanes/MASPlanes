@@ -47,7 +47,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 /**
  * Resolves the dependencies between behaviors.
  *
- * @see AbstractMessagingAgent#addBehavior(Behavior)
+ * @see AbstractBehaviorAgent#addBehavior(Behavior)
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class DependencyResolver {
