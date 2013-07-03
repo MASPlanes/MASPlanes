@@ -166,15 +166,14 @@ public class AuctionBehavior extends AbstractBehavior {
 
     private void doAuction(Task t) {
         final AuctionPlane agent = getAgent();
-        double baseCost = agent.getLocation().distance(t.getLocation());
 
-        BidMessage winner = computeWinner(baseCost, bids.get(t));
-        if (winner != null) {
+        BidMessage winner = computeWinner(bids.get(t));
+        if (winner.getSender() != agent) {
 
             if (LOG.isLoggable(Level.FINER)) {
-                LOG.log(Level.FINER, "{0} loses task {1} to {2} ({3} vs {4})",
+                LOG.log(Level.FINER, "{0} loses task {1} to {2} (cost: {3})",
                         new Object[]{agent, t.getId(), getSenderID(winner),
-                        baseCost, winner.getPrice()});
+                        winner.getPrice()});
             }
 
             agent.removeTask(t);
@@ -183,15 +182,15 @@ public class AuctionBehavior extends AbstractBehavior {
             agent.send(win);
         } else {
             if (LOG.isLoggable(Level.FINER)) {
-                LOG.log(Level.FINER, "{0} keeps task {1} (baseCost: {2})",
-                        new Object[]{agent, t.getId(), baseCost});
+                LOG.log(Level.FINER, "{0} keeps task {1} (cost: {2})",
+                        new Object[]{agent, t.getId(), winner.getPrice()});
             }
         }
     }
 
-    private static BidMessage computeWinner(double baseCost, List<BidMessage> bids) {
+    private static BidMessage computeWinner(List<BidMessage> bids) {
         BidMessage winner = null;
-        double minCost = baseCost;
+        double minCost = Double.MAX_VALUE;
         for (BidMessage bid : bids) {
             if (bid.getPrice() < minCost) {
                 minCost = bid.getPrice();

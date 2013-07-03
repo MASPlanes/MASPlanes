@@ -307,7 +307,8 @@ public abstract class AbstractWorld implements World {
 
         for (Plane p : planes) {
             if (  origin.distance(p.getLocation()) <= range
-               && (p != message.getSender() || p == message.getRecipient())) {
+               && (p == message.getRecipient() || message.getRecipient() == null))
+            {
                 p.receive(message);
             }
         }
