@@ -3,7 +3,7 @@ Implementing parallel single-item auctions coordination
 --------------------------------------------------------
 
 This tutorial is a walk-through on how to implement a coordination mechanism
-for the planes, based on parallel single-item auctions. Therefore, we start by
+in *MASPlanes*, based on parallel single-item auctions. Therefore, we start by
 quickly explaining what parallel single-item auctions are, and how they can
 help in solving the coordination problem represented by *MASPlanes*.
 Thereafter, we will jump into the implementation details, until we end up with
@@ -35,11 +35,16 @@ single-item auctions to obtain a better allocation. The parallel single-item
 auctions mechanism is pretty simple, and can be explained in three simple
 steps:
 
-1. Each plane opens an auction for each of its current tasks. 2. Upon
-receiving an auction anouncement, a plane replies with a *bid*, specifying the
-cost to fulfill that task (its current distance from the task). 3. Finally,
-the auctioneer collects all the bids for each of its tasks, and reallocates
-each task to the best bid (the one with lowest cost)
+1. Each plane opens an auction for each of its current tasks. 
+
+2. Upon receiving an auction anouncement, a plane replies with a *bid*,
+   specifying the cost to fulfill that task (its current distance from the task).
+
+3. The auctioneer collects all the bids for each of its tasks, and reallocates
+   each task to the best bid (the one with lowest cost).
+
+4. Finally, planes receive whatever tasks have been newly allocated to them,
+   and the task allocation procedure is complete.
 
 At the end of this simple procedure, each task will be assigned to the plane
 that is currently nearest. In this particular case, this means that on the new
@@ -152,8 +157,8 @@ the ``es.csic.iiia.planes.cli.settings.properties`` file:
 Recompile the project, and check that your changes are actually effective:
 
 1. If you updated the default settings file, check that the changes are shown
-when you dump the default settings file:
-
+   when you dump the default settings file:
+   
    .. code:: bash
     
     java -jar dist/MASPlanes.jar -d
@@ -286,16 +291,268 @@ field to specify which Task is being auctioned:
         
     }
 
-Now that we have a message to tell other planes about the auctions we are opening, it is time to actually send those out. Because auction opening messages are not sent in response to other messages, we must use one of the aforementioned action methods of our behavior. Notice that, being a step-based simulator, messages sent by a plane in the current step will not be received by other planes until the next one. Therefore, it does not really matter wether we send these auction opening messages during the ``preStep``, ``beforeMessages``, or ``afterMessages`` phases of a step. In this tutorial, we arbitrarily chose to do in the ``afterMessages`` phase. Thus, we modify our ``PSIAuctionsBehavior`` class, adding the following:
+Now that we have a message to tell other planes about the auctions we are
+opening, it is time to actually send those out. Because auction opening
+messages are not sent in response to other messages, we must use one of the
+aforementioned action methods of our behavior. Notice that, being a step-based
+simulator, messages sent by a plane in the current step will not be received
+by other planes until the next one. Therefore, it does not really matter
+wether we send these auction opening messages during the ``preStep``,
+``beforeMessages``, or ``afterMessages`` phases of a step. In this tutorial,
+we arbitrarily chose to do in the ``afterMessages`` phase. 
+
+However, there's still a minor issue to sort out. If we simply open an auction
+at every step, we would be starting new auctions for tasks that are already
+being auctioned. This is not what we want, so we have to somehow control that
+a new action is only started after the older ones have finished. Fortunately,
+this is fairly easy to do in our step-based simulator. From the explanation of
+parallel single-item auctions above, we know that the whole process takes
+exactly four steps. As a consequence, we can simply start a new auction every
+four steps, and rest assured that there will never be two simultaneous auctions
+for the same task.
+
+All this can be easily implemented by modifying our ``PSIAuctionsBehavior``
+class, where we add the following:
 
 .. sourcecode:: java
 
+    @Override
+    public void afterMessages() {
+        // Open new auctions only once every four steps
+        if (getAgent().getWorld().getTime() % 4 == 0) {
+            openAuctions();
+        }
+    }
+
+    private void openAuctions() {
+        TutorialPlane plane = getAgent();
+        for (Task t : plane.getTasks()) {
+            OpenAuctionMessage msg = new OpenAuctionMessage(t);
+            plane.send(msg);
+        }
+    }
 
 
+Bidding for tasks
+^^^^^^^^^^^^^^^^^
+
+Now that the planes already start auctions for their tasks, it's time to make
+them bid on the auctions they receive. These bids will be messages sent to the
+tasks' auctioneers, so we have to start by defining the ``BidMessage`` class.
+In this case, the message must identify for which task the bid is, as well as
+the cost for the sending plane to perform the bid's task:
+
+.. sourcecode:: java
+
+    public class BidMessage extends AbstractMessage {
+        
+        private double cost;
+        private Task task;
+        
+        public BidMessage(Task t, double cost) {
+            this.task = t;
+            this.cost = cost;
+        }
+        
+        public double getCost() {
+            return cost;
+        }
+        
+        public Task getTask() {
+            return this.task;
+        }
+        
+    }
+
+Next, we need to actually send these bid messages out in response to the
+incoming ``OpenAuctionMessage`` messages. Therefore, these (re)action can be
+implmented by introducing a new ``on(OpenAuctionMessage)`` method to our
+``PSIAuctionBehavior``:
+
+.. sourcecode:: java
+
+    public void on(OpenAuctionMessage auction) {
+        TutorialPlane plane = getAgent();
+        Task t = auction.getTask();
+        
+        double cost = plane.getLocation().distance(t.getLocation());
+        BidMessage bid = new BidMessage(t, cost);
+        bid.setRecipient(auction.getSender());
+        plane.send(bid);
+    }
+
+There is nothing fancy going on here. Upon a receiving an
+``OpenAuctionMessage``, the plane simply (i) computes the cost to perform the
+auction's task (defined as the current distance from the plane to the task);
+and (ii) sends a bid to the auctioneer (the sender of the auction message)
+specifying that cost.
+
+Since this method will get call once for each incoming ``OpenAuctionMessage``,
+this is all we need to implement for the planes to perform the second step of
+the coordination algorithm, and we are ready to move on.
 
 
+Choosing the winners
+^^^^^^^^^^^^^^^^^^^^
+
+At first, the winner selection action may seem to be a (re)action to the
+received bids, just like bidding was a reaction to the received
+``OpenAuctionMessage`` messages. Nonetheless, we must collect all the incoming
+bids for a task before choosing the winner. As a consequence, the winner
+determination process must be decomposed in two parts.
+
+Collect bids for each task
+..........................
+
+First, we must collect all the incoming bids, preferably separated by the task
+they are for. Thus, we need a ``Map`` from ``Task`` to a set of received bids.
+This map must be cleared at each simulation step, before actually processing
+the messages. Thus, the map clearing will be implemented within the
+``beforeMessages()`` actions. Thereafter, we can actually collect the
+``BidMessages`` using an ``on(BidMessage)`` (re)action. With this aim, we add
+the following code to our ``PSIAuctionBehavior`` class:
+
+.. sourcecode:: java
+
+    private Map<Task, List<BidMessage>> collectedBids =
+            new HashMap<Task, List<BidMessage>>();
+
+    @Override
+    public void beforeMessages() {
+        collectedBids.clear();
+    }
+
+    public void on(BidMessage bid) {
+        Task t = bid.getTask();
+
+        // Get the list of bids for this task, or create a new list if
+        // this is the first bid for this task.
+        List<BidMessage> taskBids = collectedBids.get(t);
+        if (taskBids == null) {
+            taskBids = new ArrayList<BidMessage>();
+            collectedBids.put(t, taskBids);
+        }
+
+        taskBids.add(bid);
+    }
+
+Choose winners and reallocate tasks
+....................................
+
+Second, we must determine the winner and reallocate the tasks if the winner of
+a task is not the plane where the task is currently allocated. As should be
+familiar by now, this reallocation should be notified with a message sent from
+the auctioneer to whatever plane the task must be reallocated to. Therefore,
+we will first create a ``ReallocateMessage`` message class to perform such
+notifications:
+
+.. sourcecode:: java
+
+    public class ReallocateMessage extends AbstractMessage {
+
+        private Task task;
+
+        public ReallocateMessage(Task t) {
+            this.task = t;
+        }
+
+        public Task getTask() {
+            return task;
+        }
+
+    }
+
+Now we can proceed to compute the auction winners, but only after having
+processed all the incoming messages. Hence, the winner determination procedure
+must be performed int the ``afterMessages()`` actions. Since this method is
+aleady implemented in our behavior, we have to add the code along with the
+existing one:
+
+.. sourcecode:: java
+
+    @Override
+    public void afterMessages() {
+        // Open new auctions only once every four steps
+        if (getAgent().getWorld().getTime() % 4 == 0) {
+            openAuctions();
+        }
+
+        // Compute auction winners only if we have received bids in this step
+        if (!collectedBids.isEmpty()) {
+            computeAuctionWinners();
+        }
+    }
+
+The new code calls a function that we have yet to implement. Hence, we also
+need to add the following methods to our ``PSIAuctionBehavior`` class:
+
+.. sourcecode:: java
+
+    private void computeAuctionWinners() {
+        for (Task t : collectedBids.keySet()) {
+            BidMessage winner = computeAuctionWinner(collectedBids.get(t));
+            reallocateTask(winner);
+        }
+    }
+
+    private BidMessage computeAuctionWinner(List<BidMessage> bids) {
+        BidMessage winner = null;
+        double minCost = Double.MAX_VALUE;
+
+        for (BidMessage bid : bids) {
+            if (bid.getCost() < minCost) {
+                winner = bid;
+                minCost = bid.getCost();
+            }
+        }
+
+        return winner;
+    }
+
+    private void reallocateTask(BidMessage winner) {
+        TutorialPlane plane = getAgent();
+        
+        // No need to reallocate when the task is already ours
+        if (winner.getSender() == plane) {
+            return;
+        }
+
+        // Remove the task from our list of pending tasks
+        plane.removeTask(winner.getTask());
+        
+        // Send it to the auction's winner
+        ReallocateMessage msg = new ReallocateMessage(winner.getTask());
+        msg.setRecipient(winner.getSender());
+        plane.send(msg);
+    }
+
+Although this is a big chunk of code, it should be pretty self-explanatory.
+Basically, we compute the winner for each task we are auctioning. Notice that
+the winner of an auction is usually whoever makes the highest bid. However, in
+this particular case we are bidding costs, so the winner will be whoever has
+the lowest valued bid. Finally, we reallocate those tasks for which we did not
+win the auction.
 
 
+Accepting reallocated tasks
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Apparently, the only thing left to do is to make planes accept those tasks
+that have been reallocated to them. This is clearly a pure reaction to the
+received ``ReallocateMessage`` messages, so we just have to add a simple
+method to our behavior:
+
+.. sourcecode:: java
+
+    public void on(ReallocateMessage msg) {
+        getAgent().addTask(msg.getTask());
+    }
+
+And that's it. At this point we should have planes that coordinate using the
+parallel single-item auctions. However, we must still test that everything
+works correctly before finishing!
 
 
+Testing
+-------
 
