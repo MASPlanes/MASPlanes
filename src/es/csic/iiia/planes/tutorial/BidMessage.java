@@ -25,55 +25,42 @@
  */
 package es.csic.iiia.planes.tutorial;
 
-import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.messaging.AbstractMessage;
 
 /**
- * Behavior that implements the Parallel Single-Item Auctions 
- * coordination mechanism.
- * 
+ * Message containing a bid for a task.
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
-
+public class BidMessage extends AbstractMessage {
+    
+    private double cost;
+    
+    private Task task;
+    
     /**
-     * Build a new Parallel Single Item Auctions behavior.
-     * @param agent plane that will display this behavior.
+     * Build a new bid message
+     * @param cost 
      */
-    public PSIAuctionBehavior(TutorialPlane agent) {
-        super(agent);
+    public BidMessage(Task t, double cost) {
+        this.task = t;
+        this.cost = cost;
     }
     
-    @Override
-    public Class[] getDependencies() {
-        return null;
+    /**
+     * Get the cost for the sending plane to perform the specified task.
+     * @return cost for {@link #getSender()} to perform {@link #getTask()}.
+     */
+    public double getCost() {
+        return cost;
     }
     
-    public void on(OpenAuctionMessage auction) {
-        TutorialPlane plane = getAgent();
-        Task t = auction.getTask();
-        
-        double cost = plane.getLocation().distance(t.getLocation());
-        BidMessage bid = new BidMessage(t, cost);
-        bid.setRecipient(auction.getSender());
-        plane.send(bid);
-    }
-    
-    @Override
-    public void afterMessages() {
-        // Open new auctions only once every four steps
-        if (getAgent().getWorld().getTime() % 4 == 0) {
-            openAuctions();
-        }
-    }
-
-    private void openAuctions() {
-        TutorialPlane plane = getAgent();
-        for (Task t : plane.getTasks()) {
-            OpenAuctionMessage msg = new OpenAuctionMessage(t);
-            plane.send(msg);
-        }
+    /**
+     * Get the task for which this bid is.
+     * @return task for which this bid is.
+     */
+    public Task getTask() {
+        return this.task;
     }
     
 }
