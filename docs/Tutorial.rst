@@ -69,7 +69,7 @@ We want to implement the above procedure within the simulator. In essence, this 
 
 Although we could implement the ``Plane`` plane interface by ourselves, the platform includes an ``AbstractPlane`` class that has most of the common functionally already implemented. This includes flying to the nearest task assigned to this plane and deciding what to do whenever it has no assigned tasks, among many others. Therefore, we create our class extending from this one:
 
-.. code:: java
+.. sourcecode :: java
 
 	public class TutorialPlane extends AbstractPlane {
 
@@ -102,7 +102,7 @@ Launch a simulation with our custom planes
 
 At this point we should already have functional (albeit very silly) planes. However, we need to let the simulator know that it can use those planes by modyfing the available configuration options. This can be easily done by modifying the (private) method ``es.csic.iiia.planes.cli.Configuration#getPlaneClasses()`` method, adding a new entry for our custom plane type:
 
-.. code:: java
+.. sourcecode :: java
 
     private Map<String, Class<? extends Plane>> getPlaneClasses() {
         return new HashMap<String, Class<? extends Plane>>() {{
@@ -116,7 +116,7 @@ At this point we should already have functional (albeit very silly) planes. Howe
 
 This part is optional, but it is also nice to document that this new type of planes is available in the default configuration file. Therefore, we can edit the ``es.csic.iiia.planes.cli.settings.properties`` file:
 
-.. code:: diff
+.. sourcecode :: diff
 
 	@@ -22,6 +22,7 @@ operator-strategy=nearest-inrange
 	 #   auction     Planes coordinate with each other using auctions.
