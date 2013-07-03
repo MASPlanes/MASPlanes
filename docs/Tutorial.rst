@@ -212,7 +212,7 @@ a default (no action) implementation for all the above methods:
 
 .. sourcecode :: java
 
-    public class PSIAuctionsBehavior extends AbstractBehavior {
+    public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
 
         public PSIAuctionsBehavior(TutorialPlane agent) {
             super(agent);
@@ -222,19 +222,11 @@ a default (no action) implementation for all the above methods:
         public Class[] getDependencies() {
             return null;
         }
-
-        @Override 
-        public TutorialPlane getAgent() {
-            return (TutorialPlane)super.getAgent();
-        }
         
     }
 
 For now you can ignore the ``getDependencies()`` method, whose function we
-will explain later on. Additionally, notice that we also override the
-``getAgent()`` method. This is because 
-
-Before expanding this behavior, let's actually make our
+will explain later on. Before expanding this behavior, let's actually make our
 planes use it. Since we used the ``AbstractPlane`` as a base class for our
 ``TutorialPlane``, it is now very easy to incorporate a behavior to our
 planes. In fact, we only have to call the ``addBehavior(Behavior)`` method at
