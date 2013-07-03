@@ -25,31 +25,27 @@
  */
 package es.csic.iiia.planes.tutorial;
 
-import es.csic.iiia.planes.DefaultPlane;
-import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.behaviors.AbstractBehavior;
 
 /**
- * Implementation of a plane that will coordinate using auctions.
- * 
- * This implementation is solely for learning purposes.
+ * Behavior that implements the Parallel Single-Item Auctions 
+ * coordination mechanism.
  * 
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class TutorialPlane extends DefaultPlane {
+public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
 
     /**
-     * Build a new tutorial plane.
-     * 
-     * @param location initial location of this plane.
+     * Build a new Parallel Single Item Auctions behavior.
+     * @param agent plane that will display this behavior.
      */
-    public TutorialPlane(Location location) {
-        super(location);
+    public PSIAuctionBehavior(TutorialPlane agent) {
+        super(agent);
     }
     
     @Override
-    public void initialize() {
-        addBehavior(new PSIAuctionBehavior(this));
-        super.initialize();
+    public Class[] getDependencies() {
+        return null;
     }
-    
+
 }
