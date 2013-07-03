@@ -65,9 +65,18 @@ be isolated in a project of its own.
 Custom planes type ``TutorialPlane``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We want to implement the above procedure within the simulator. In essence, this means that we want planes that behave in a custom manner. Therefore, the first thing we must do is create our own type of planes. Therefore, we will create a  ``TutorialPlane`` class, implementing the ``Plane`` interface to allow it to be treated as an actual plane by the platform.
+We want to implement the above procedure within the simulator. In essence,
+this means that we want planes that behave in a custom manner. Therefore, the
+first thing we must do is create our own type of planes. Therefore, we will
+create a  ``TutorialPlane`` class, implementing the ``Plane`` interface to
+allow it to be treated as an actual plane by the platform.
 
-Although we could implement the ``Plane`` plane interface by ourselves, the platform includes an ``AbstractPlane`` class that has most of the common functionally already implemented. This includes flying to the nearest task assigned to this plane and deciding what to do whenever it has no assigned tasks, among many others. Therefore, we create our class extending from this one:
+Although we could implement the ``Plane`` plane interface by ourselves, the
+platform includes an ``AbstractPlane`` class that has most of the common
+functionally already implemented. This includes flying to the nearest task
+assigned to this plane and deciding what to do whenever it has no assigned
+tasks, among many others. Therefore, we create our class extending from this
+one:
 
 .. sourcecode :: java
 
@@ -94,13 +103,22 @@ Although we could implement the ``Plane`` plane interface by ourselves, the plat
 	    
 	}
 
-As you can see, extending ``AbstractPlane`` forces us to implement three methods. These methods are called by the base class whenever a task is completed by this plane, added (allocated) to this plane, or removed (deallocated) from this plane respectively. For now, we will just print out what happened to the standard error.
+As you can see, extending ``AbstractPlane`` forces us to implement three
+methods. These methods are called by the base class whenever a task is
+completed by this plane, added (allocated) to this plane, or removed
+(deallocated) from this plane respectively. For now, we will just print out
+what happened to the standard error.
 
 
 Launch a simulation with our custom planes
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-At this point we should already have functional (albeit very silly) planes. However, we need to let the simulator know that it can use those planes by modyfing the available configuration options. This can be easily done by modifying the (private) method ``es.csic.iiia.planes.cli.Configuration#getPlaneClasses()`` method, adding a new entry for our custom plane type:
+At this point we should already have functional (albeit very silly) planes.
+However, we need to let the simulator know that it can use those planes by
+modyfing the available configuration options. This can be easily done by
+modifying the (private) method
+``es.csic.iiia.planes.cli.Configuration#getPlaneClasses()`` method, adding a
+new entry for our custom plane type:
 
 .. sourcecode :: java
 
@@ -114,7 +132,9 @@ At this point we should already have functional (albeit very silly) planes. Howe
         }};
     }
 
-This part is optional, but it is also nice to document that this new type of planes is available in the default configuration file. Therefore, we can edit the ``es.csic.iiia.planes.cli.settings.properties`` file:
+This part is optional, but it is also nice to document that this new type of
+planes is available in the default configuration file. Therefore, we can edit
+the ``es.csic.iiia.planes.cli.settings.properties`` file:
 
 .. sourcecode :: diff
 
@@ -129,7 +149,8 @@ This part is optional, but it is also nice to document that this new type of pla
 
 Recompile the project, and check that your changes are actually effective:
 
-1. If you updated the default settings file, check that the changes are shown when you dump the default settings file:
+1. If you updated the default settings file, check that the changes are shown
+when you dump the default settings file:
 
    .. code:: bash
 	
@@ -139,9 +160,50 @@ Recompile the project, and check that your changes are actually effective:
    
    .. code:: bash
 
-	java -jar dist/MASPlanes.jar -o planes=tutorial problem.json
+	java -jar dist/MASPlanes.jar -o planes=tutorial problem.json -g
+
+If everything went well, you should see the messages being printed by the
+planes whenever they get and complete tasks. For now, the planes are not
+coordinating at all. Thus, the operator allocates tasks to whatever plane it
+can, and then this plane is going to complete this tasks one after the other
+(by always going to the nearest allocated task).
 
 
+Improving the plane's behavior
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Now that we have working planes, it is time to add some interesting behaviors
+to them. In *MASPlanes*, this is achieved by adding ``Behavior`` classes to
+the planes. A behavior is a class that bundles together some actions and
+reactions, possibly involving communicating with other planes.
+
+To better understand the capabilities of these behaviors, take a look at the
+javadoc of the ``Behavior`` interface. Basically, the interface defines the
+following action methods, where a plane can initiate some actions (such as
+sending messages):
+
+``preStep()``     
+	This method is invoked at the beggining of each step. The
+	platform guarantees that this method will be called on **all** behaviors of
+	**all** agents before any other action methods are called. That is, the
+	plaform will never call the ``beforeMessages()`` method of an agent's behavior
+	unless all other agents have already executed their ``preStep()`` operations.
+
+``beforeMessages()``
+	This method is invoked right before processing any messages received in this 
+	step.
+
+``on(MessageType)``
+ 	You can have as many of these methods as you wish. These methods are invoked 
+ 	once for each message of type ``MessageType`` received in this step.
+
+``afterMessage()``
+	Invoked immediately after the plane has processed all the received messages.
+
+``postStep()``
+	Called after **all** behaviors of **all** agents have processed their messages.
+
+Knowing this, we can now try to implement the parallel single-item auctions mechanism using a behavior. 
 
 
 
