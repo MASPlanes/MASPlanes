@@ -46,6 +46,7 @@ import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MouseInputAdapter;
 
 /**
  *
@@ -59,23 +60,11 @@ class DisplayPane extends JPanel {
     public DisplayPane(GUIWorld w) {
         world = w;
 
-        this.addMouseListener(new MouseListener() {
-
-            @Override
-            public void mouseClicked(final MouseEvent me) {
-
-            }
-
-            @Override
-            public void mousePressed(MouseEvent me) {
-
-            }
-
+        this.addMouseListener(new MouseInputAdapter() {
             @Override
             public void mouseReleased(final MouseEvent me) {
 
                 SwingUtilities.invokeLater(new Runnable() {
-
                     @Override
                     public void run() {
                         // Select or deselect a Plane
@@ -94,24 +83,12 @@ class DisplayPane extends JPanel {
                                 System.err.println(t);
                             }
                         }
-
-//                        System.err.println(me);
-//                        System.err.println("Click at " + l.getXInt() + "," + l.getYInt());
-                    }
+                    } // End of 'run()' method
                 });
-
-            }
-
-            @Override
-            public void mouseEntered(MouseEvent me) {
-
-            }
-
-            @Override
-            public void mouseExited(MouseEvent me) {
-
-            }
+                
+            } // End of 'mouseReleased(MouseEvent)' method
         });
+        
     }
 
     @Override
