@@ -25,9 +25,12 @@
  */
 package es.csic.iiia.planes.tutorial;
 
-import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Behavior that implements the Parallel Single-Item Auctions 
@@ -37,6 +40,9 @@ import es.csic.iiia.planes.behaviors.AbstractBehavior;
  */
 public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
 
+    private Map<Task, List<BidMessage>> collectedBids =
+            new HashMap<Task, List<BidMessage>>();
+
     /**
      * Build a new Parallel Single Item Auctions behavior.
      * @param agent plane that will display this behavior.
@@ -44,12 +50,17 @@ public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
     public PSIAuctionBehavior(TutorialPlane agent) {
         super(agent);
     }
-    
+
     @Override
     public Class[] getDependencies() {
         return null;
     }
-    
+
+    @Override
+    public void beforeMessages() {
+        collectedBids.clear();
+    }
+
     public void on(OpenAuctionMessage auction) {
         TutorialPlane plane = getAgent();
         Task t = auction.getTask();
@@ -60,6 +71,20 @@ public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
         plane.send(bid);
     }
     
+    public void on(BidMessage bid) {
+        Task t = bid.getTask();
+
+        // Get the list of bids for this task, or create a new list if
+        // this is the first bid for this task.
+        List<BidMessage> taskBids = collectedBids.get(t);
+        if (taskBids == null) {
+            taskBids = new ArrayList<BidMessage>();
+            collectedBids.put(t, taskBids);
+        }
+
+        taskBids.add(bid);
+    }
+
     @Override
     public void afterMessages() {
         // Open new auctions only once every four steps
