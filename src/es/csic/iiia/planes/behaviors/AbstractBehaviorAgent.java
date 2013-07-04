@@ -101,7 +101,10 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
         // Compute the behavior ordering from the declared dependencies
         DependencyResolver d = new DependencyResolver();
         for (Behavior v : behaviors) {
-            d.add(v.getClass(), v.getDependencies());
+            Class[] dependencies = v.getDependencies();
+            if (dependencies != null) {
+                d.add(v.getClass(), dependencies);
+            }
         }
 
         // Get an ordered list of behavior classes, and construct a new
