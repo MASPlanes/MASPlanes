@@ -79,42 +79,20 @@ create a  ``TutorialPlane`` class, implementing the ``Plane`` interface to
 allow it to be treated as an actual plane by the platform.
 
 Although we could implement the ``Plane`` plane interface by ourselves, the
-platform includes an ``AbstractPlane`` class that has most of the common
-functionally already implemented. This includes flying to the nearest task
-assigned to this plane and deciding what to do whenever it has no assigned
-tasks, among many others. Therefore, we create our class extending from this
-one:
+platform includes a ``DefaultPlane`` class that has all common functionally
+already implemented. This includes flying to the nearest task assigned to this
+plane and deciding what to do whenever it has no assigned tasks, among many
+others. Therefore, we create our class extending from this one:
 
 .. sourcecode :: java
 
-    public class TutorialPlane extends AbstractPlane {
+    public class TutorialPlane extends DefaultPlane {
 
         public TutorialPlane(Location location) {
             super(location);
         }
-     
-        @Override
-        protected void taskCompleted(Task t) {
-            System.out.println(this + " completed " + t);
-        }
-
-        @Override
-        protected void taskAdded(Task t) {
-            System.out.println(t + " is now allocated to " + this);
-        }
-
-        @Override
-        protected void taskRemoved(Task t) {
-            System.out.println(t + " is no longer allocated to " + this);
-        }
         
     }
-
-As you can see, extending ``AbstractPlane`` forces us to implement three
-methods. These methods are called by the base class whenever a task is
-completed by this plane, added (allocated) to this plane, or removed
-(deallocated) from this plane respectively. For now, we will just print out
-what happened to the standard error.
 
 
 Launch a simulation with our custom planes
@@ -169,11 +147,10 @@ Recompile the project, and check that your changes are actually effective:
 
     java -jar dist/MASPlanes.jar -o planes=tutorial problem.json -g
 
-If everything went well, you should see the messages being printed by the
-planes whenever they get and complete tasks. For now, the planes are not
-coordinating at all. Thus, the operator allocates tasks to whatever plane it
-can, and then this plane is going to complete this tasks one after the other
-(by always going to the nearest allocated task).
+If everything went well, the simulation should work normally, but the planes
+shouldn't be coordinating at all. Thus, the operator allocates tasks to
+whatever plane it can, and then this plane is going to complete this tasks one
+after the other (by always going to the nearest allocated task).
 
 
 Improving the plane's behavior
@@ -555,4 +532,163 @@ works correctly before finishing!
 
 Testing
 -------
+
+First of all, we will visually inspect what the planes are doing with a simple
+scenario. If there's some problem in the coordination front, we should see the
+planes behaving erratically, not exchanging tasks, or something else
+noticeable enough. Focus on trying to see whether planes successfully
+reallocate tasks as you would expect them to::
+
+    java -jar dist/MASPlanes.jar -oplanes=tutorial scenarios/short-hotspots-3planes.json -g
+
+If you followed the tutorial, planes should be behaving as expected. That's
+pretty good, but we should test a little bit more before resting. Let's start
+by letting the simulator run this whole small scenario until the end (we
+disable the gui so that it runs faster)::
+
+    java -jar dist/MASPlanes.jar -oplanes=tutorial scenarios/short-hotspots-3planes.json
+
+After a short while, you should see no errors and get the simulation results.
+If the simulator finishes without any error, this means that all tasks have
+been completed by the planes. The hardest errors to detect and debug are those
+that produce a *"task loss"*, where somehow no plane knows that there's a
+pending task anymore and that task never gets completed. For now, it seems
+that we have been careful enough to avoid anything like that happening.
+
+However, check what happens when we use our shiny new planes in a longer, more
+intricate scenario::
+
+    java -jar dist/MASPlanes.jar -o planes=tutorial scenarios/long-uniform.json
+
+We get no java errors, so we have no code problems. Despite that, if you let
+it run long enough, you will see a very strange thing happening: the
+percentage of completion of the simulation goes well beyond 100%! Basically,
+the simulator does not stop at the endtime of the simulation because there are
+still pending tasks, and it is waiting for the planes to complete them before
+finishing. However, due to a bug in our coordination algorithm, none of the
+planes is aware of the existance of those tasks. As a result, the simulator
+just keeps running and running... until it reaches a 1000% completion, where
+it would actually stop with an error.
+
+Well, what do now? We know that there are some tasks getting "lost" at some
+point, and not much more than that. In this particular case, it may be
+interesting to discover specifically which tasks are those. Luckily, we can do
+that easily by using the GUI. Let's launch the simulation again, but now with
+the GUI enabled::
+
+   java -jar dist/MASPlanes.jar -o planes=tutorial scenarios/long-uniform.json -g
+
+Increase the simulation speed to the maximum possible. Now, if we wait long
+enough, we will see some small blue dots appearing throughout the screen.
+These dots should be noticeable because they won't be connected to any plane.
+In fact, these dots represent tasks that are not allocated to any plane. Click
+right on top of one of this dots, and you will get a message on your terminal
+(or wherever you get the stdout of the simulator) telling you which task is
+it. At this point, we know the id of one of these tasks that are being "lost"
+by the planes.
+
+At this point, you can employ any technique in your belt to discover what
+exactly is happening with that task. For instance, you can output a trace log
+every time that agents try to reallocate that specific task. Or you could set
+a conditional breakpoint and dive into de debugger. Or just think really hard
+about what may be happening.
+
+After some time, you should be able to figure out what the problem is: very
+rarely, a plane ``P1`` will bid for a task while barely being in range of the
+auctioneer plane ``P2``. At the next step, ``P2`` computes the winner of a
+task ``T1``, which happens to be ``P1``. Therefore, the auctioneer "forgets"
+about the task, and sends a ``ReallocateMessage`` to ``P1``. However, during
+that time ``P1`` has moved out of range of ``P2``, so it doesn't receive the
+message. Therefore, from now on there is no plane aware of the existence of
+``T1``, and that task will never be completed.
+
+
+Depending on other behaviors: neighbor tracking
+-----------------------------------------------
+
+There are many ways to deal with the above problem. For instance, we could
+introduce yet another step to the coordination procedure, where recipients of
+``ReallocateMessage`` messages have to acknowledge that they have received the
+task. However, then the acknowledge messages themselves could get lost, and we
+could end up with multiple copies of the same task.
+
+Another approach is for the auctioneer to make sure that the winner of an
+auction is guaranteed to still be in range, and therefore that it will receive
+the ``ReallocateMessage``. To do this, we must add some facilities to our
+planes so that they are able to know which planes are currently in range, and
+somehow compute for how long are they guaranteed to keep being reachable.
+Because such facility is mostly independent of our coordination algorithm, we
+should probably implement it as a separate behavior.
+
+In fact, the platform has a readily available ``NeighborTracking`` behavior
+for that, so we just need to make our planes use it. First, we must add that
+behavior to the ``TutorialPlane`` class, by modifying its ``initialize()``
+method:
+
+.. sourcecode:: java
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        addBehavior(new NeighborTracking(this));
+        addBehavior(new PSIAuctionBehavior(this));
+    }
+
+Next, we have to declare that our behavior needs the neighbor tracking one.
+This can be easily done by changing the ``getDependencies()`` method of our
+behavior (that's what it is for!):
+
+.. sourcecode:: java
+
+    @Override
+    public Class[] getDependencies() {
+        return new Class[]{NeighborTracking.class};
+    }
+
+The planes now have this behavior available and will execute it. However, our
+``PSIAuctionsBehavior`` is not actually using it. To do that, it must first
+acquire a reference to the neighbor tracking behavior of the plane. At this
+aim, we add a property to the ``PSIAuctionBehavior`` that will hold this
+reference, and properly initialize it during the ``initialize()`` phase:
+
+.. sourcecode:: java
+
+    private NeighborTracking neighborTracker;
+
+    @Override
+    public void initialize() {
+        super.initialize();
+        neighborTracker = getAgent().getBehavior(NeighborTracking.class);
+    }
+
+You can check the javadoc of the ``NeighborTracking`` behavior to see the
+methods it provides and what they do. In our case, we want to use this method
+to ignore bids from those neighbors that could go out of range before
+receiving the ``ReallocateMessage``. In other words, we want to ignore bids
+whose senders are not guaranteed to be neighbors for at least one extra step.
+Thanks to the neighbor tracking behavior, this is actually very easy to
+accomplish. In fact, we only have to update the ``on(BidMessage)`` reaction
+and include this check. After the modification, the method ends up looking
+like this:
+
+.. sourcecode:: java
+
+    public void on(BidMessage bid) {
+        Task t = bid.getTask();
+
+        // Ignore bids from planes that may run out of range
+        if (!neighborTracker.isNeighbor(bid.getSender(), 1)) {
+            return;
+        }
+
+        // Get the list of bids for this task, or create a new list if
+        // this is the first bid for this task.
+        List<BidMessage> taskBids = collectedBids.get(t);
+        if (taskBids == null) {
+            taskBids = new ArrayList<BidMessage>();
+            collectedBids.put(t, taskBids);
+        }
+
+        taskBids.add(bid);
+    }
 
