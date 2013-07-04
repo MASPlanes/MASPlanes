@@ -18,7 +18,7 @@ At a particular point in time, the *MASPlanes* coordination problem can be
 represented as a task allocation problem. For instance, consider that the
 world is in the state represented by the following picture:
 
-..  image:: file://localhost/Users/marc/Documents/Projects/Netbeans/planes/img/tutorial1.png
+..  image:: ../img/tutorial1.png
     :align: center
     :width: 500px
     :alt: Example problem at a specific point in time.
