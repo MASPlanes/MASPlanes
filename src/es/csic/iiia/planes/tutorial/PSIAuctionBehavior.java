@@ -27,6 +27,7 @@ package es.csic.iiia.planes.tutorial;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +44,8 @@ public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
     private Map<Task, List<BidMessage>> collectedBids =
             new HashMap<Task, List<BidMessage>>();
 
+    private NeighborTracking neighborTracker;
+
     /**
      * Build a new Parallel Single Item Auctions behavior.
      * @param agent plane that will display this behavior.
@@ -52,8 +55,14 @@ public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
     }
 
     @Override
+    public void initialize() {
+        super.initialize();
+        neighborTracker = getAgent().getBehavior(NeighborTracking.class);
+    }
+
+    @Override
     public Class[] getDependencies() {
-        return null;
+        return new Class[]{NeighborTracking.class};
     }
 
     @Override
@@ -73,6 +82,11 @@ public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
     
     public void on(BidMessage bid) {
         Task t = bid.getTask();
+
+        // Ignore bids from planes that may run out of range
+        if (!neighborTracker.isNeighbor(bid.getSender(), 1)) {
+            return;
+        }
 
         // Get the list of bids for this task, or create a new list if
         // this is the first bid for this task.

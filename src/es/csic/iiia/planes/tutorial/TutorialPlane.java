@@ -27,6 +27,7 @@ package es.csic.iiia.planes.tutorial;
 
 import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 
 /**
  * Implementation of a plane that will coordinate using auctions.
@@ -48,6 +49,7 @@ public class TutorialPlane extends DefaultPlane {
     
     @Override
     public void initialize() {
+        addBehavior(new NeighborTracking(this));
         addBehavior(new PSIAuctionBehavior(this));
         super.initialize();
     }
