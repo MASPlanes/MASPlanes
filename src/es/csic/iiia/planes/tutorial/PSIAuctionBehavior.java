@@ -85,6 +85,10 @@ public class PSIAuctionBehavior extends AbstractBehavior<TutorialPlane> {
         taskBids.add(bid);
     }
 
+    public void on(ReallocateMessage msg) {
+        getAgent().addTask(msg.getTask());
+    }
+
     @Override
     public void afterMessages() {
         // Open new auctions only once every four steps
