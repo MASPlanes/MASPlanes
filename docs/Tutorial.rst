@@ -1,6 +1,6 @@
---------------------------------------------------------
-Implementing parallel single-item auctions coordination
---------------------------------------------------------
+------------------------------------------------------------------------------
+*MASPlanes* tutorial: Implementing parallel single-item auctions coordination
+------------------------------------------------------------------------------
 
 This tutorial is a walk-through on how to implement a coordination mechanism
 in *MASPlanes*, based on parallel single-item auctions. Therefore, we start by
@@ -211,18 +211,19 @@ For now you can ignore the ``getDependencies()`` method, whose function we
 will explain later on. Before expanding this behavior, let's actually make our
 planes use it. Since we used the ``AbstractPlane`` as a base class for our
 ``TutorialPlane``, it is now very easy to incorporate a behavior to our
-planes. In fact, we only have to call the ``addBehavior(Behavior)`` method at
-some point, and the plane will start using it. Typically, the best place where
-to add behaviors is during the plane's initialization function. Therefore, we
-can open our ``TutorialPlane`` class and override its initialization method,
-adding our new behavior
+planes. In fact, we only have to call the ``addBehavior(Behavior)`` method.
+Due to how behaviors are implemented, you should always add them in the
+plane's initialization function, and call the ``super.initialize()`` function
+only **after** the behaviors are added. In this case, edit the
+``TutorialPlane`` class and override its initialization method, adding our new
+behavior:
 
 .. sourcecode :: java
 
     @Override
     public void initialize() {
-        super.initialize();
         addBehavior(new PSIAuctionsBehavior(this));
+        super.initialize();
     }
 
 Our planes will now execute the ``PSIAuctionBehavior``, performing any actions
@@ -623,15 +624,16 @@ should probably implement it as a separate behavior.
 In fact, the platform has a readily available ``NeighborTracking`` behavior
 for that, so we just need to make our planes use it. First, we must add that
 behavior to the ``TutorialPlane`` class, by modifying its ``initialize()``
-method:
+method (remember that behaviors must be added **before** calling the parent
+``initialize()``):
 
 .. sourcecode:: java
 
     @Override
     public void initialize() {
-        super.initialize();
         addBehavior(new NeighborTracking(this));
         addBehavior(new PSIAuctionBehavior(this));
+        super.initialize();
     }
 
 Next, we have to declare that our behavior needs the neighbor tracking one.
@@ -692,3 +694,14 @@ like this:
         taskBids.add(bid);
     }
 
+
+Closing words
+-------------
+
+That's it! You can now re-test with a few scenarios, and the planes should
+behave properly, coordinating nicely and completing all the tasks. If you are
+implementing a novel coordination method, now it is time for you to test on
+multiple scenarios. Hopefully your method will outperform others on some types
+of scenarios, so it is time for you to find those and tell the world!
+
+Happy coordinating!
