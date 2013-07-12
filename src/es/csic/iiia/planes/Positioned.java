@@ -56,4 +56,11 @@ public interface Positioned {
      */
     public Location getLocation();
 
+    /**
+     * Get the distance between this object and the given one.
+     * @param other object to get the distance to.
+     * @return distance from this object to the given one.
+     */
+    public double distance(Positioned other);
+
 }

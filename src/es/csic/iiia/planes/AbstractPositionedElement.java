@@ -71,4 +71,9 @@ public abstract class AbstractPositionedElement extends AbstractElement
         this.location = location;
     }
 
+    @Override
+    public double distance(Positioned other) {
+        return getLocation().distance(other.getLocation());
+    }
+
 }

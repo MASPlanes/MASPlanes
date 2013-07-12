@@ -38,6 +38,7 @@ package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
+import es.csic.iiia.planes.Positioned;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.gui.graphics.PlaneGraphic;
 import java.awt.BasicStroke;
@@ -117,6 +118,11 @@ public class PlaneDrawer implements Drawable {
     @Override
     public void setLocation(Location l) {
         plane.setLocation(l);
+    }
+
+    @Override
+    public double distance(Positioned other) {
+        return getLocation().distance(other.getLocation());
     }
 
     private void drawFutureLocations(Graphics2D g) {
