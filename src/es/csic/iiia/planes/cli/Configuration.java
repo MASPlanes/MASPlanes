@@ -71,6 +71,7 @@ import es.csic.iiia.planes.operator_behavior.NearestInRange;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import es.csic.iiia.planes.operator_behavior.Random;
 import es.csic.iiia.planes.operator_behavior.RandomInRange;
+import es.csic.iiia.planes.tutorial.TutorialPlane;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -389,6 +390,7 @@ public final class Configuration {
            put("none", DefaultPlane.class);
            put("maxsum", MSPlane.class);
            put("omniscient", OmniscientPlane.class);
+           put("tutorial", TutorialPlane.class);
         }};
     }
 
