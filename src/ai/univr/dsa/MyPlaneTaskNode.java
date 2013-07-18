@@ -45,7 +45,11 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      * List which represents the domain.
      */
     private List<Plane> domain;
-    
+    /**
+     * Builds a MyPlaneTaskNode
+     * @param t Task represented by this Node.
+     * @param own Task's owner Plane.
+     */
     public MyPlaneTaskNode(Task t, Plane own) {
         super(t, own);
         
