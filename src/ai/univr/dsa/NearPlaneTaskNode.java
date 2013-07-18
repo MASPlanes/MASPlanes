@@ -32,48 +32,13 @@ import es.csic.iiia.planes.Task;
  *
  * @author Andrea Jeradi, Francesco Donato
  */
-public abstract class AbstractTaskNode {
+public class NearPlaneTaskNode extends AbstractTaskNode {
+
     
-    private final Task t;
-    private final Plane owner;
-    private Plane value;
-    private Plane old_value;
-    
-    public AbstractTaskNode(Task t, Plane own){
-        this.t = t;
-        this.owner = own;
-        this.value = null;
-        this.old_value = null;
+    public NearPlaneTaskNode(Task t, Plane own) {
+        super(t, own);
     }
     
-    public Task getTask(){
-        
-        return this.t;
-        
-    }
     
-    public Plane getOwner(){
-        
-        return this.owner;
-        
-    }
     
-    public Plane getValue(){
-        
-        return this.value;
-        
-    }
-    
-    public void setValue(Plane p){
-        
-        this.old_value = this.value;
-        this.value = p;
-        
-    }
-    
-    public boolean isChanged(){
-        
-        return this.old_value == this.value;
-        
-    }
 }

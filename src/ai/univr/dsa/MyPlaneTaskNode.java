@@ -27,53 +27,49 @@ package ai.univr.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author Andrea Jeradi, Francesco Donato
  */
-public abstract class AbstractTaskNode {
+public class MyPlaneTaskNode extends AbstractTaskNode {
+
+    private List<AbstractTaskNode> neighbors; 
+    private List<Plane> domain;
     
-    private final Task t;
-    private final Plane owner;
-    private Plane value;
-    private Plane old_value;
-    
-    public AbstractTaskNode(Task t, Plane own){
-        this.t = t;
-        this.owner = own;
-        this.value = null;
-        this.old_value = null;
+    public MyPlaneTaskNode(Task t, Plane own) {
+        super(t, own);
+        
+        this.neighbors = new ArrayList<AbstractTaskNode>();
+        this.domain = new ArrayList<Plane>();
     }
     
-    public Task getTask(){
+    public boolean addNeighbor(AbstractTaskNode n) {
         
-        return this.t;
-        
-    }
-    
-    public Plane getOwner(){
-        
-        return this.owner;
+       return this.neighbors.add(n);
         
     }
     
-    public Plane getValue(){
+    
+    public List<AbstractTaskNode> getNeighbors() {
         
-        return this.value;
+        return this.neighbors;
         
     }
     
-    public void setValue(Plane p){
+    public List<Plane> getDomain() {
         
-        this.old_value = this.value;
-        this.value = p;
+        return this.domain;
         
     }
     
-    public boolean isChanged(){
+    public boolean updateDomani(Plane p) {
         
-        return this.old_value == this.value;
+        return this.domain.add(p); 
         
     }
+    
+    public void makeDecision(){}
 }
