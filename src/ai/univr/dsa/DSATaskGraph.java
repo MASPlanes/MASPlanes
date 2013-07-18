@@ -60,7 +60,9 @@ public class DSATaskGraph {
      * @param n Node to be added to the Graph.
      */
     public void add(AbstractTaskNode n) {
-       
+        if(this.myTasks.containsKey(n.getTask()) || this.otherTasks.containsKey(n.getTask())) {
+            throw new IllegalArgumentException();
+        }
         if(n instanceof MyPlaneTaskNode) {
             
             this.myTasks.put(n.getTask(),(MyPlaneTaskNode)n);
@@ -78,7 +80,7 @@ public class DSATaskGraph {
     /**
      * Gets the Node that represents the Task passed as parameter.
      * @param t Task represented by the searched Node.
-     * @return the Node looked for.
+     * @return the Node looked for or null if the Node linked by the Task doesn't exists.
      */
     public AbstractTaskNode getTaskNode(Task t) {
         

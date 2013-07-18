@@ -46,7 +46,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      */
     private List<Plane> domain;
     /**
-     * Builds a MyPlaneTaskNode
+     * Builds a MyPlaneTaskNode and assigned owner Plane in the domain. 
      * @param t Task represented by this Node.
      * @param own Task's owner Plane.
      */
@@ -58,13 +58,14 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     }
     /**
      * Adds a neighbor Node at this Node.
-     * @param n to be added
-     * @return true if and only if adding is succesful
+     * @param n to be added.
+     * @return true if and only if adding is succesful, false if n is already in the List of Neighbors.
      */
     public boolean addNeighbor(AbstractTaskNode n) {
-        
-       return this.neighbors.add(n);
-        
+       if(!this.neighbors.contains(n)){ 
+        return this.neighbors.add(n);
+       }
+       return false;
     }
     
     /**
@@ -73,7 +74,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      */
     public List<AbstractTaskNode> getNeighbors() {
         
-        return this.neighbors;
+        return new ArrayList<AbstractTaskNode>(this.neighbors);
         
     }
     /**
@@ -82,18 +83,21 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      */
     public List<Plane> getDomain() {
         
-        return this.domain;
+        return new ArrayList<Plane>(this.domain);
         
     }
     /**
      * Adds a value(Plane) at the domain List
      * @param p Plane to be added at the domain List.
-     * @return true if and only if the domain is correctly updated.
+     * @return true if and only if the domain is correctly updated, false il p is already in the Domain.
      */
-    public boolean updateDomani(Plane p) {
+    public boolean updateDomain(Plane p) {
+        if(!this.domain.contains(p)){
+            return this.domain.add(p); 
+        }
         
-        return this.domain.add(p); 
-        
+        return false;
+
     }
     
     public void makeDecision(){}
