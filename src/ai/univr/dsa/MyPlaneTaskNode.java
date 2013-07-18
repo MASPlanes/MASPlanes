@@ -31,12 +31,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Represents a TaskNode which is assigned to a Plane.<br>
+ * Contains a List of neighbors task, and  a Planes list which represents the 
+ * possible domain of this TaskNode.
  * @author Andrea Jeradi, Francesco Donato
  */
 public class MyPlaneTaskNode extends AbstractTaskNode {
-
-    private List<AbstractTaskNode> neighbors; 
+    /**
+     * List of the neighbors of this Task.
+     */
+    private List<AbstractTaskNode> neighbors;
+    /**
+     * List which represents the domain.
+     */
     private List<Plane> domain;
     
     public MyPlaneTaskNode(Task t, Plane own) {
@@ -45,26 +52,40 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         this.neighbors = new ArrayList<AbstractTaskNode>();
         this.domain = new ArrayList<Plane>();
     }
-    
+    /**
+     * Adds a neighbor Node at this Node.
+     * @param n to be added
+     * @return true if and only if adding is succesful
+     */
     public boolean addNeighbor(AbstractTaskNode n) {
         
        return this.neighbors.add(n);
         
     }
     
-    
+    /**
+     * Gets the List of Neighbors.
+     * @return List of Neighbors
+     */
     public List<AbstractTaskNode> getNeighbors() {
         
         return this.neighbors;
         
     }
-    
+    /**
+     * Gets a List which contains values(Planes) of the domain.
+     * @return List of Planes
+     */
     public List<Plane> getDomain() {
         
         return this.domain;
         
     }
-    
+    /**
+     * Adds a value(Plane) at the domain List
+     * @param p Plane to be added at the domain List.
+     * @return true if and only if the domain is correctly updated.
+     */
     public boolean updateDomani(Plane p) {
         
         return this.domain.add(p); 

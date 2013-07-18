@@ -29,12 +29,16 @@ import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 
 /**
- *
+ * Represents a TaskNode which contains a Task owned by another Plane.
  * @author Andrea Jeradi, Francesco Donato
  */
 public class NearPlaneTaskNode extends AbstractTaskNode {
 
-    
+    /**
+     * Builds a NearPlaneTaskNode
+     * @param t Task represented by this Node.
+     * @param own Task's owner Plane.
+     */
     public NearPlaneTaskNode(Task t, Plane own) {
         super(t, own);
     }
