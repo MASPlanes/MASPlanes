@@ -27,9 +27,10 @@ package ai.univr.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.auctions.AskMessage;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
+import java.util.List;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -50,6 +51,7 @@ public class DSABehavior extends AbstractBehavior {
     private int current_DSA_iteration;
     final int n_of_DSA_iterations = 20;//da togliere
     final int DSA_every = 50;//da togliere
+    final double DSA_p = 0.3;//da togliere
 
     private enum DSAStep {
         StartDSA, RandomDSA, ContinueDSA, EndDSA, Nothing;
@@ -193,7 +195,8 @@ public class DSABehavior extends AbstractBehavior {
         case RandomDSA
         l’algoritmo prevederebbe una lettura dei PresentationMessage degli aerei vici e un conseguente aggiornamento del grafo ma isiccome siamo in afterMessage tutto ciò è stato già fatto in on(PresentationMessage)
         per ogni mio PlaneTaskNode scelgli casualmente in valore per esso tra i possibili valori appartenenti al dominio, aggiorna il campo value del nodo e crea /invia un TaskMessage per ogni aereo presente nel dominio del nodo(escluso me stesso ovviamente)
-        case ContinueDSA
+        
+        * case ContinueDSA
         come prima cosa bisognerebbe leggere i TaskMessage degli aerei vicini e aggiornare il proprio grafo con le nuove info. Questo viene fatto in on(TaskMessage)
         genera un numero random rn compreso [0,1)
         se rn < p puoi ‘giocare’
@@ -210,6 +213,8 @@ public class DSABehavior extends AbstractBehavior {
         rimuovi il Task dalla tua lista.
 
         */
+        final Plane agent = getAgent();
+        Random rnd = new Random();
         
         switch(toDo){
             case StartDSA:
@@ -218,7 +223,7 @@ public class DSABehavior extends AbstractBehavior {
                 /*per ogni mio Task crea il relativo MyPlaneTaskNode indicando il Task che rappresenta e aggiungendo al dominio il riferimento a me (inteso come Plane)
         per ogni mio PlaneTaskNode aggiorna la lista dei suoi vicini aggiungendo tutti gli altri nodi creati nella fase precedente
         invia in broadcast un PresentationMessage {“sono P3 e questa è la mia lista di Task”}*/
-                final Plane agent = getAgent();
+                
                 for(Task t: agent.getTasks()){
                     dsa_graph.add(new MyPlaneTaskNode(t,agent));
                 }
@@ -237,13 +242,71 @@ public class DSABehavior extends AbstractBehavior {
             case RandomDSA:
                 /*
         l’algoritmo prevederebbe una lettura dei PresentationMessage degli aerei vici e un conseguente aggiornamento del grafo ma isiccome siamo in afterMessage tutto ciò è stato già fatto in on(PresentationMessage)
-        per ogni mio PlaneTaskNode scelgli casualmente in valore per esso tra i possibili valori appartenenti al dominio, aggiorna il campo value del nodo e crea /invia un TaskMessage per ogni aereo presente nel dominio del nodo(escluso me stesso ovviamente)
+        per ogni mio PlaneTaskNode scelgli casualmente in valore per esso tra i possibili valori appartenenti al dominio, 
+        *aggiorna il campo value del nodo e crea /invia un TaskMessage per ogni aereo presente nel dominio del nodo(escluso me stesso ovviamente)
         
                  */
+                
+                int rnd_index;
+                List<Plane> domain;
+                
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-                    tNode.getDomain().
+                    domain = tNode.getDomain();
+                    rnd_index = rnd.nextInt(domain.size());
+                    tNode.setValue(domain.get(rnd_index));
+                    
+                    for(Plane p: domain){
+                        if(p != agent)
+                            agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
+                    }
                 }
                 
+                break;
+                
+            case ContinueDSA:
+                /* case ContinueDSA
+        come prima cosa bisognerebbe leggere i TaskMessage degli aerei vicini e aggiornare il proprio grafo con le nuove info. Questo viene fatto in on(TaskMessage)
+        genera un numero random rn compreso [0,1)
+        se rn < p puoi ‘giocare’
+        per ogni mio task (PlaneTaskNode ) ti
+        per ogni possibile valore del dominio assegnabile a ti calcola il costo dell’assegnamento totale  condiderando il valore corrente dei nodi vicini.
+        prendi il valore che minimizza il costo totale
+        se il valore scelto è diverso da quello attuale crea /invia un TaskMessage per ogni aereo presente nel dominio del nodo(escluso me stesso ovviamente) di ti
+        NB : rimane ancora da chiarire come bisogna comportari con i task che vengono gestiti dallo stesso aereo es. se l’ordine pi processamento dei task per l’aereo è t1,t2 se il valore di t1=P1 e dopo l’iterazione di DSA diventa P2, t2 quale dei due valori deve usare per la sua iterazione? probabilmente P1 perchè anche se i due task sono gestiti dallo stesso aereo l’unico modo di comunicare che dovrebbero avere è quello via messaggi e non attraverso condivisione di dati.
+
+        NB: bisogna rianalizzare la questione della condizione di terminazione cercando di far terminare dsa se converge in un minino locale
+
+                 */
+               
+                for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
+                    if(rnd.nextDouble() < this.DSA_p){
+                        tNode.makeDecision();
+                        if(tNode.isChanged()){
+                            for(Plane p: tNode.getDomain()){
+                                if(p != agent)
+                                    agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
+                            }
+                            
+                        }
+                    }
+                    
+                }
+                
+                current_DSA_iteration++;
+                break;
+                
+            case EndDSA:
+                
+                for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
+                    if(tNode.getValue() != tNode.getOwner()){
+                        agent.send(new ReallocatedTaskMessage(tNode.getTask(),tNode.getValue()));
+                        agent.removeTask(tNode.getTask());
+                    }
+                }
+                break;
+                
+                
+            case Nothing:
                 break;
                 
                 
@@ -252,6 +315,8 @@ public class DSABehavior extends AbstractBehavior {
 
     
     }
+    
+   
     
     private void initializeNewDSAExec(){
         dsa_graph.clear();

@@ -27,6 +27,7 @@ package ai.univr.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.util.PathPlan;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -101,5 +102,43 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
 
     }
     
-    public void makeDecision(){}
+    public void makeDecision(){
+        //controllo se almeno uno dei vicini ha cambiato il proprio valore
+        boolean changed = false || this.neighbors.size()==0; //Attenzione in questo modo se c'è solo un task(io) entro sempre nell'if
+        int i = 0;
+        while(!changed && i < this.neighbors.size())
+            changed = this.neighbors.get(i++).isChanged();
+        
+        //se almeno uno è cambiato ha senso cercare un nuovo valore per me che minimizza il costo totale
+        double minCost = Double.MAX_VALUE;
+        Plane best = null;
+        PathPlan path;
+        if(changed){
+            for(Plane possibleOwner: this.domain){
+                
+                //starting from the possibleOwner location
+                path = new PathPlan(possibleOwner);
+                
+                //and add me to the path
+                path.add(this.getTask());
+                
+                //and add the other tasks to the path that they have the same my current value
+                for(AbstractTaskNode other: this.neighbors)
+                    if(other.getValue() == possibleOwner)
+                        path.add(other.getTask());
+                
+                //what is the total cost of the path???
+                if(path.getCost() < minCost){
+                    //change
+                    minCost = path.getCost();
+                    best = possibleOwner;
+                            
+                }
+     
+            }
+            //the best new value has been found
+            this.setValue(best);
+            
+        }
+    }
 }

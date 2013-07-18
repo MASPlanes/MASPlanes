@@ -25,6 +25,7 @@
  */
 package ai.univr.dsa;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.Task;
 
@@ -47,9 +48,10 @@ public class ReallocatedTaskMessage extends AbstractMessage{
      * 
      * @param task that has changed the owner.
      */
-    public ReallocatedTaskMessage(Task task) {
+    public ReallocatedTaskMessage(Task task,Plane recipient) {
         
         this.task = task;
+        super.setRecipient(recipient);
     }
     
     /**
