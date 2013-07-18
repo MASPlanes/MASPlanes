@@ -31,21 +31,34 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
+ * Represents the DSA graph of a Plane.<br>
+ * It's builded by a Plane during the DSA with its TaskNodes and with the received TaskNodes from Planes near.<br>
+ * It is formed by AbstractTaskNode.
+ * Nodes are dived into two set, MyPlaneTaskNode, and NearPlaneTaskNode.
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSATaskGraph {
-
+    /**
+     * Map that represents the link between a myTask and a Node of the Graph.
+     */
     private Map<Task,MyPlaneTaskNode> myTasks;
+    /**
+     * Map that represents the link between a Task owned by a near Plane and a Node of the Graph.
+     */
     private Map<Task,NearPlaneTaskNode> otherTasks;
-
+    /**
+     * Builds an empty DSATaskGraph
+     */
     public DSATaskGraph() {
        
       this.myTasks = new HashMap<Task,MyPlaneTaskNode>();
       this.otherTasks = new HashMap<Task,NearPlaneTaskNode>();
       
     }
-    
+    /**
+     * Adds an AbstractTaskNode to the Graph.
+     * @param n Node to be added to the Graph.
+     */
     public void add(AbstractTaskNode n) {
        
         if(n instanceof MyPlaneTaskNode) {
@@ -62,7 +75,11 @@ public class DSATaskGraph {
             
         }   
     }
-    
+    /**
+     * Gets the Node that represents the Task passed as parameter.
+     * @param t Task represented by the searched Node.
+     * @return the Node looked for.
+     */
     public AbstractTaskNode getTaskNode(Task t) {
         
         if(this.myTasks.containsKey(t)) {
@@ -76,19 +93,27 @@ public class DSATaskGraph {
         }
         
     }
-   
+    /**
+     * Gets the Set of MyPlaneTaskNode.
+     * @return a Collection that represents the set.
+     */
     public Collection<MyPlaneTaskNode> getMyPlaneTasksNode() {
         
         return this.myTasks.values();
         
     }
-    
+    /**
+     * Gets the Set of NearPlaneTaskNode.
+     * @return a Collection that represents the set.
+     */
     public Collection<NearPlaneTaskNode> getNearPlaneTaskNode() {
         
         return this.otherTasks.values();
         
     }
-    
+    /**
+     * Clears the Graph from all Nodes.
+     */
     public void clear() {
         
         this.myTasks.clear();
