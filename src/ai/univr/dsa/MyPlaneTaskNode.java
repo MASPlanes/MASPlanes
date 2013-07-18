@@ -55,6 +55,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         
         this.neighbors = new ArrayList<AbstractTaskNode>();
         this.domain = new ArrayList<Plane>();
+        updateDomain(own);
     }
     /**
      * Adds a neighbor Node at this Node.
@@ -90,7 +91,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      * @param p Plane to be added at the domain List.
      * @return true if and only if the domain is correctly updated.
      */
-    public boolean updateDomani(Plane p) {
+    public boolean updateDomain(Plane p) {
         
         return this.domain.add(p); 
         
