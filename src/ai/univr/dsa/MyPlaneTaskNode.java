@@ -71,7 +71,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     }
     
     /**
-     * Gets the List of Neighbors.
+     * Gets a new List of Neighbors.
      * @return List of Neighbors
      */
     public List<AbstractTaskNode> getNeighbors() {
@@ -80,7 +80,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         
     }
     /**
-     * Gets a List which contains values(Planes) of the domain.
+     * Gets a new List which contains values(Planes) of the domain.
      * @return List of Planes
      */
     public List<Plane> getDomain() {

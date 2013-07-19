@@ -121,4 +121,10 @@ public class DSATaskGraph {
         this.myTasks.clear();
         this.otherTasks.clear();
     }
+    
+    public boolean isEmpty() {
+        
+        return this.myTasks.isEmpty() && this.otherTasks.isEmpty();
+        
+    }
 }

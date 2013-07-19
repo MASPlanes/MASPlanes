@@ -49,9 +49,10 @@ public class DSABehavior extends AbstractBehavior {
     private DSATaskGraph dsa_graph;
     
     private int current_DSA_iteration;
-    final int n_of_DSA_iterations = 20;//da togliere
-    final int DSA_every = 50;//da togliere
-    final double DSA_p = 0.3;//da togliere
+    
+    final int n_of_DSA_iterations;
+    final int DSA_every;
+    final double DSA_p;
 
     private enum DSAStep {
         StartDSA, RandomDSA, ContinueDSA, EndDSA, Nothing;
@@ -64,14 +65,19 @@ public class DSABehavior extends AbstractBehavior {
         toDo = DSAStep.Nothing;
         dsa_graph = new DSATaskGraph();
         current_DSA_iteration=0;
+        
+        //load the settings
+        n_of_DSA_iterations = getConfiguration().getDsaIterations();
+        DSA_every = getConfiguration().getDsaEvery();
+        DSA_p = getConfiguration().getDsaP();
     }
 
-    @Override					//provo a lasciarlo
+    @Override
     public Class[] getDependencies() {
         return new Class[]{NeighborTracking.class};
     }
 
-    @Override 					//provo a lasciarlo
+    @Override
     public void initialize() {
         super.initialize();
         neighborTracker = getAgent().getBehavior(NeighborTracking.class);
@@ -92,23 +98,27 @@ public class DSABehavior extends AbstractBehavior {
         */
         final Plane sender =(Plane) pm.getSender();
         
-        //verifico che il Plane vicino resti tale per tutta la durata di DSA        
-        if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
-            
-            NearPlaneTaskNode newTask;
-            for(Task t: pm.getTasks()){
-                newTask = new NearPlaneTaskNode(t,sender);
-                dsa_graph.add(newTask);
-                
-                for(MyPlaneTaskNode my_t : dsa_graph.getMyPlaneTasksNode()){                
-                    my_t.addNeighbor(newTask);
-                }
-            }            
-            
-            for(MyPlaneTaskNode t: dsa_graph.getMyPlaneTasksNode()){
-                t.updateDomain(sender);               
-            }                        
-        }        
+        //if you send a broadcast message, also the sender receive the message
+        if(sender != getAgent()){
+        
+            //verifico che il Plane vicino resti tale per tutta la durata di DSA        
+            if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
+
+                NearPlaneTaskNode newTask;
+                for(Task t: pm.getTasks()){
+                    newTask = new NearPlaneTaskNode(t,sender);
+                    dsa_graph.add(newTask);
+
+                    for(MyPlaneTaskNode my_t : dsa_graph.getMyPlaneTasksNode()){                
+                        my_t.addNeighbor(newTask);
+                    }
+                }            
+
+                for(MyPlaneTaskNode t: dsa_graph.getMyPlaneTasksNode()){
+                    t.updateDomain(sender);               
+                }                        
+        }
+        }
     }
 
     public void on(TaskMessage ts ){
@@ -117,7 +127,14 @@ public class DSABehavior extends AbstractBehavior {
         recupara dal messaggio il nuovo valore assunto dal task( il valore è di tipo Plane es P2)
         cerca nel grafo il NearPlaneTaskNode che rappresenta il task e aggiorna il nodo con il nuovo valore
         */
-        dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
+        try{
+            dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
+        }
+        catch(Exception eex){
+            System.out.println("dfsf");
+            
+        }
+        
     }
 
     public void on(ReallocatedTaskMessage rtm) {
@@ -149,7 +166,7 @@ public class DSABehavior extends AbstractBehavior {
             toDo = DSAStep.StartDSA;
             
         }
-        else if(toDo == DSAStep.StartDSA)
+        else if(toDo == DSAStep.StartDSA)// && !this.dsa_graph.isEmpty())
             toDo = DSAStep.RandomDSA;
         
         else if(toDo == DSAStep.RandomDSA)
@@ -253,8 +270,8 @@ public class DSABehavior extends AbstractBehavior {
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
                     domain = tNode.getDomain();
                     rnd_index = rnd.nextInt(domain.size());
-                    tNode.setValue(domain.get(rnd_index));
-                    
+                    //tNode.setValue(domain.get(rnd_index));
+                    tNode.setValue(tNode.getOwner());
                     for(Plane p: domain){
                         if(p != agent)
                             agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
@@ -283,8 +300,9 @@ public class DSABehavior extends AbstractBehavior {
                         tNode.makeDecision();
                         if(tNode.isChanged()){
                             for(Plane p: tNode.getDomain()){
-                                if(p != agent)
+                                if(p != agent){
                                     agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
+                                }
                             }
                             
                         }

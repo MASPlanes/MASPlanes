@@ -151,6 +151,11 @@ public final class Configuration {
     private int msStartEvery;
     private double msWorkloadK;
     private double msWorkloadAlpha;
+    
+    /* DSA specific stuff */
+    private int dsaIterations;
+    private int dsaEvery;
+    private double dsaP;
 
     private LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
     private CostFactorFactory msCostFactorFactory;
@@ -234,6 +239,20 @@ public final class Configuration {
                     values.put("maxsum-workload-alpha", String.valueOf(msWorkloadAlpha));
                 }
             }
+        }
+        
+        // DSA settings
+        if (values.get("planes").equals("dsa")) {
+            dsaIterations = Integer.valueOf(settings.getProperty("dsa-iterations"));
+            values.put("dsa-iterations", String.valueOf(dsaIterations));
+            
+            dsaEvery = Integer.valueOf(settings.getProperty("dsa-every"));
+            values.put("dsa-every", String.valueOf(dsaEvery));
+            
+            dsaP = Double.valueOf(settings.getProperty("dsa-p"));
+            values.put("dsa-p", String.valueOf(dsaP));
+            
+            
         }
 
     }
@@ -372,6 +391,27 @@ public final class Configuration {
      */
     public WorkloadFunctionFactory getMsWorkloadFunctionFactory() {
         return msWorkloadFunctionFactory;
+    }
+
+    /**
+     * @return the number of DSA iterations.
+     */
+    public int getDsaIterations() {
+        return dsaIterations;
+    }
+
+    /**
+     * @return the number of tenths of seconds between dsa executions.
+     */
+    public int getDsaEvery() {
+        return dsaEvery;
+    }
+
+    /**
+     * @return the value of the probability used by dsa algorithm.
+     */
+    public double getDsaP() {
+        return dsaP;
     }
 
     private Map<String, OperatorStrategy> getOperatorStrategies() {

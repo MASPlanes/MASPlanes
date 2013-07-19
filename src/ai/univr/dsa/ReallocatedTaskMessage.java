@@ -48,7 +48,7 @@ public class ReallocatedTaskMessage extends AbstractMessage{
      * 
      * @param task that has changed the owner.
      */
-    public ReallocatedTaskMessage(Task task,Plane recipient) {
+    public ReallocatedTaskMessage(Task task, Plane recipient) {
         
         this.task = task;
         super.setRecipient(recipient);
