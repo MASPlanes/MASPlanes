@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.cli;
 
+import ai.univr.dsa.DSAPlane;
 import es.csic.iiia.planes.Battery;
 import es.csic.iiia.planes.DefaultBattery;
 import es.csic.iiia.planes.DefaultPlane;
@@ -389,6 +390,7 @@ public final class Configuration {
            put("none", DefaultPlane.class);
            put("maxsum", MSPlane.class);
            put("omniscient", OmniscientPlane.class);
+           put("dsa", DSAPlane.class);
         }};
     }
 
