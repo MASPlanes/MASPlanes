@@ -127,4 +127,16 @@ public class DSATaskGraph {
         return this.myTasks.isEmpty() && this.otherTasks.isEmpty();
         
     }
+    
+    @Override
+    public String toString(){
+        String s="{";
+        for(MyPlaneTaskNode t: this.getMyPlaneTasksNode())
+            s+="["+t+"],";
+        s+="}{";
+        for(NearPlaneTaskNode t: this.getNearPlaneTaskNode())
+            s+="["+t+"],";
+        s+="}";
+        return s;        
+    }
 }

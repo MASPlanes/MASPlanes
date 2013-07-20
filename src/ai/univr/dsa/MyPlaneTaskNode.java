@@ -141,4 +141,10 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             
         }
     }
+    
+    
+    @Override
+    public String toString(){
+        return super.toString()+" dom:"+this.domain.toString();
+    }
 }

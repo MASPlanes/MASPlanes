@@ -116,7 +116,10 @@ public class DSABehavior extends AbstractBehavior {
 
                 for(MyPlaneTaskNode t: dsa_graph.getMyPlaneTasksNode()){
                     t.updateDomain(sender);               
-                }                        
+                } 
+                
+                
+                System.out.println("t="+getAgent().getWorld().getTime()+" sono Pre:"+getAgent()+" read dsa grafo:"+dsa_graph);
         }
         }
     }
@@ -129,6 +132,8 @@ public class DSABehavior extends AbstractBehavior {
         */
         try{
             dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
+            
+            System.out.println("t="+getAgent().getWorld().getTime()+" sono Pre:"+getAgent()+" read dsa grafo:"+dsa_graph);
         }
         catch(Exception eex){
             System.out.println("dfsf");
@@ -263,7 +268,7 @@ public class DSABehavior extends AbstractBehavior {
                                 tNode.addNeighbor(other_tNode);
                         }                                        
                     }
-
+System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" start dsa grafo:"+dsa_graph);
                     agent.send(new PresentationMessage(agent.getTasks()));
                 }
                 else{
@@ -293,6 +298,8 @@ public class DSABehavior extends AbstractBehavior {
                             agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
                     }
                 }
+                
+                System.out.println("t="+getAgent().getWorld().getTime()+" sono Pre:"+getAgent()+" rand dsa grafo:"+dsa_graph);
                 
                 break;
                 

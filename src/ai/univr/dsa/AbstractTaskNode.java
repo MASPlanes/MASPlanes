@@ -101,7 +101,7 @@ public abstract class AbstractTaskNode {
      * @param p the new value of this Node.
      */
     public void setValue(Plane p){
-        
+        //DEBUG//System.out.println("set value:"+p);
         this.old_value = this.value;
         this.value = p;
         
@@ -115,5 +115,10 @@ public abstract class AbstractTaskNode {
         
         return this.old_value != this.value;
         
+    }
+    
+    @Override
+    public String toString(){
+        return t.getId() +" value:"+value+" old:"+old_value+" own:" + this.owner ;
     }
 }
