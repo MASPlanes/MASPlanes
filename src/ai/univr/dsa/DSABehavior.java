@@ -65,7 +65,6 @@ public class DSABehavior extends AbstractBehavior {
         super(agent);
         toDo = DSAStep.Nothing;
         dsa_graph = new DSATaskGraph();
-        current_DSA_iteration=0;
         
         //load the settings
         n_of_DSA_iterations = getConfiguration().getDsaIterations();
@@ -246,7 +245,7 @@ public class DSABehavior extends AbstractBehavior {
                     
                 }
 
-                if(neighborTracker.hasNeighbors(n_of_DSA_iterations) && count > 1) {
+                if( count > 1) {//neighborTracker.hasNeighbors(n_of_DSA_iterations) &&
                     
                     initializeNewDSAExec();
 
@@ -268,7 +267,7 @@ public class DSABehavior extends AbstractBehavior {
                     agent.send(new PresentationMessage(agent.getTasks()));
                 }
                 else{
-                    
+                    System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" NON inizio dsa ho il colore: "+agent.getColor());
                     toDo = DSAStep.Nothing;
                 }
                 break;
@@ -331,7 +330,9 @@ public class DSABehavior extends AbstractBehavior {
                 break;
                 
             case EndDSA:
-                
+                System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" dsa_iter:"+current_DSA_iteration+" fine dsa");
+                        
+                        
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
                     if(tNode.getValue() != tNode.getOwner()){
                         agent.send(new ReallocatedTaskMessage(tNode.getTask(),tNode.getValue()));

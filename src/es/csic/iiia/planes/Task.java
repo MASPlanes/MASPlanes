@@ -73,6 +73,7 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
      */
     public Task(Location location) {
         super(location);
+        System.out.println("id:"+id+" loc: "+location.getXInt()+" y:"+location.getYInt());
     }
 
     @Override
