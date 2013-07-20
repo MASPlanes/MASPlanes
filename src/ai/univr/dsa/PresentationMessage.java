@@ -27,6 +27,7 @@ package ai.univr.dsa;
 
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.Task;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -49,14 +50,14 @@ public class PresentationMessage extends AbstractMessage{
      * @param tasks list of all task known by sender plane, in this moment.
      */
     public PresentationMessage(List<Task> tasks){
-        this.tasks = tasks;
+        this.tasks = new ArrayList<Task>(tasks);
     }
     /**
      * Get a list of task.
      * @return a list of task.
      */
     public List<Task> getTasks(){
-        return tasks;
+        return this.tasks;
     }
             
     

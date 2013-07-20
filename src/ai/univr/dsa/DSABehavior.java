@@ -25,6 +25,7 @@
  */
 package ai.univr.dsa;
 
+import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
@@ -159,8 +160,11 @@ public class DSABehavior extends AbstractBehavior {
         */
         final Plane agent = getAgent();
         
-        if (agent.getWorld().getTime() % this.DSA_every == 0 &&
+        /*if (agent.getWorld().getTime() % this.DSA_every == 0 &&
             neighborTracker.hasNeighbors(n_of_DSA_iterations) && 
+            toDo == DSAStep.Nothing) {
+          */  
+        if (agent.getWorld().getTime() % this.DSA_every == 0 &&
             toDo == DSAStep.Nothing) {
             
             toDo = DSAStep.StartDSA;
@@ -235,27 +239,40 @@ public class DSABehavior extends AbstractBehavior {
         
         switch(toDo){
             case StartDSA:
-                initializeNewDSAExec();
-                
-                /*per ogni mio Task crea il relativo MyPlaneTaskNode indicando il Task che rappresenta e aggiungendo al dominio il riferimento a me (inteso come Plane)
-        per ogni mio PlaneTaskNode aggiorna la lista dei suoi vicini aggiungendo tutti gli altri nodi creati nella fase precedente
-        invia in broadcast un PresentationMessage {“sono P3 e questa è la mia lista di Task”}*/
-                
-                for(Task t: agent.getTasks()){
-                    dsa_graph.add(new MyPlaneTaskNode(t,agent));
+                int count = 0;
+                for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations)){
+                    
+                    count++;
+                    
                 }
-                
-                for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-                    for(MyPlaneTaskNode other_tNode : dsa_graph.getMyPlaneTasksNode()){
-                        if(tNode != other_tNode)
-                            tNode.addNeighbor(other_tNode);
-                    }                                        
+
+                if(neighborTracker.hasNeighbors(n_of_DSA_iterations) && count > 1) {
+                    
+                    initializeNewDSAExec();
+
+                    /*per ogni mio Task crea il relativo MyPlaneTaskNode indicando il Task che rappresenta e aggiungendo al dominio il riferimento a me (inteso come Plane)
+            per ogni mio PlaneTaskNode aggiorna la lista dei suoi vicini aggiungendo tutti gli altri nodi creati nella fase precedente
+            invia in broadcast un PresentationMessage {“sono P3 e questa è la mia lista di Task”}*/
+
+                    for(Task t: agent.getTasks()){
+                        dsa_graph.add(new MyPlaneTaskNode(t,agent));
+                    }
+
+                    for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
+                        for(MyPlaneTaskNode other_tNode : dsa_graph.getMyPlaneTasksNode()){
+                            if(tNode != other_tNode)
+                                tNode.addNeighbor(other_tNode);
+                        }                                        
+                    }
+
+                    agent.send(new PresentationMessage(agent.getTasks()));
                 }
-                
-                agent.send(new PresentationMessage(agent.getTasks()));
-                
+                else{
+                    
+                    toDo = DSAStep.Nothing;
+                }
                 break;
-            
+                
             case RandomDSA:
                 /*
         l’algoritmo prevederebbe una lettura dei PresentationMessage degli aerei vici e un conseguente aggiornamento del grafo ma isiccome siamo in afterMessage tutto ciò è stato già fatto in on(PresentationMessage)
@@ -270,8 +287,8 @@ public class DSABehavior extends AbstractBehavior {
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
                     domain = tNode.getDomain();
                     rnd_index = rnd.nextInt(domain.size());
-                    //tNode.setValue(domain.get(rnd_index));
-                    tNode.setValue(tNode.getOwner());
+                    tNode.setValue(domain.get(rnd_index));
+                    //tNode.setValue(tNode.getOwner());
                     for(Plane p: domain){
                         if(p != agent)
                             agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
@@ -338,7 +355,7 @@ public class DSABehavior extends AbstractBehavior {
     
     private void initializeNewDSAExec(){
         dsa_graph.clear();
-        current_DSA_iteration = 0;
+        current_DSA_iteration = 2;
     }
 
     //FORSE non serve
