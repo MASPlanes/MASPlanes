@@ -119,7 +119,7 @@ public class DSABehavior extends AbstractBehavior {
                 } 
                 
                 
-                System.out.println("t="+getAgent().getWorld().getTime()+" sono Pre:"+getAgent()+" read dsa grafo:"+dsa_graph);
+                System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on PresentationMess grafo:"+dsa_graph);
         }
         }
     }
@@ -130,15 +130,15 @@ public class DSABehavior extends AbstractBehavior {
         recupara dal messaggio il nuovo valore assunto dal task( il valore è di tipo Plane es P2)
         cerca nel grafo il NearPlaneTaskNode che rappresenta il task e aggiorna il nodo con il nuovo valore
         */
-        try{
+        //try{
             dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
             
-            System.out.println("t="+getAgent().getWorld().getTime()+" sono Pre:"+getAgent()+" read dsa grafo:"+dsa_graph);
-        }
-        catch(Exception eex){
-            System.out.println("dfsf");
-            
-        }
+            System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on TaskMess("+ts.getTask().getId()+","+ts.getValue()+") grafo:"+dsa_graph);
+//        }
+//        catch(Exception eex){
+//            System.out.println("dfsf");
+//            
+//        }
         
     }
 
@@ -268,11 +268,11 @@ public class DSABehavior extends AbstractBehavior {
                                 tNode.addNeighbor(other_tNode);
                         }                                        
                     }
-System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" start dsa grafo:"+dsa_graph);
+System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"+dsa_graph);
                     agent.send(new PresentationMessage(agent.getTasks()));
                 }
                 else{
-                    System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" NON inizio dsa ho il colore: "+agent.getColor());
+                    System.out.println("t="+agent.getWorld().getTime()+" "+agent+" NON inizio dsa ho il colore: "+agent.getColor());
                     toDo = DSAStep.Nothing;
                 }
                 break;
@@ -299,7 +299,7 @@ System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" start dsa gr
                     }
                 }
                 
-                System.out.println("t="+getAgent().getWorld().getTime()+" sono Pre:"+getAgent()+" rand dsa grafo:"+dsa_graph);
+                System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" random dsa grafo:"+dsa_graph);
                 
                 break;
                 
@@ -337,7 +337,7 @@ System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" start dsa gr
                 break;
                 
             case EndDSA:
-                System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" dsa_iter:"+current_DSA_iteration+" fine dsa");
+                System.out.println("t="+agent.getWorld().getTime()+" "+agent+" dsa_iter:"+current_DSA_iteration+" fine dsa");
                         
                         
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
@@ -366,15 +366,5 @@ System.out.println("t="+agent.getWorld().getTime()+" sono:"+agent+" start dsa gr
         current_DSA_iteration = 2;
     }
 
-    //FORSE non serve
-    /*private static int getSenderID(DMessage m) {
-    MessagingAgent sender = m.getSender();
-    if (!(sender instanceof AuctionPlane)) {
-            throw new ClassCastException();
-    }
 
-    return ((AuctionPlane)sender).getId();
-    }
-
-    */
 }

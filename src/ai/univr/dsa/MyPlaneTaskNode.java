@@ -111,9 +111,11 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         
         //se almeno uno è cambiato ha senso cercare un nuovo valore per me che minimizza il costo totale
         double minCost = Double.MAX_VALUE;
+        double currentCost;
         Plane best = null;
         PathPlan path;
         if(changed){
+            System.out.print(getTask().getId()+" ");
             for(Plane possibleOwner: this.domain){
                 
                 //starting from the possibleOwner location
@@ -122,15 +124,18 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                 //and add me to the path
                 path.add(this.getTask());
                 
-                //and add the other tasks to the path that they have the same my current value
+                //and add the other tasks that they have the same my current value to the path
                 for(AbstractTaskNode other: this.neighbors)
                     if(other.getValue() == possibleOwner)
-                        path.add(other.getTask());
+                        path.add(other.getTask());                
                 
                 //what is the total cost of the path???
-                if(path.getCost() < minCost){
+                currentCost = path.getCostTo(this.getTask());
+                System.out.print(possibleOwner+"="+currentCost+" ");
+                
+                if(currentCost < minCost){
                     //change
-                    minCost = path.getCost();
+                    minCost = currentCost;
                     best = possibleOwner;
                             
                 }
@@ -138,6 +143,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             }
             //the best new value has been found
             this.setValue(best);
+            System.out.println();
             
         }
     }
