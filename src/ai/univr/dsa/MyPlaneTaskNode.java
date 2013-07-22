@@ -46,6 +46,8 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      * List which represents the domain.
      */
     private List<Plane> domain;
+    
+    private long lastDecisionTime;
     /**
      * Builds a MyPlaneTaskNode and assigned owner Plane in the domain. 
      * @param t Task represented by this Node.
@@ -57,6 +59,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         this.neighbors = new ArrayList<AbstractTaskNode>();
         this.domain = new ArrayList<Plane>();
         updateDomain(own);
+        lastDecisionTime = -1;
     }
     /**
      * Adds a neighbor Node at this Node.
@@ -104,10 +107,10 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     
     public void makeDecision(){
         //controllo se almeno uno dei vicini ha cambiato il proprio valore
-        boolean changed = false || this.neighbors.size()==0; //Attenzione in questo modo se c'è solo un task(io) entro sempre nell'if
+        boolean changed = false || this.neighbors.isEmpty(); //Attenzione in questo modo se c'è solo un task(io) entro sempre nell'if
         int i = 0;
         while(!changed && i < this.neighbors.size())
-            changed = this.neighbors.get(i++).isChanged();
+            changed = this.lastDecisionTime < this.neighbors.get(i++).getLastChangedTime();
         
         //se almeno uno è cambiato ha senso cercare un nuovo valore per me che minimizza il costo totale
         double minCost = Double.MAX_VALUE;
@@ -144,6 +147,8 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             //the best new value has been found
             this.setValue(best);
             System.out.println();
+            
+            this.lastDecisionTime = this.getOwner().getWorld().getTime();
             
         }
     }

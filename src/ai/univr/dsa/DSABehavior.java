@@ -244,10 +244,8 @@ public class DSABehavior extends AbstractBehavior {
         switch(toDo){
             case StartDSA:
                 int count = 0;
-                for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations)){
-                    
-                    count++;
-                    
+                for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations)){                    
+                    count++;                    
                 }
 
                 if( count > 1) {//neighborTracker.hasNeighbors(n_of_DSA_iterations) &&
@@ -321,7 +319,7 @@ System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
                     if(rnd.nextDouble() < this.DSA_p){
                         tNode.makeDecision();
-                        if(tNode.isChanged()){
+                        if(tNode.getLastChangedTime() == agent.getWorld().getTime()){
                             for(Plane p: tNode.getDomain()){
                                 if(p != agent){
                                     agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 

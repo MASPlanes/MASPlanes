@@ -53,9 +53,9 @@ public abstract class AbstractTaskNode {
     /**
      * Plane which had been assigned at this Node.
      */
-    private Plane old_value;
+    //private Plane old_value;
     
-    //private long last_changed_time;
+    private long last_changed_time;
     
     /**
      * Builds a Node contained a Task and a Plane owner.
@@ -66,7 +66,8 @@ public abstract class AbstractTaskNode {
         this.t = t;
         this.owner = own;
         this.value = null;
-        this.old_value = null;
+        //this.old_value = null;
+        this.last_changed_time = -1;
     }
     /**
      * Get the Task represented by this Node. 
@@ -104,8 +105,11 @@ public abstract class AbstractTaskNode {
      */
     public void setValue(Plane p){
         //DEBUG//System.out.println("set value:"+p);
-        this.old_value = this.value;
-        this.value = p;
+        //this.old_value = this.value;
+        if(this.value != p){
+            this.value = p;
+            this.last_changed_time = owner.getWorld().getTime();
+        }
         
     }
     
@@ -113,11 +117,18 @@ public abstract class AbstractTaskNode {
      * Check if the value of the Node is changed.
      * @return true if and only if the value is different from the old_value, false otherwise
      */
-    public boolean isChanged(){
+    /*public boolean isChanged(){
         
         return this.old_value != this.value;
         
+    }*/
+    
+
+
+    public long getLastChangedTime() {
+        return last_changed_time;
     }
+    
     
     @Override
     public String toString(){
