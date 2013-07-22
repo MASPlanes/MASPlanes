@@ -119,7 +119,7 @@ public class DSABehavior extends AbstractBehavior {
                 } 
                 
                 
-                System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on PresentationMess grafo:"+dsa_graph);
+                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on PresentationMess grafo:"+dsa_graph);
         }
         }
     }
@@ -133,7 +133,7 @@ public class DSABehavior extends AbstractBehavior {
         //try{
             dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
             
-            System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on TaskMess("+ts.getTask().getId()+","+ts.getValue()+") grafo:"+dsa_graph);
+            if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on TaskMess("+ts.getTask().getId()+","+ts.getValue()+") grafo:"+dsa_graph);
 //        }
 //        catch(Exception eex){
 //            System.out.println("dfsf");
@@ -266,11 +266,11 @@ public class DSABehavior extends AbstractBehavior {
                                 tNode.addNeighbor(other_tNode);
                         }                                        
                     }
-System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"+dsa_graph);
+if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"+dsa_graph);
                     agent.send(new PresentationMessage(agent.getTasks()));
                 }
                 else{
-                    System.out.println("t="+agent.getWorld().getTime()+" "+agent+" NON inizio dsa ho il colore: "+agent.getColor());
+                    if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+agent.getWorld().getTime()+" "+agent+" NON inizio dsa ho il colore: "+agent.getColor());
                     toDo = DSAStep.Nothing;
                 }
                 break;
@@ -297,7 +297,7 @@ System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"
                     }
                 }
                 
-                System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" random dsa grafo:"+dsa_graph);
+                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" random dsa grafo:"+dsa_graph);
                 
                 break;
                 
@@ -335,7 +335,7 @@ System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"
                 break;
                 
             case EndDSA:
-                System.out.println("t="+agent.getWorld().getTime()+" "+agent+" dsa_iter:"+current_DSA_iteration+" fine dsa");
+                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+agent.getWorld().getTime()+" "+agent+" dsa_iter:"+current_DSA_iteration+" fine dsa");
                         
                         
                 for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){

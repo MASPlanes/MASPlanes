@@ -118,7 +118,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         Plane best = null;
         PathPlan path;
         if(changed){
-            System.out.print(getTask().getId()+" ");
+            if(ai.univr.dsa.DSAPlane.DEBUG)System.out.print(getTask().getId()+" ");
             for(Plane possibleOwner: this.domain){
                 
                 //starting from the possibleOwner location
@@ -134,7 +134,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                 
                 //what is the total cost of the path???
                 currentCost = path.getCostTo(this.getTask());
-                System.out.print(possibleOwner+"="+currentCost+" ");
+                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.print(possibleOwner+"="+currentCost+" ");
                 
                 if(currentCost < minCost){
                     //change
@@ -146,7 +146,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             }
             //the best new value has been found
             this.setValue(best);
-            System.out.println();
+            if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println();
             
             this.lastDecisionTime = this.getOwner().getWorld().getTime();
             

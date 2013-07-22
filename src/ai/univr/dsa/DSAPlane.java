@@ -37,6 +37,8 @@ import java.util.List;
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSAPlane extends AbstractPlane {
+    
+    final static boolean DEBUG=false;
 
     private ArrayList<Task> localTasks = new ArrayList<Task>();
 
