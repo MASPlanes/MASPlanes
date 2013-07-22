@@ -104,7 +104,7 @@ The simulator includes a simple GUI to visualize what is happening in the
 simulation while it runs. The GUI has three distinct sections, as shown in this
 figure:
 
-..  image:: https://bitbucket.org/mpujol/planes/raw/master/img/sections.png
+..  image:: img/sections.png
     :align: center
     :alt: Simulator's GUI screenshot.
 
