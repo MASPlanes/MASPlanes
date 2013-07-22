@@ -103,6 +103,8 @@ public class DSABehavior extends AbstractBehavior {
         
             //verifico che il Plane vicino resti tale per tutta la durata di DSA        
             if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
+                
+                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("sender:"+sender+" io sono:"+getAgent());
 
                 NearPlaneTaskNode newTask;
                 for(Task t: pm.getTasks()){
@@ -119,7 +121,8 @@ public class DSABehavior extends AbstractBehavior {
                 } 
                 
                 
-                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on PresentationMess grafo:"+dsa_graph);
+                if(ai.univr.dsa.DSAPlane.DEBUG)
+                    System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on PresentationMess grafo:"+dsa_graph);
         }
         }
     }
@@ -243,15 +246,15 @@ public class DSABehavior extends AbstractBehavior {
         
         switch(toDo){
             case StartDSA:
+                initializeNewDSAExec();
+                 
                 int count = 0;
                 for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations)){                    
                     count++;                    
                 }
 
                 if( count > 1) {//neighborTracker.hasNeighbors(n_of_DSA_iterations) &&
-                    
-                    initializeNewDSAExec();
-
+ 
                     /*per ogni mio Task crea il relativo MyPlaneTaskNode indicando il Task che rappresenta e aggiungendo al dominio il riferimento a me (inteso come Plane)
             per ogni mio PlaneTaskNode aggiorna la lista dei suoi vicini aggiungendo tutti gli altri nodi creati nella fase precedente
             invia in broadcast un PresentationMessage {“sono P3 e questa è la mia lista di Task”}*/
@@ -361,7 +364,7 @@ if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+agent.getWorld().getTime(
     
     private void initializeNewDSAExec(){
         dsa_graph.clear();
-        current_DSA_iteration = 2;
+        current_DSA_iteration = 3;
     }
 
 

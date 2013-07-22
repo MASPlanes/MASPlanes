@@ -248,9 +248,13 @@ public final class Configuration {
             
             dsaEvery = Integer.valueOf(settings.getProperty("dsa-every"));
             values.put("dsa-every", String.valueOf(dsaEvery));
+            if(dsaEvery <= dsaIterations)
+                throw new IllegalArgumentException("dsa-iterations must be < dsa-every");
             
             dsaP = Double.valueOf(settings.getProperty("dsa-p"));
             values.put("dsa-p", String.valueOf(dsaP));
+            if(dsaP < 0 ||dsaP > 1)
+                throw new IllegalArgumentException("dsa-p must be between 0 and 1.");
             
             
         }

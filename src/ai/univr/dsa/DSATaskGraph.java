@@ -61,6 +61,9 @@ public class DSATaskGraph {
      */
     public void add(AbstractTaskNode n) {
         if(this.myTasks.containsKey(n.getTask()) || this.otherTasks.containsKey(n.getTask())) {
+            System.out.println(n);
+            System.out.println(this);
+
             throw new IllegalArgumentException();
         }
         if(n instanceof MyPlaneTaskNode) {

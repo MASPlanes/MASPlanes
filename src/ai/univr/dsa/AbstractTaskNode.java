@@ -133,6 +133,6 @@ public abstract class AbstractTaskNode {
     @Override
     public String toString(){
         return t.getId()+"="+value;
-        //return t.getId() +" value:"+value+" old:"+old_value+" own:" + this.owner ;
+        //return t.getId() +" value:"+value+" last_changed_time:"+last_changed_time+" own:" + this.owner ;
     }
 }
