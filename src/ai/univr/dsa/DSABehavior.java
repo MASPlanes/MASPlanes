@@ -316,6 +316,11 @@ public class DSABehavior extends AbstractBehavior {
                             agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
                         }
                     }
+                    
+                    if (LOG.isLoggable(Level.FINER)){
+                        LOG.log(Level.FINER, "t={0} task:{1} changed its value. new value:{2}", 
+                        new Object[]{getAgent().getWorld().getTime(), tNode.getTask(),tNode.getValue()});
+                    }
 
                 }
             }
