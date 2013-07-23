@@ -102,26 +102,23 @@ public class DSABehavior extends AbstractBehavior {
             //verifico che il Plane vicino resti tale per tutta la durata di DSA        
             if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
                 
-                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("sender:"+sender+" io sono:"+getAgent());
-
                 NearPlaneTaskNode newTask;
                 for(Task t: pm.getTasks()){
                     newTask = new NearPlaneTaskNode(t,sender);
                     dsa_graph.add(newTask);
 
-                    for(MyPlaneTaskNode my_t : dsa_graph.getMyPlaneTasksNode()){                
+                    for(MyPlaneTaskNode my_t : dsa_graph.getMyPlaneTasksNode())
                         my_t.addNeighbor(newTask);
-                    }
                 }            
 
-                for(MyPlaneTaskNode t: dsa_graph.getMyPlaneTasksNode()){
+                for(MyPlaneTaskNode t: dsa_graph.getMyPlaneTasksNode())
                     t.updateDomain(sender);               
-                } 
                 
-                
-                if(ai.univr.dsa.DSAPlane.DEBUG)
-                    System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on PresentationMess grafo:"+dsa_graph);
-        }
+                if (LOG.isLoggable(Level.FINER)) {
+                    LOG.log(Level.FINER, "t={0} agent:{1} recive PresentationMessage from {2} updated graph:{3}", 
+                            new Object[]{getAgent().getWorld().getTime(), getAgent(), pm.getSender(), dsa_graph});
+                }
+            }
         }
     }
 
@@ -131,23 +128,21 @@ public class DSABehavior extends AbstractBehavior {
         recupara dal messaggio il nuovo valore assunto dal task( il valore è di tipo Plane es P2)
         cerca nel grafo il NearPlaneTaskNode che rappresenta il task e aggiorna il nodo con il nuovo valore
         */
-        //try{
-            dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
+     
+        dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
             
-            if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" on TaskMess("+ts.getTask().getId()+","+ts.getValue()+") grafo:"+dsa_graph);
-//        }
-//        catch(Exception eex){
-//            System.out.println("dfsf");
-//            
-//        }
-        
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "t={0} agent:{1} recive TaskMessage({2},{3}) updated graph:{4}", 
+                    new Object[]{getAgent().getWorld().getTime(), getAgent(), ts.getTask().getId(),ts.getValue(), dsa_graph});
+        }
     }
 
     public void on(ReallocatedTaskMessage rtm) {
         getAgent().addTask(rtm.getTask());
 
         if (LOG.isLoggable(Level.FINER)) {
-            LOG.log(Level.FINER, "{0} recives task {1}", new Object[]{getAgent(), rtm.getTask().getId()});
+            LOG.log(Level.FINER, "t={0} agent:{1} has recived the task {2}", 
+                    new Object[]{getAgent().getWorld().getTime(), getAgent(), rtm.getTask().getId()});
         }
     }
 
@@ -162,14 +157,13 @@ public class DSABehavior extends AbstractBehavior {
             initializeNewDSAExec();
             
  
-            if( getNumberOfNeighbors() > 0)//neighborTracker.hasNeighbors(n_of_DSA_iterations) &&
+            if( getNumberOfNeighbors() > 0)
                 toDo = DSAStep.StartDSA;
             else
                 toDo = DSAStep.Nothing;
             
         }
-        
-        
+                
         switch(toDo){
             case StartDSA:
               
@@ -177,10 +171,7 @@ public class DSABehavior extends AbstractBehavior {
                 toDo = DSAStep.RandomDSA;
                 break;
 
-                
             case RandomDSA:
-                
-                
                 
                 doRandomDSAStep();
                 toDo = DSAStep.ContinueDSA;
@@ -199,11 +190,11 @@ public class DSABehavior extends AbstractBehavior {
             case EndDSA:
                 
                 endDSA();
-                toDo = DSAStep.Nothing;
-                
+                toDo = DSAStep.Nothing;                
                 break;
                                 
             case Nothing:
+                
                 break;
                 
         }
@@ -245,8 +236,13 @@ public class DSABehavior extends AbstractBehavior {
                     tNode.addNeighbor(other_tNode);
             }                                        
         }
-        if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+agent.getWorld().getTime()+" "+agent+" start dsa grafo:"+dsa_graph);
-        agent.send(new PresentationMessage(agent.getTasks()));        
+
+        agent.send(new PresentationMessage(agent.getTasks()));   
+        
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "t={0} agent:{1} START DSA. current graph:{2}", 
+                    new Object[]{getAgent().getWorld().getTime(), agent, dsa_graph});
+        }
     }
     
     
@@ -274,7 +270,10 @@ public class DSABehavior extends AbstractBehavior {
             }
         }
 
-        if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+getAgent().getWorld().getTime()+" "+getAgent()+" random dsa grafo:"+dsa_graph);
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "t={0} agent:{1} RANDOM DSA. current graph:{2}", 
+                    new Object[]{getAgent().getWorld().getTime(), agent, dsa_graph});
+        }
     }
     
     private void doDSAStep(){
@@ -314,9 +313,10 @@ public class DSABehavior extends AbstractBehavior {
     private void endDSA(){
         final Plane agent = getAgent();
              
-        
-        if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println("t="+agent.getWorld().getTime()+" "+agent+" dsa_iter:"+current_DSA_iteration+" fine dsa");
-                        
+        if (LOG.isLoggable(Level.FINER)) {
+            LOG.log(Level.FINER, "t={0} agent:{1} END DSA.", 
+                    new Object[]{getAgent().getWorld().getTime(), agent});
+        }                
                         
         for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
             if(tNode.getValue() != tNode.getOwner()){

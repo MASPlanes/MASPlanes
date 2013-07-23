@@ -48,7 +48,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      */
     private List<Plane> domain;
     /**
-     * The simulator time of the last invocation of <em>makeDecision</em> method
+     * The simulator time of the last invocation of <em>makeDecision</em> method.
      */
     private long lastDecisionTime;
     /**
