@@ -48,8 +48,10 @@ public class TaskMessage extends AbstractMessage{
     
     /**
      * Builds a new TaskMessage.
+     * 
      * @param task The task that has changed its value.
      * @param value The new value of the task to comunicate to the message's recipient.
+     * @param recipient Plane who received the message.
      */
     public TaskMessage(Task task, Plane value, Plane recipient){
         this.task = task;

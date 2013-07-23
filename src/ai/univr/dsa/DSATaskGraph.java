@@ -35,6 +35,7 @@ import java.util.Map;
  * It's builded by a Plane during the DSA with its TaskNodes and with the received TaskNodes from Planes near.<br>
  * It is formed by AbstractTaskNode.
  * Nodes are dived into two set, MyPlaneTaskNode, and NearPlaneTaskNode.
+ * 
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSATaskGraph {
@@ -58,13 +59,14 @@ public class DSATaskGraph {
     /**
      * Adds an AbstractTaskNode to the Graph.
      * @param n Node to be added to the Graph.
+     * @exception IllegalArgumentException the node n as parameter is already in the graph.
      */
     public void add(AbstractTaskNode n) {
+        
         if(this.myTasks.containsKey(n.getTask()) || this.otherTasks.containsKey(n.getTask())) {
-            System.out.println(n);
-            System.out.println(this);
 
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException(" Try to add a node of a task that is already in the graph ");
+            
         }
         if(n instanceof MyPlaneTaskNode) {
             
@@ -124,7 +126,10 @@ public class DSATaskGraph {
         this.myTasks.clear();
         this.otherTasks.clear();
     }
-    
+    /**
+     * Checks if the graph is empty.
+     * @return true if and only if the graph i empty, false otherwise.
+     */
     public boolean isEmpty() {
         
         return this.myTasks.isEmpty() && this.otherTasks.isEmpty();

@@ -47,6 +47,7 @@ public class ReallocatedTaskMessage extends AbstractMessage{
      * Builds a new message to inform the intended recipient that it has a new task to do.
      * 
      * @param task that has changed the owner.
+     * @param  recipient Plane who receive the message.
      */
     public ReallocatedTaskMessage(Task task, Plane recipient) {
         
