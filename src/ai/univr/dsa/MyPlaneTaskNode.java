@@ -30,6 +30,8 @@ import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.util.PathPlan;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a TaskNode which is assigned to a Plane.<br>
@@ -42,7 +44,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     /**
      * List of the neighbors of this Task.
      */
-    private List<AbstractTaskNode> neighbors;
+    private List<AbstractTaskNode> neighbors;    
     /**
      * List which represents the domain.
      */
@@ -51,6 +53,9 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      * The simulator time of the last invocation of <em>makeDecision</em> method.
      */
     private long lastDecisionTime;
+    
+    private static final Logger LOG = Logger.getLogger(MyPlaneTaskNode.class.getName());
+        
     /**
      * Builds a MyPlaneTaskNode and assigned owner Plane in the domain. 
      * @param t Task represented by this Node.
@@ -114,7 +119,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      */
     public void makeDecision(){
         //check if at least one of the neighbors has changed its value
-        boolean changed = false || this.neighbors.isEmpty(); //Attention in this way if there is only one task always within nell'if
+        boolean changed = false || this.neighbors.isEmpty(); //Attention in this way if there is only one task always within in the if
         int i = 0;
         while(!changed && i < this.neighbors.size())
             changed = this.lastDecisionTime < this.neighbors.get(i++).getLastChangedTime();
@@ -125,7 +130,6 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         Plane best = null;
         PathPlan path;
         if(changed){
-            if(ai.univr.dsa.DSAPlane.DEBUG)System.out.print(getTask().getId()+" ");
             for(Plane possibleOwner: this.domain){
                 
                 //starting from the possibleOwner location
@@ -139,9 +143,13 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                     if(other.getValue() == possibleOwner)
                         path.add(other.getTask());                
                 
-                //what is the total cost of the path???
+                //what is the cost of the path???
                 currentCost = path.getCostTo(this.getTask());
-                if(ai.univr.dsa.DSAPlane.DEBUG)System.out.print(possibleOwner+"="+currentCost+" ");
+                
+                if (LOG.isLoggable(Level.FINER)) {
+                    LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3}", 
+                            new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner, currentCost});
+                }
                 
                 if(currentCost < minCost){
                     //change
@@ -153,14 +161,10 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             }
             //the best new value has been found
             this.setValue(best);
-            if(ai.univr.dsa.DSAPlane.DEBUG)System.out.println();
-            
-            this.lastDecisionTime = this.getOwner().getWorld().getTime();
-            
+            this.lastDecisionTime = this.getOwner().getWorld().getTime();            
         }
     }
-    
-    
+        
     @Override
     public String toString(){
         return super.toString()+" dom:"+this.domain.toString();

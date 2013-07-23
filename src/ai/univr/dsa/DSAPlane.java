@@ -38,8 +38,6 @@ import java.util.List;
  */
 public class DSAPlane extends AbstractPlane {
     
-    final static boolean DEBUG=false;//BUTTA
-
     private ArrayList<Task> localTasks = new ArrayList<Task>();
 
     public DSAPlane(Location location) {
