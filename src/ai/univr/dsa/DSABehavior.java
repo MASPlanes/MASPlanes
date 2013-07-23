@@ -93,27 +93,19 @@ public class DSABehavior extends AbstractBehavior {
             return (DSAPlane)super.getAgent();
     }
     /**
-     * Takes the neighbor Tasks and inserts them into the graph
+     * Takes the neighbor Tasks and inserts them into the graph and updating the
+     * near node.
      * 
-     * @param pm 
+     * @param pm message contaning the tasks list of a near Plane.
      */
     public void on(PresentationMessage pm){
-        /*
-        recupera il Plane sender
-        recupera i task da lui conosciuti
-        se resterà nel range di comunicazione per tutta la durata di dsa allora 
-        * aggiungi al grafo dei task, per ogni task del sender, un nodo di tipo 
-        * NearPlaneTaskNode rappresentante del task
-        aggiorna il dominio dei nodi(quindi task) da me gestiti  MyPlaneTaskNode
-        * inserendo il Plane sender  
-        aggiorna i vicini dei nodi(quindi task) da me gestiti  MyPlaneTaskNode inserendo i nuovi Task	
-        */
+        
         final Plane sender =(Plane) pm.getSender();
         
         //if you send a broadcast message, also the sender receive the message
         if(sender != getAgent() && toDo != DSAStep.Nothing){
         
-            //verifico che il Plane vicino resti tale per tutta la durata di DSA        
+            //check if the sender plane is a my neighbor for all time of dsa
             if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
                 
                 NearPlaneTaskNode newTask;
@@ -135,7 +127,12 @@ public class DSABehavior extends AbstractBehavior {
             }
         }
     }
-
+    /**
+     * Manages a message send by a task of another plane in the range, and updates
+     * the value of the correspondent {@link NearPlaneTaskNode} in the graph.
+     * 
+     * @param ts message containg the sender of the task and its new value.
+     */
     public void on(TaskMessage ts ){
         /*
         recupara dal messaggio il riferimerto al Task
@@ -150,7 +147,11 @@ public class DSABehavior extends AbstractBehavior {
                     new Object[]{getAgent().getWorld().getTime(), getAgent(), ts.getTask().getId(),ts.getValue(), dsa_graph});
         }
     }
-
+    /**
+     * Assigns the Task at this agent which before it belonged to the sender.
+     * 
+     * @param rtm message contains the new task for this agent.
+     */
     public void on(ReallocatedTaskMessage rtm) {
         getAgent().addTask(rtm.getTask());
 
@@ -220,7 +221,11 @@ public class DSABehavior extends AbstractBehavior {
         dsa_graph.clear();
         current_DSA_iteration = 3;
     }
-    
+
+    /**
+     * 
+     * @return number of Neighbors Agent without myself
+     */
     private int getNumberOfNeighbors(){
         
         int count = 0;
@@ -232,10 +237,10 @@ public class DSABehavior extends AbstractBehavior {
     }
     
     
-    /*per ogni mio Task crea il relativo MyPlaneTaskNode indicando il Task che rappresenta e aggiungendo al dominio il riferimento a me (inteso come Plane)
-        per ogni mio PlaneTaskNode aggiorna la lista dei suoi vicini aggiungendo tutti gli altri nodi creati nella fase precedente
-        invia in broadcast un PresentationMessage {“sono P3 e questa è la mia lista di Task”}*/
-
+    /**
+     * Starts a new dsa execution, builds the graph with the tasks of this agent
+     * and sends the {@link PresentationMessage}.
+     */
     private void beginDSA(){
         final Plane agent = getAgent();
 
@@ -260,13 +265,10 @@ public class DSABehavior extends AbstractBehavior {
     }
     
     
-    
-    /*
-        l’algoritmo prevederebbe una lettura dei PresentationMessage degli aerei vici e un conseguente aggiornamento del grafo ma isiccome siamo in afterMessage tutto ciò è stato già fatto in on(PresentationMessage)
-        per ogni mio PlaneTaskNode scelgli casualmente in valore per esso tra i possibili valori appartenenti al dominio, 
-        *aggiorna il campo value del nodo e crea /invia un TaskMessage per ogni aereo presente nel dominio del nodo(escluso me stesso ovviamente)
-        
-                 */
+    /**
+     * Executes the random step of DSA and for all tasks chooses 
+     * an initial random value.
+     */
     private void doRandomDSAStep(){
         final Plane agent = getAgent();
         Random rnd = new Random();
@@ -290,20 +292,12 @@ public class DSABehavior extends AbstractBehavior {
         }
     }
     
+    /**
+     * Tries to improve the correspondent value of all tasks of this agent 
+     * by calling the makeDecision method, only if the dsa-p configuration is respected.
+     */
     private void doDSAStep(){
-        /* case ContinueDSA
-        come prima cosa bisognerebbe leggere i TaskMessage degli aerei vicini e aggiornare il proprio grafo con le nuove info. Questo viene fatto in on(TaskMessage)
-        genera un numero random rn compreso [0,1)
-        se rn < p puoi ‘giocare’
-        per ogni mio task (PlaneTaskNode ) ti
-        per ogni possibile valore del dominio assegnabile a ti calcola il costo dell’assegnamento totale  condiderando il valore corrente dei nodi vicini.
-        prendi il valore che minimizza il costo totale
-        se il valore scelto è diverso da quello attuale crea /invia un TaskMessage per ogni aereo presente nel dominio del nodo(escluso me stesso ovviamente) di ti
-        NB : rimane ancora da chiarire come bisogna comportari con i task che vengono gestiti dallo stesso aereo es. se l’ordine pi processamento dei task per l’aereo è t1,t2 se il valore di t1=P1 e dopo l’iterazione di DSA diventa P2, t2 quale dei due valori deve usare per la sua iterazione? probabilmente P1 perchè anche se i due task sono gestiti dallo stesso aereo l’unico modo di comunicare che dovrebbero avere è quello via messaggi e non attraverso condivisione di dati.
 
-        NB: bisogna rianalizzare la questione della condizione di terminazione cercando di far terminare dsa se converge in un minino locale
-
-                 */
         final Plane agent = getAgent();
         Random rnd = new Random();
                
@@ -328,7 +322,9 @@ public class DSABehavior extends AbstractBehavior {
         }
         current_DSA_iteration++;
     }
-    
+    /**
+     * Reallocates tasks if the value is different from the owner.
+     */
     private void endDSA(){
         final Plane agent = getAgent();
              
