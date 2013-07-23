@@ -338,7 +338,7 @@ public class DSABehavior extends AbstractBehavior {
         }                
                         
         for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-            if(tNode.getValue() != tNode.getOwner()){
+            if(tNode.getValue() != tNode.getOwner() && this.neighborTracker.isNeighbor(tNode.getValue())){
                 agent.send(new ReallocatedTaskMessage(tNode.getTask(),tNode.getValue()));
                 agent.removeTask(tNode.getTask());
             }
