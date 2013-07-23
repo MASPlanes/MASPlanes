@@ -36,7 +36,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * Implements the DSA and replying behavior for DSAPlanes.
+ * 
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSABehavior extends AbstractBehavior {
@@ -50,15 +51,21 @@ public class DSABehavior extends AbstractBehavior {
     private int current_DSA_iteration;
     
     final int n_of_DSA_iterations;
+    
     final int DSA_every;
+    
     final double DSA_p;
 
     private enum DSAStep {
         StartDSA, RandomDSA, ContinueDSA, EndDSA, Nothing;
     }
+    
     private DSAStep toDo;
-
-
+    /**
+     * Builds a DSA Behavior for the agent passed as parameter.
+     * 
+     * @param agent that will display this behavior.
+     */
     public DSABehavior(DSAPlane agent) {
         super(agent);
         toDo = DSAStep.Nothing;
@@ -85,13 +92,20 @@ public class DSABehavior extends AbstractBehavior {
     public DSAPlane getAgent() {
             return (DSAPlane)super.getAgent();
     }
-
+    /**
+     * Takes the neighbor Tasks and inserts them into the graph
+     * 
+     * @param pm 
+     */
     public void on(PresentationMessage pm){
         /*
         recupera il Plane sender
         recupera i task da lui conosciuti
-        se resterà nel range di comunicazione per tutta la durata di dsa allora aggiungi al grafo dei task, per ogni task del sender, un nodo di tipo NearPlaneTaskNode rappresentante del task
-        aggiorna il dominio dei nodi(quindi task) da me gestiti  MyPlaneTaskNode inserendo il Plane sender  
+        se resterà nel range di comunicazione per tutta la durata di dsa allora 
+        * aggiungi al grafo dei task, per ogni task del sender, un nodo di tipo 
+        * NearPlaneTaskNode rappresentante del task
+        aggiorna il dominio dei nodi(quindi task) da me gestiti  MyPlaneTaskNode
+        * inserendo il Plane sender  
         aggiorna i vicini dei nodi(quindi task) da me gestiti  MyPlaneTaskNode inserendo i nuovi Task	
         */
         final Plane sender =(Plane) pm.getSender();
