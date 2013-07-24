@@ -106,7 +106,7 @@ public class DSABehavior extends AbstractBehavior {
         if(sender != getAgent() && toDo != DSAStep.Nothing){
         
             //check if the sender plane is a my neighbor for all time of dsa
-            if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
+            if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations + 1)){
                 
                 NearPlaneTaskNode newTask;
                 for(Task t: pm.getTasks()){
@@ -229,7 +229,7 @@ public class DSABehavior extends AbstractBehavior {
     private int getNumberOfNeighbors(){
         
         int count = 0;
-        for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations))                    
+        for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations + 1))                    
             count++;
         
         return count - 1;
@@ -334,7 +334,7 @@ public class DSABehavior extends AbstractBehavior {
         }                
                         
         for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-            if(tNode.getValue() != tNode.getOwner() && this.neighborTracker.isNeighbor(tNode.getValue())){
+            if(tNode.getValue() != tNode.getOwner())/* && this.neighborTracker.isNeighbor(tNode.getValue()))*/{
                 agent.send(new ReallocatedTaskMessage(tNode.getTask(),tNode.getValue()));
                 agent.removeTask(tNode.getTask());
             }
