@@ -23,29 +23,39 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.util.PathPlan;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Represents a TaskNode which is assigned to a Plane.<br>
  * Contains a List of neighbors task, and  a Planes list which represents the 
  * possible domain of this TaskNode.
+ * 
  * @author Andrea Jeradi, Francesco Donato
  */
 public class MyPlaneTaskNode extends AbstractTaskNode {
     /**
      * List of the neighbors of this Task.
      */
-    private List<AbstractTaskNode> neighbors;
+    private List<AbstractTaskNode> neighbors;    
     /**
      * List which represents the domain.
      */
     private List<Plane> domain;
+    /**
+     * The simulator time of the last invocation of <em>makeDecision</em> method.
+     */
+    private long lastDecisionTime;
+    
+    private static final Logger LOG = Logger.getLogger(MyPlaneTaskNode.class.getName());
+        
     /**
      * Builds a MyPlaneTaskNode and assigned owner Plane in the domain. 
      * @param t Task represented by this Node.
@@ -57,11 +67,12 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         this.neighbors = new ArrayList<AbstractTaskNode>();
         this.domain = new ArrayList<Plane>();
         updateDomain(own);
+        lastDecisionTime = -1;
     }
     /**
      * Adds a neighbor Node at this Node.
      * @param n to be added.
-     * @return true if and only if adding is succesful, false if n is already in the List of Neighbors.
+     * @return true if and only if adding is succesful, false if n is already in the List of Neighbors or adding is failed.
      */
     public boolean addNeighbor(AbstractTaskNode n) {
        if(!this.neighbors.contains(n)){ 
@@ -91,7 +102,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     /**
      * Adds a value(Plane) at the domain List
      * @param p Plane to be added at the domain List.
-     * @return true if and only if the domain is correctly updated, false il p is already in the Domain.
+     * @return true if and only if the domain is correctly updated, false if p is already in the Domain or the updating failed.
      */
     public boolean updateDomain(Plane p) {
         if(!this.domain.contains(p)){
@@ -101,16 +112,21 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         return false;
 
     }
-    
+    /**
+     * Lets choose a new value (a plane) for the TaskNode  minimizing evaluation 
+     * function which chooses path based on the knowledge of the neighbors task.
+     * 
+     */
     public void makeDecision(){
-        //controllo se almeno uno dei vicini ha cambiato il proprio valore
-        boolean changed = false || this.neighbors.size()==0; //Attenzione in questo modo se c'è solo un task(io) entro sempre nell'if
+        //check if at least one of the neighbors has changed its value
+        boolean changed = false || this.neighbors.isEmpty(); //Attention in this way if there is only one task always within in the if
         int i = 0;
         while(!changed && i < this.neighbors.size())
-            changed = this.neighbors.get(i++).isChanged();
+            changed = this.lastDecisionTime < this.neighbors.get(i++).getLastChangedTime();
         
-        //se almeno uno è cambiato ha senso cercare un nuovo valore per me che minimizza il costo totale
+        //if at least one has changed it makes sense to look for a new value to me that minimizes the total cost
         double minCost = Double.MAX_VALUE;
+        double currentCost;
         Plane best = null;
         PathPlan path;
         if(changed){
@@ -122,15 +138,22 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                 //and add me to the path
                 path.add(this.getTask());
                 
-                //and add the other tasks to the path that they have the same my current value
+                //and add the other tasks that they have the same my current value to the path
                 for(AbstractTaskNode other: this.neighbors)
                     if(other.getValue() == possibleOwner)
-                        path.add(other.getTask());
+                        path.add(other.getTask());                
                 
-                //what is the total cost of the path???
-                if(path.getCost() < minCost){
+                //what is the cost of the path???
+                currentCost = path.getCostTo(this.getTask());
+                
+                if (LOG.isLoggable(Level.FINER)) {
+                    LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3}", 
+                            new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner, currentCost});
+                }
+                
+                if(currentCost < minCost){
                     //change
-                    minCost = path.getCost();
+                    minCost = currentCost;
                     best = possibleOwner;
                             
                 }
@@ -138,7 +161,12 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             }
             //the best new value has been found
             this.setValue(best);
-            
+            this.lastDecisionTime = this.getOwner().getWorld().getTime();            
         }
+    }
+        
+    @Override
+    public String toString(){
+        return super.toString()+" dom:"+this.domain.toString();
     }
 }

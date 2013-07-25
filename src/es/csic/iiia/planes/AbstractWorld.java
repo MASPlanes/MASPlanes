@@ -203,7 +203,7 @@ public abstract class AbstractWorld implements World {
         for (Plane p : planes) {
             stats.collect(p);
         }
-        stats.display();
+        stats.display(); 
     }
 
     /**

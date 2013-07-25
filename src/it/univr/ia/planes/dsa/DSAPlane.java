@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
@@ -33,7 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- *
+ * Implementation of a plane that coordinates using DSA
+ * 
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSAPlane extends AbstractPlane {

@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.Task;
 import java.util.Collection;
@@ -35,6 +35,7 @@ import java.util.Map;
  * It's builded by a Plane during the DSA with its TaskNodes and with the received TaskNodes from Planes near.<br>
  * It is formed by AbstractTaskNode.
  * Nodes are dived into two set, MyPlaneTaskNode, and NearPlaneTaskNode.
+ * 
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSATaskGraph {
@@ -58,10 +59,14 @@ public class DSATaskGraph {
     /**
      * Adds an AbstractTaskNode to the Graph.
      * @param n Node to be added to the Graph.
+     * @exception IllegalArgumentException the node n as parameter is already in the graph.
      */
     public void add(AbstractTaskNode n) {
+        
         if(this.myTasks.containsKey(n.getTask()) || this.otherTasks.containsKey(n.getTask())) {
-            throw new IllegalArgumentException();
+
+            throw new IllegalArgumentException(" Try to add a node of a task that is already in the graph ");
+            
         }
         if(n instanceof MyPlaneTaskNode) {
             
@@ -121,10 +126,25 @@ public class DSATaskGraph {
         this.myTasks.clear();
         this.otherTasks.clear();
     }
-    
+    /**
+     * Checks if the graph is empty.
+     * @return true if and only if the graph i empty, false otherwise.
+     */
     public boolean isEmpty() {
         
         return this.myTasks.isEmpty() && this.otherTasks.isEmpty();
         
+    }
+    
+    @Override
+    public String toString(){
+        String s="{";
+        for(MyPlaneTaskNode t: this.getMyPlaneTasksNode())
+            s+="["+t+"],";
+        s+="}{";
+        for(NearPlaneTaskNode t: this.getNearPlaneTaskNode())
+            s+="["+t+"],";
+        s+="}";
+        return s;        
     }
 }

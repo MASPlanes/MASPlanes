@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
@@ -51,9 +51,9 @@ public abstract class AbstractTaskNode {
      */
     private Plane value;
     /**
-     * Plane which had been assigned at this Node.
-     */
-    private Plane old_value;
+    * Time of the last changed happened in this node.
+    */    
+    private long last_changed_time;
     
     /**
      * Builds a Node contained a Task and a Plane owner.
@@ -64,7 +64,7 @@ public abstract class AbstractTaskNode {
         this.t = t;
         this.owner = own;
         this.value = null;
-        this.old_value = null;
+        this.last_changed_time = -1;
     }
     /**
      * Get the Task represented by this Node. 
@@ -102,18 +102,24 @@ public abstract class AbstractTaskNode {
      */
     public void setValue(Plane p){
         
-        this.old_value = this.value;
-        this.value = p;
+        if(this.value != p){
+            this.value = p;
+            this.last_changed_time = owner.getWorld().getTime();
+        }
         
     }
-    
     /**
-     * Check if the value of the Node is changed.
-     * @return true if and only if the value is different from the old_value, false otherwise
+     * Gets the Time of simulator when the last change was submitted to this Node.
+     * @return a long integer represents the Time of last change.
      */
-    public boolean isChanged(){
-        
-        return this.old_value != this.value;
-        
+    public long getLastChangedTime() {
+        return last_changed_time;
+    }
+    
+    
+    @Override
+    public String toString(){
+        return t.getId()+"="+value;
+        //return t.getId() +" value:"+value+" last_changed_time:"+last_changed_time+" own:" + this.owner ;
     }
 }

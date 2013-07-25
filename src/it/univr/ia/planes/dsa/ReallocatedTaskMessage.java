@@ -23,41 +23,46 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
+import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.messaging.AbstractMessage;
 import es.csic.iiia.planes.Task;
-import java.util.List;
 
 /**
- * Message used to start DSA.<br>
+ * Message to notify an agent that it has a new task to do.
  * 
- * All Planes send this message to comunicate to the other planes in the comunication range the list of the known tasks.
- * In this way, a plane can update its knowledge of the world
+ * Message sends by the previous owner plane of the task.
+ * After the execution of DSA, the task has been delegated by the sender agent to receiver.
  * 
  * @author Andrea Jeradi, Francesco Donato
  */
-public class PresentationMessage extends AbstractMessage{
+public class ReallocatedTaskMessage extends AbstractMessage{
     /**
-     * Tasks list that the sender plane know.
-     */    
-    private final List<Task> tasks;
-    
-    
-    /**
-     * Build a PresentationMessage containing the task list.
-     * @param tasks list of all task known by sender plane, in this moment.
+     * Task to do.
      */
-    public PresentationMessage(List<Task> tasks){
-        this.tasks = tasks;
-    }
+    private final Task task;
+
     /**
-     * Get a list of task.
-     * @return a list of task.
+     * Builds a new message to inform the intended recipient that it has a new task to do.
+     * 
+     * @param task that has changed the owner.
+     * @param  recipient Plane who receive the message.
      */
-    public List<Task> getTasks(){
-        return tasks;
+    public ReallocatedTaskMessage(Task task, Plane recipient) {
+        
+        this.task = task;
+        super.setRecipient(recipient);
     }
-            
+    
+    /**
+     * Get the task that this message refers to.
+     *
+     * @return task that this message refers to.
+     */
+    public Task getTask() {
+        
+        return task;
+    }
     
 }

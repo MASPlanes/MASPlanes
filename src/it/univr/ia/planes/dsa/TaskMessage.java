@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.messaging.AbstractMessage;
@@ -48,8 +48,10 @@ public class TaskMessage extends AbstractMessage{
     
     /**
      * Builds a new TaskMessage.
+     * 
      * @param task The task that has changed its value.
      * @param value The new value of the task to comunicate to the message's recipient.
+     * @param recipient Plane who received the message.
      */
     public TaskMessage(Task task, Plane value, Plane recipient){
         this.task = task;
