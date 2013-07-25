@@ -27,4 +27,4 @@
  * This package contains all the classes used for the planes
  * that coordinate using DSA.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;

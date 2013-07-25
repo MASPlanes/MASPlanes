@@ -36,7 +36,7 @@
  */
 package es.csic.iiia.planes.cli;
 
-import ai.univr.dsa.DSAPlane;
+import it.univr.ia.planes.dsa.DSAPlane;
 import es.csic.iiia.planes.Battery;
 import es.csic.iiia.planes.DefaultBattery;
 import es.csic.iiia.planes.DefaultPlane;

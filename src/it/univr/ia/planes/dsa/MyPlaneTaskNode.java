@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
@@ -114,7 +114,7 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     }
     /**
      * Lets choose a new value (a plane) for the TaskNode  minimizing evaluation 
-     * function which chooses path based on the knowledge of the neighbors task
+     * function which chooses path based on the knowledge of the neighbors task.
      * 
      */
     public void makeDecision(){

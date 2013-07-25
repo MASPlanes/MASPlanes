@@ -23,7 +23,7 @@
  * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
  * POSSIBILITY OF SUCH DAMAGE.
  */
-package ai.univr.dsa;
+package it.univr.ia.planes.dsa;
 
 import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Plane;
@@ -134,11 +134,6 @@ public class DSABehavior extends AbstractBehavior {
      * @param ts message containg the sender of the task and its new value.
      */
     public void on(TaskMessage ts ){
-        /*
-        recupara dal messaggio il riferimerto al Task
-        recupara dal messaggio il nuovo valore assunto dal task( il valore è di tipo Plane es P2)
-        cerca nel grafo il NearPlaneTaskNode che rappresenta il task e aggiorna il nodo con il nuovo valore
-        */
      
         dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
             
@@ -171,7 +166,6 @@ public class DSABehavior extends AbstractBehavior {
         if (agent.getWorld().getTime() % this.DSA_every == 0 && toDo == DSAStep.Nothing){
             initializeNewDSAExec();
             
- 
             if( getNumberOfNeighbors() > 0)
                 toDo = DSAStep.StartDSA;
             else
@@ -341,6 +335,5 @@ public class DSABehavior extends AbstractBehavior {
             }
         }
     }
-
-
+    
 }
