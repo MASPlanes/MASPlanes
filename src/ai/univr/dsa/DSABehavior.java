@@ -41,7 +41,7 @@ import java.util.logging.Logger;
  * @author Andrea Jeradi, Francesco Donato
  */
 public class DSABehavior extends AbstractBehavior {
-
+    
     private static final Logger LOG = Logger.getLogger(DSABehavior.class.getName());
 
     private NeighborTracking neighborTracker;
@@ -106,7 +106,7 @@ public class DSABehavior extends AbstractBehavior {
         if(sender != getAgent() && toDo != DSAStep.Nothing){
         
             //check if the sender plane is a my neighbor for all time of dsa
-            if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations + 1)){
+            if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
                 
                 NearPlaneTaskNode newTask;
                 for(Task t: pm.getTasks()){
@@ -154,7 +154,7 @@ public class DSABehavior extends AbstractBehavior {
      */
     public void on(ReallocatedTaskMessage rtm) {
         getAgent().addTask(rtm.getTask());
-
+        
         if (LOG.isLoggable(Level.FINER)) {
             LOG.log(Level.FINER, "t={0} agent:{1} has recived the task {2}", 
                     new Object[]{getAgent().getWorld().getTime(), getAgent(), rtm.getTask().getId()});
@@ -229,7 +229,7 @@ public class DSABehavior extends AbstractBehavior {
     private int getNumberOfNeighbors(){
         
         int count = 0;
-        for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations + 1))                    
+        for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations))                    
             count++;
         
         return count - 1;
@@ -334,9 +334,10 @@ public class DSABehavior extends AbstractBehavior {
         }                
                         
         for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-            if(tNode.getValue() != tNode.getOwner())/* && this.neighborTracker.isNeighbor(tNode.getValue()))*/{
-                agent.send(new ReallocatedTaskMessage(tNode.getTask(),tNode.getValue()));
+            if(tNode.getValue() != tNode.getOwner()){
+                
                 agent.removeTask(tNode.getTask());
+                agent.send(new ReallocatedTaskMessage(tNode.getTask(),tNode.getValue()));
             }
         }
     }
