@@ -50,10 +50,6 @@ public abstract class AbstractTaskNode {
      * Plane which is currently assigned at this Node.
      */
     private Plane value;
-    /**
-    * Time of the last changed happened in this node.
-    */    
-    private long last_changed_time;
     
     /**
      * Builds a Node contained a Task and a Plane owner.
@@ -64,16 +60,14 @@ public abstract class AbstractTaskNode {
         this.t = t;
         this.owner = own;
         this.value = null;
-        this.last_changed_time = -1;
     }
+    
     /**
      * Get the Task represented by this Node. 
      * @return the Task.
      */
     public Task getTask(){
-        
-        return this.t;
-        
+        return this.t;   
     }
     
     /**
@@ -81,9 +75,7 @@ public abstract class AbstractTaskNode {
      * @return the owner
      */
     public Plane getOwner(){
-        
         return this.owner;
-        
     }
     
     /**
@@ -91,31 +83,18 @@ public abstract class AbstractTaskNode {
      * @return the plane that is the current value of the Node.
      */
     public Plane getValue(){
-        
         return this.value;
-        
     }
     
     /**
      * Set the current value of this Node and tracks the old value.
      * @param p the new value of this Node.
      */
-    public void setValue(Plane p){
-        
+    public void setValue(Plane p){        
         if(this.value != p){
             this.value = p;
-            this.last_changed_time = owner.getWorld().getTime();
         }
-        
     }
-    /**
-     * Gets the Time of simulator when the last change was submitted to this Node.
-     * @return a long integer represents the Time of last change.
-     */
-    public long getLastChangedTime() {
-        return last_changed_time;
-    }
-    
     
     @Override
     public String toString(){

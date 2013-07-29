@@ -49,10 +49,6 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      * List which represents the domain.
      */
     private List<Plane> domain;
-    /**
-     * The simulator time of the last invocation of <em>makeDecision</em> method.
-     */
-    private long lastDecisionTime;
     
     private static final Logger LOG = Logger.getLogger(MyPlaneTaskNode.class.getName());
         
@@ -66,9 +62,9 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         
         this.neighbors = new ArrayList<AbstractTaskNode>();
         this.domain = new ArrayList<Plane>();
-        updateDomain(own);
-        lastDecisionTime = -1;
+        updateDomain(own);       
     }
+    
     /**
      * Adds a neighbor Node at this Node.
      * @param n to be added.
@@ -86,19 +82,17 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
      * @return List of Neighbors
      */
     public List<AbstractTaskNode> getNeighbors() {
-        
         return new ArrayList<AbstractTaskNode>(this.neighbors);
-        
     }
+    
     /**
      * Gets a new List which contains values(Planes) of the domain.
      * @return List of Planes
      */
     public List<Plane> getDomain() {
-        
-        return new ArrayList<Plane>(this.domain);
-        
+        return new ArrayList<Plane>(this.domain); 
     }
+    
     /**
      * Adds a value(Plane) at the domain List
      * @param p Plane to be added at the domain List.
@@ -108,63 +102,53 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         if(!this.domain.contains(p)){
             return this.domain.add(p); 
         }
-        
         return false;
-
     }
+    
     /**
      * Lets choose a new value (a plane) for the TaskNode  minimizing evaluation 
      * function which chooses path based on the knowledge of the neighbors task.
      * 
      */
     public void makeDecision(){
-        //check if at least one of the neighbors has changed its value
-        boolean changed = false || this.neighbors.isEmpty(); //Attention in this way if there is only one task always within in the if
-        int i = 0;
-        while(!changed && i < this.neighbors.size())
-            changed = this.lastDecisionTime < this.neighbors.get(i++).getLastChangedTime();
         
-        //if at least one has changed it makes sense to look for a new value to me that minimizes the total cost
         double minCost = Double.MAX_VALUE;
         double currentCost;
         Plane best = null;
         PathPlan path;
-        if(changed){
-            for(Plane possibleOwner: this.domain){
-                
-                //starting from the possibleOwner location
-                path = new PathPlan(possibleOwner);
-                
-                //and add me to the path
-                path.add(this.getTask());
-                
-                //and add the other tasks that they have the same my current value to the path
-                for(AbstractTaskNode other: this.neighbors)
-                    if(other.getValue() == possibleOwner)
-                        path.add(other.getTask());                
-                
-                //what is the cost of the path???
-                currentCost = path.getCostTo(this.getTask());
-                
-                if (LOG.isLoggable(Level.FINER)) {
-                    LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3}", 
-                            new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner, currentCost});
-                }
-                
-                if(currentCost < minCost){
-                    //change
-                    minCost = currentCost;
-                    best = possibleOwner;
-                            
-                }
-     
-            }
-            //the best new value has been found
-            this.setValue(best);
-            this.lastDecisionTime = this.getOwner().getWorld().getTime();            
-        }
-    }
         
+        for(Plane possibleOwner: this.domain){
+
+            //starting from the possibleOwner location
+            path = new PathPlan(possibleOwner);
+
+            //and add me to the path
+            path.add(this.getTask());
+
+            //and add the other tasks that they have the same my current value to the path
+            for(AbstractTaskNode other: this.neighbors)
+                if(other.getValue() == possibleOwner)
+                    path.add(other.getTask());                
+
+            //what is the cost of the path???
+            currentCost = path.getCostTo(this.getTask());
+
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3}", 
+                        new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner, currentCost});
+            }
+
+            if(currentCost < minCost){
+                //change
+                minCost = currentCost;
+                best = possibleOwner;
+
+            }
+        }
+        //the best new value has been found
+        this.setValue(best);              
+    }
+     
     @Override
     public String toString(){
         return super.toString()+" dom:"+this.domain.toString();

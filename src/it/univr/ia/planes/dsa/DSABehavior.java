@@ -40,27 +40,39 @@ import java.util.logging.Logger;
  * 
  * @author Andrea Jeradi, Francesco Donato
  */
-public class DSABehavior extends AbstractBehavior {
+public class DSABehavior extends AbstractBehavior<DSAPlane> {
     
     private static final Logger LOG = Logger.getLogger(DSABehavior.class.getName());
 
     private NeighborTracking neighborTracker;
     
-    private DSATaskGraph dsa_graph;
+    private DSATaskGraph dsaGraph;
     
-    private int current_DSA_iteration;
+    private int currentDsaIteration;
     
-    final int n_of_DSA_iterations;
+    final int nDsaIterations;
     
-    final int DSA_every;
+    final int dsaEvery;
     
-    final double DSA_p;
-
+    final double dsaP;
+    
+    /**
+     * For each step keeps track of the current state of the algorithm and in accord to the current state it chooses the next step that has to do.
+     * When DSA step is:<br>
+     * <em>StartDSA</em>: This is the first step that calls the {@link beginDSA()} method.<br>
+     * <em>RandomDSA</em>: In this step the algorithm calls the {@link doRandomDSAStep()} method.<br>
+     * <em>ContinueDSA</em>: This step calls {@link doDSAStep()} method for the number of dsa-iterations.<br>
+     * <em>EndDSA</em>: In this step the algorithm calls {@link endDSA()} method.<br>
+     * <em>Nothing</em>: This step is used to check if a plane can start a new DSA or is currently doing a DSA with another plane.<br>
+     */
     private enum DSAStep {
         StartDSA, RandomDSA, ContinueDSA, EndDSA, Nothing;
     }
     
     private DSAStep toDo;
+    
+    private Random rnd;
+    
     /**
      * Builds a DSA Behavior for the agent passed as parameter.
      * 
@@ -69,12 +81,14 @@ public class DSABehavior extends AbstractBehavior {
     public DSABehavior(DSAPlane agent) {
         super(agent);
         toDo = DSAStep.Nothing;
-        dsa_graph = new DSATaskGraph();
+        dsaGraph = new DSATaskGraph();
+        
+        rnd = new Random(agent.getId());
         
         //load the settings
-        n_of_DSA_iterations = getConfiguration().getDsaIterations();
-        DSA_every = getConfiguration().getDsaEvery();
-        DSA_p = getConfiguration().getDsaP();
+        nDsaIterations = getConfiguration().getDsaIterations();
+        dsaEvery = getConfiguration().getDsaEvery();
+        dsaP = getConfiguration().getDsaP();
     }
 
     @Override
@@ -88,10 +102,6 @@ public class DSABehavior extends AbstractBehavior {
         neighborTracker = getAgent().getBehavior(NeighborTracking.class);
     }
 
-    @Override
-    public DSAPlane getAgent() {
-            return (DSAPlane)super.getAgent();
-    }
     /**
      * Takes the neighbor Tasks and inserts them into the graph and updating the
      * near node.
@@ -106,27 +116,28 @@ public class DSABehavior extends AbstractBehavior {
         if(sender != getAgent() && toDo != DSAStep.Nothing){
         
             //check if the sender plane is a my neighbor for all time of dsa
-            if(neighborTracker.isNeighbor(sender, n_of_DSA_iterations)){
+            if(neighborTracker.isNeighbor(sender, nDsaIterations)){
                 
                 NearPlaneTaskNode newTask;
                 for(Task t: pm.getTasks()){
                     newTask = new NearPlaneTaskNode(t,sender);
-                    dsa_graph.add(newTask);
+                    dsaGraph.add(newTask);
 
-                    for(MyPlaneTaskNode my_t : dsa_graph.getMyPlaneTasksNode())
+                    for(MyPlaneTaskNode my_t : dsaGraph.getMyPlaneTasksNode())
                         my_t.addNeighbor(newTask);
                 }            
 
-                for(MyPlaneTaskNode t: dsa_graph.getMyPlaneTasksNode())
+                for(MyPlaneTaskNode t: dsaGraph.getMyPlaneTasksNode())
                     t.updateDomain(sender);               
                 
                 if (LOG.isLoggable(Level.FINER)) {
                     LOG.log(Level.FINER, "t={0} agent:{1} recive PresentationMessage from {2} updated graph:{3}", 
-                            new Object[]{getAgent().getWorld().getTime(), getAgent(), pm.getSender(), dsa_graph});
+                            new Object[]{getAgent().getWorld().getTime(), getAgent(), pm.getSender(), dsaGraph});
                 }
             }
         }
     }
+    
     /**
      * Manages a message send by a task of another plane in the range, and updates
      * the value of the correspondent {@link NearPlaneTaskNode} in the graph.
@@ -135,13 +146,14 @@ public class DSABehavior extends AbstractBehavior {
      */
     public void on(TaskMessage ts ){
      
-        dsa_graph.getTaskNode(ts.getTask()).setValue(ts.getValue());
+        dsaGraph.getTaskNode(ts.getTask()).setValue(ts.getValue());
             
         if (LOG.isLoggable(Level.FINER)) {
             LOG.log(Level.FINER, "t={0} agent:{1} recive TaskMessage({2},{3}) updated graph:{4}", 
-                    new Object[]{getAgent().getWorld().getTime(), getAgent(), ts.getTask().getId(),ts.getValue(), dsa_graph});
+                    new Object[]{getAgent().getWorld().getTime(), getAgent(), ts.getTask().getId(),ts.getValue(), dsaGraph});
         }
     }
+    
     /**
      * Assigns the Task at this agent which before it belonged to the sender.
      * 
@@ -156,21 +168,20 @@ public class DSABehavior extends AbstractBehavior {
         }
     }
 
-
-
     @Override
     public void afterMessages() {
 
         final Plane agent = getAgent();
         
-        if (agent.getWorld().getTime() % this.DSA_every == 0 && toDo == DSAStep.Nothing){
+        if (agent.getWorld().getTime() % this.dsaEvery == 0 && toDo == DSAStep.Nothing){
             initializeNewDSAExec();
             
-            if( getNumberOfNeighbors() > 0)
+            if( getNumberOfNeighbors() > 0){
                 toDo = DSAStep.StartDSA;
-            else
+            }
+            else{
                 toDo = DSAStep.Nothing;
-            
+            }
         }
                 
         switch(toDo){
@@ -189,11 +200,12 @@ public class DSABehavior extends AbstractBehavior {
             case ContinueDSA:
                 
                 doDSAStep();
-                if(current_DSA_iteration < n_of_DSA_iterations)
+                if(currentDsaIteration < (nDsaIterations -1)){
                     toDo = DSAStep.ContinueDSA;
-                else
+                }
+                else{
                     toDo = DSAStep.EndDSA;
-                
+                }
                 break;
                 
             case EndDSA:
@@ -209,23 +221,21 @@ public class DSABehavior extends AbstractBehavior {
         }
     }
     
-   
     
     private void initializeNewDSAExec(){
-        dsa_graph.clear();
-        current_DSA_iteration = 3;
+        dsaGraph.clear();
+        currentDsaIteration = 0;
     }
-
+    
     /**
      * 
      * @return number of Neighbors Agent without myself
      */
-    private int getNumberOfNeighbors(){
-        
+    private int getNumberOfNeighbors(){  
         int count = 0;
-        for(MessagingAgent a: neighborTracker.getNeighbors(n_of_DSA_iterations))                    
+        for(MessagingAgent a: neighborTracker.getNeighbors(nDsaIterations)) {                    
             count++;
-        
+        }
         return count - 1;
         
     }
@@ -238,15 +248,15 @@ public class DSABehavior extends AbstractBehavior {
     private void beginDSA(){
         final Plane agent = getAgent();
 
-        
         for(Task t: agent.getTasks()){
-            dsa_graph.add(new MyPlaneTaskNode(t,agent));
+            dsaGraph.add(new MyPlaneTaskNode(t,agent));
         }
 
-        for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-            for(MyPlaneTaskNode other_tNode : dsa_graph.getMyPlaneTasksNode()){
-                if(tNode != other_tNode)
+        for(MyPlaneTaskNode tNode : dsaGraph.getMyPlaneTasksNode()){
+            for(MyPlaneTaskNode other_tNode : dsaGraph.getMyPlaneTasksNode()){
+                if(tNode != other_tNode){
                     tNode.addNeighbor(other_tNode);
+                }
             }                                        
         }
 
@@ -254,10 +264,10 @@ public class DSABehavior extends AbstractBehavior {
         
         if (LOG.isLoggable(Level.FINER)) {
             LOG.log(Level.FINER, "t={0} agent:{1} START DSA. current graph:{2}", 
-                    new Object[]{getAgent().getWorld().getTime(), agent, dsa_graph});
+                    new Object[]{getAgent().getWorld().getTime(), agent, dsaGraph});
         }
+        currentDsaIteration++;
     }
-    
     
     /**
      * Executes the random step of DSA and for all tasks chooses 
@@ -265,12 +275,11 @@ public class DSABehavior extends AbstractBehavior {
      */
     private void doRandomDSAStep(){
         final Plane agent = getAgent();
-        Random rnd = new Random();
-        
+               
         int rnd_index;
         List<Plane> domain;
 
-        for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
+        for(MyPlaneTaskNode tNode : dsaGraph.getMyPlaneTasksNode()){
             domain = tNode.getDomain();
             rnd_index = rnd.nextInt(domain.size());
             tNode.setValue(domain.get(rnd_index));
@@ -280,10 +289,11 @@ public class DSABehavior extends AbstractBehavior {
             }
         }
 
-        if (LOG.isLoggable(Level.FINER)) {
+        if (LOG.isLoggable(Level.FINER)){
             LOG.log(Level.FINER, "t={0} agent:{1} RANDOM DSA. current graph:{2}", 
-                    new Object[]{getAgent().getWorld().getTime(), agent, dsa_graph});
+                    new Object[]{getAgent().getWorld().getTime(), agent, dsaGraph});
         }
+        currentDsaIteration++;
     }
     
     /**
@@ -293,12 +303,13 @@ public class DSABehavior extends AbstractBehavior {
     private void doDSAStep(){
 
         final Plane agent = getAgent();
-        Random rnd = new Random();
-               
-        for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
-            if(rnd.nextDouble() < this.DSA_p){
+        Plane tmp;
+        
+        for(MyPlaneTaskNode tNode : dsaGraph.getMyPlaneTasksNode()){
+            if(rnd.nextDouble() < this.dsaP){
+                tmp = tNode.getValue();
                 tNode.makeDecision();
-                if(tNode.getLastChangedTime() == agent.getWorld().getTime()){
+                  if(tmp != tNode.getValue()){
                     for(Plane p: tNode.getDomain()){
                         if(p != agent){
                             agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
@@ -309,13 +320,12 @@ public class DSABehavior extends AbstractBehavior {
                         LOG.log(Level.FINER, "t={0} task:{1} changed its value. new value:{2}", 
                         new Object[]{getAgent().getWorld().getTime(), tNode.getTask(),tNode.getValue()});
                     }
-
                 }
             }
-
         }
-        current_DSA_iteration++;
+        currentDsaIteration++;
     }
+    
     /**
      * Reallocates tasks if the value is different from the owner.
      */
@@ -327,7 +337,7 @@ public class DSABehavior extends AbstractBehavior {
                     new Object[]{getAgent().getWorld().getTime(), agent});
         }                
                         
-        for(MyPlaneTaskNode tNode : dsa_graph.getMyPlaneTasksNode()){
+        for(MyPlaneTaskNode tNode : dsaGraph.getMyPlaneTasksNode()){
             if(tNode.getValue() != tNode.getOwner()){
                 
                 agent.removeTask(tNode.getTask());

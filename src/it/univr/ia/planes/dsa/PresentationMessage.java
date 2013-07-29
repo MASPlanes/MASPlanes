@@ -44,7 +44,6 @@ public class PresentationMessage extends AbstractMessage{
      */    
     private final List<Task> tasks;
     
-    
     /**
      * Build a PresentationMessage containing the task list.
      * @param tasks list of all task known by sender plane, in this moment.
@@ -52,6 +51,7 @@ public class PresentationMessage extends AbstractMessage{
     public PresentationMessage(List<Task> tasks){
         this.tasks = new ArrayList<Task>(tasks);
     }
+    
     /**
      * Get a list of task.
      * @return a list of task.

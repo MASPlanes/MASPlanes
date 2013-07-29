@@ -47,6 +47,7 @@ public class DSATaskGraph {
      * Map that represents the link between a Task owned by a near Plane and a Node of the Graph.
      */
     private Map<Task,NearPlaneTaskNode> otherTasks;
+    
     /**
      * Builds an empty DSATaskGraph
      */
@@ -56,6 +57,7 @@ public class DSATaskGraph {
       this.otherTasks = new HashMap<Task,NearPlaneTaskNode>();
       
     }
+    
     /**
      * Adds an AbstractTaskNode to the Graph.
      * @param n Node to be added to the Graph.
@@ -64,24 +66,19 @@ public class DSATaskGraph {
     public void add(AbstractTaskNode n) {
         
         if(this.myTasks.containsKey(n.getTask()) || this.otherTasks.containsKey(n.getTask())) {
-
-            throw new IllegalArgumentException(" Try to add a node of a task that is already in the graph ");
-            
+            throw new IllegalArgumentException(" Try to add a node of a task that is already in the graph ");    
         }
-        if(n instanceof MyPlaneTaskNode) {
-            
+        if(n instanceof MyPlaneTaskNode) {   
             this.myTasks.put(n.getTask(),(MyPlaneTaskNode)n);
         }
-        else if(n instanceof NearPlaneTaskNode) {
-            
+        else if(n instanceof NearPlaneTaskNode) {    
             this.otherTasks.put(n.getTask(), (NearPlaneTaskNode)n);
         }
         else {
-            
             throw new ClassCastException();
-            
         }   
     }
+    
     /**
      * Gets the Node that represents the Task passed as parameter.
      * @param t Task represented by the searched Node.
@@ -100,40 +97,37 @@ public class DSATaskGraph {
         }
         
     }
+    
     /**
      * Gets the Set of MyPlaneTaskNode.
      * @return a Collection that represents the set.
      */
     public Collection<MyPlaneTaskNode> getMyPlaneTasksNode() {
-        
         return this.myTasks.values();
-        
     }
+    
     /**
      * Gets the Set of NearPlaneTaskNode.
      * @return a Collection that represents the set.
      */
     public Collection<NearPlaneTaskNode> getNearPlaneTaskNode() {
-        
-        return this.otherTasks.values();
-        
+        return this.otherTasks.values(); 
     }
+    
     /**
      * Clears the Graph from all Nodes.
      */
     public void clear() {
-        
         this.myTasks.clear();
         this.otherTasks.clear();
     }
+    
     /**
      * Checks if the graph is empty.
      * @return true if and only if the graph i empty, false otherwise.
      */
     public boolean isEmpty() {
-        
         return this.myTasks.isEmpty() && this.otherTasks.isEmpty();
-        
     }
     
     @Override
