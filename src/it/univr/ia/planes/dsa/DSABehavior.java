@@ -50,11 +50,13 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
     
     private int currentDsaIteration;
     
-    final int nDsaIterations;
+    private final int nDsaIterations;
     
-    final int dsaEvery;
+    private final int dsaEvery;
     
-    final double dsaP;
+    private final double dsaP;
+    
+    private EvaluationFunction evalFunction;
     
     /**
      * For each step keeps track of the current state of the algorithm and in accord to the current state it chooses the next step that has to do.
@@ -89,6 +91,12 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
         nDsaIterations = getConfiguration().getDsaIterations();
         dsaEvery = getConfiguration().getDsaEvery();
         dsaP = getConfiguration().getDsaP();
+        if(getConfiguration().getDsaEvaluationFunction().equals("pathcost")) {
+            evalFunction = new DSAPathCost();
+        }
+        else {
+            evalFunction = new DSAWorkload(getConfiguration().getMsWorkloadK(), getConfiguration().getMsWorkloadAlpha());
+        }
     }
 
     @Override
@@ -200,7 +208,7 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
             case ContinueDSA:
                 
                 doDSAStep();
-                if(currentDsaIteration < (nDsaIterations -1)){
+                if(currentDsaIteration < nDsaIterations){
                     toDo = DSAStep.ContinueDSA;
                 }
                 else{
@@ -249,7 +257,7 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
         final Plane agent = getAgent();
 
         for(Task t: agent.getTasks()){
-            dsaGraph.add(new MyPlaneTaskNode(t,agent));
+            dsaGraph.add(new MyPlaneTaskNode(t,agent,evalFunction));
         }
 
         for(MyPlaneTaskNode tNode : dsaGraph.getMyPlaneTasksNode()){

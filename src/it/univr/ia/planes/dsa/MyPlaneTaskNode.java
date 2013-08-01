@@ -51,17 +51,20 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     private List<Plane> domain;
     
     private static final Logger LOG = Logger.getLogger(MyPlaneTaskNode.class.getName());
+    
+    private EvaluationFunction evalFunction;
         
     /**
      * Builds a MyPlaneTaskNode and assigned owner Plane in the domain. 
      * @param t Task represented by this Node.
      * @param own Task's owner Plane.
      */
-    public MyPlaneTaskNode(Task t, Plane own) {
+    public MyPlaneTaskNode(Task t, Plane own, EvaluationFunction evalFunction) {
         super(t, own);
         
         this.neighbors = new ArrayList<AbstractTaskNode>();
         this.domain = new ArrayList<Plane>();
+        this.evalFunction = evalFunction;
         updateDomain(own);       
     }
     
@@ -118,7 +121,32 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
         PathPlan path;
         
         for(Plane possibleOwner: this.domain){
+            
+            currentCost = getCost(possibleOwner);
+            
+            
+            if(currentCost < minCost){
+                //change
+                minCost = currentCost;
+                best = possibleOwner;
 
+            }
+        }
+        //the best new value has been found
+        this.setValue(best);  
+        
+        
+        //System.out.println("t="+this.getOwner().getWorld().getTime()+" task:"+this.getTask()+" makeDecision() best value:"+best+" cost:"+minCost);
+            
+    }
+    
+    
+    private  double getCost(Plane possibleOwner){
+        double currentCost=0;
+        
+        if(evalFunction instanceof DSAPathCost) {
+            PathPlan path;
+            
             //starting from the possibleOwner location
             path = new PathPlan(possibleOwner);
 
@@ -137,16 +165,24 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                 LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3}", 
                         new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner, currentCost});
             }
-
-            if(currentCost < minCost){
-                //change
-                minCost = currentCost;
-                best = possibleOwner;
-
+    
+        }
+        else if(evalFunction instanceof DSAWorkload) {
+            int nTasks = 0;
+                        
+            for(AbstractTaskNode other: this.neighbors)
+                if(other.getValue() == possibleOwner)
+                    nTasks++;
+            
+            currentCost = possibleOwner.getCost(this.getTask()) + ((DSAWorkload)evalFunction).getWorload(nTasks);
+            
+            if (LOG.isLoggable(Level.FINER)) {
+                LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3} nTasks:{4} total:{5}", 
+                        new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner.getCost(this.getTask()), nTasks, currentCost});
             }
         }
-        //the best new value has been found
-        this.setValue(best);              
+
+        return currentCost;
     }
      
     @Override

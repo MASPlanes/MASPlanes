@@ -156,6 +156,9 @@ public final class Configuration {
     private int dsaIterations;
     private int dsaEvery;
     private double dsaP;
+    private double dsaWorkloadK;
+    private double dsaWorkloadAlpha;
+    private String dsaEvaluationFunction;
 
     private LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
     private CostFactorFactory msCostFactorFactory;
@@ -256,7 +259,27 @@ public final class Configuration {
             if(dsaP < 0 ||dsaP > 1)
                 throw new IllegalArgumentException("dsa-p must be between 0 and 1.");
             
+            dsaEvaluationFunction = settings.getProperty("dsa-planes-function");
+            if(dsaEvaluationFunction.equals("workload")){
+                
+                values.put("dsa-planes-function", dsaEvaluationFunction);
+                
+                dsaWorkloadK = Double.valueOf(settings.getProperty("dsa-workload-k"));
+                values.put("dsa-workload-k", String.valueOf(dsaWorkloadK));
+                
+                dsaWorkloadAlpha = Double.valueOf(settings.getProperty("dsa-workload-alpha"));
+                values.put("dsa-workload-alpha", String.valueOf(dsaWorkloadAlpha));
+   
+            }
+            else {
+                if(dsaEvaluationFunction.equals("pathcost")) {
+                    values.put("dsa-planes-function", dsaEvaluationFunction);
+                }    
+                else {
+                    throw new IllegalArgumentException("Two possible type of dsa function used to represent plane's preferences: pathcost or workload.");
             
+                }
+            }
         }
 
     }
@@ -417,6 +440,19 @@ public final class Configuration {
     public double getDsaP() {
         return dsaP;
     }
+
+    public double getDsaWorkloadK() {
+        return dsaWorkloadK;
+    }
+
+    public double getDsaWorkloadAlpha() {
+        return dsaWorkloadAlpha;
+    }
+
+    public String getDsaEvaluationFunction() {
+        return dsaEvaluationFunction;
+    }
+    
 
     private Map<String, OperatorStrategy> getOperatorStrategies() {
         return new HashMap<String, OperatorStrategy>() {{
