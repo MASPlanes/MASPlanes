@@ -174,11 +174,11 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                 if(other.getValue() == possibleOwner)
                     nTasks++;
             
-            currentCost = possibleOwner.getCost(this.getTask()) + ((DSAWorkload)evalFunction).getWorload(nTasks);
+            currentCost = possibleOwner.getCost(this.getTask()) + ((DSAWorkload)evalFunction).getWorkload(nTasks);
             
             if (LOG.isLoggable(Level.FINER)) {
                 LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3} nTasks:{4} total:{5}", 
-                        new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner.getCost(this.getTask()), nTasks, currentCost});
+                        new Object[]{this.getOwner().getWorld().getTime(), this.getTask(),possibleOwner, possibleOwner.getCost(this.getTask()), nTasks, currentCost});
             }
         }
 

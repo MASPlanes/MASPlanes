@@ -90,10 +90,8 @@ public abstract class AbstractTaskNode {
      * Set the current value of this Node and tracks the old value.
      * @param p the new value of this Node.
      */
-    public void setValue(Plane p){        
-        if(this.value != p){
+    public void setValue(Plane p){
             this.value = p;
-        }
     }
     
     @Override

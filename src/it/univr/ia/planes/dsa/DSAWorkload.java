@@ -51,7 +51,7 @@ public class DSAWorkload implements EvaluationFunction{
         return "workload";
     }
     
-    public double getWorload(int nTasks){
+    public double getWorkload(int nTasks){
         return k * Math.pow(nTasks, alpha);
     }
     

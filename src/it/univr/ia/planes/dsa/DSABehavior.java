@@ -95,7 +95,7 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
             evalFunction = new DSAPathCost();
         }
         else {
-            evalFunction = new DSAWorkload(getConfiguration().getMsWorkloadK(), getConfiguration().getMsWorkloadAlpha());
+            evalFunction = new DSAWorkload(getConfiguration().getDsaWorkloadK(), getConfiguration().getDsaWorkloadAlpha());
         }
     }
 
