@@ -131,12 +131,14 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
                     newTask = new NearPlaneTaskNode(t,sender);
                     dsaGraph.add(newTask);
 
-                    for(MyPlaneTaskNode my_t : dsaGraph.getMyPlaneTasksNode())
+                    for(MyPlaneTaskNode my_t : dsaGraph.getMyPlaneTasksNode()){
                         my_t.addNeighbor(newTask);
+                    }
                 }            
 
-                for(MyPlaneTaskNode t: dsaGraph.getMyPlaneTasksNode())
+                for(MyPlaneTaskNode t: dsaGraph.getMyPlaneTasksNode()){
                     t.updateDomain(sender);               
+                }
                 
                 if (LOG.isLoggable(Level.FINER)) {
                     LOG.log(Level.FINER, "t={0} agent:{1} recive PresentationMessage from {2} updated graph:{3}", 
@@ -292,8 +294,9 @@ public class DSABehavior extends AbstractBehavior<DSAPlane> {
             rnd_index = rnd.nextInt(domain.size());
             tNode.setValue(domain.get(rnd_index));
             for(Plane p: domain){
-                if(p != agent)
+                if(p != agent){
                     agent.send(new TaskMessage(tNode.getTask(),tNode.getValue(),p)); 
+                }
             }
         }
 

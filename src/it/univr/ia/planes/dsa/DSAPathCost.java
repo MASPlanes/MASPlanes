@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, fd
+ * Copyright (c) 2013, Andrea Jeradi, Francesco Donato
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,8 +26,10 @@
 package it.univr.ia.planes.dsa;
 
 /**
- *
- * @author fd
+ * Implements the DSAPathCost evaluation function.
+ * Based on path plan for the evaluation of the cost of a task.
+ * 
+ * @author Andrea Jeradi, Francesco Donato
  */
 public class DSAPathCost implements EvaluationFunction{
 

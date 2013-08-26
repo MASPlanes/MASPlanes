@@ -51,7 +51,9 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
     private List<Plane> domain;
     
     private static final Logger LOG = Logger.getLogger(MyPlaneTaskNode.class.getName());
-    
+    /**
+     * DSA Evaluation Function.
+     */
     private EvaluationFunction evalFunction;
         
     /**
@@ -124,20 +126,16 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
             
             currentCost = getCost(possibleOwner);
             
-            
             if(currentCost < minCost){
                 //change
                 minCost = currentCost;
                 best = possibleOwner;
-
+                
             }
         }
         //the best new value has been found
         this.setValue(best);  
-        
-        
-        //System.out.println("t="+this.getOwner().getWorld().getTime()+" task:"+this.getTask()+" makeDecision() best value:"+best+" cost:"+minCost);
-            
+              
     }
     
     
@@ -165,14 +163,16 @@ public class MyPlaneTaskNode extends AbstractTaskNode {
                 LOG.log(Level.FINER, "t={0} task:{1} makeDecision() possible new value:{2} cost:{3}", 
                         new Object[]{this.getOwner().getWorld().getTime(), this.getTask(), possibleOwner, currentCost});
             }
-    
+            
         }
         else if(evalFunction instanceof DSAWorkload) {
             int nTasks = 0;
                         
-            for(AbstractTaskNode other: this.neighbors)
-                if(other.getValue() == possibleOwner)
+            for(AbstractTaskNode other: this.neighbors){
+                if(other.getValue() == possibleOwner){
                     nTasks++;
+                }
+            }
             
             currentCost = possibleOwner.getCost(this.getTask()) + ((DSAWorkload)evalFunction).getWorkload(nTasks);
             

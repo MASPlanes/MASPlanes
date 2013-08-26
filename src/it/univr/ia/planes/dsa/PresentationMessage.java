@@ -59,6 +59,4 @@ public class PresentationMessage extends AbstractMessage{
     public List<Task> getTasks(){
         return this.tasks;
     }
-            
-    
 }

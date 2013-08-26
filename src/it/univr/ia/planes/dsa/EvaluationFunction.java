@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2013, fd
+ * Copyright (c) 2013, Andrea Jeradi, Francesco Donato
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -26,10 +26,15 @@
 package it.univr.ia.planes.dsa;
 
 /**
- *
- * @author fd
+ * Interface that represents the Evaluation Function used by dsa.
+ * 
+ * @author Andrea Jeradi, Francesco Donato
  */
 public interface EvaluationFunction {
+    /**
+     * Gets the name of the evaluation function choosen for dsa.
+     * @return String represents the evaluation function name.
+     */
     public String getName();
     
 }

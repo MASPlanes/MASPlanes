@@ -50,7 +50,6 @@ public class ReallocatedTaskMessage extends AbstractMessage{
      * @param  recipient Plane who receive the message.
      */
     public ReallocatedTaskMessage(Task task, Plane recipient) {
-        
         this.task = task;
         super.setRecipient(recipient);
     }
@@ -60,9 +59,7 @@ public class ReallocatedTaskMessage extends AbstractMessage{
      *
      * @return task that this message refers to.
      */
-    public Task getTask() {
-        
+    public Task getTask() {        
         return task;
-    }
-    
+    }   
 }

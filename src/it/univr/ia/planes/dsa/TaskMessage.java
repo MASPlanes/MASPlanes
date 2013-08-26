@@ -69,7 +69,6 @@ public class TaskMessage extends AbstractMessage{
         return task;
     }
     
-    
     /**
      * Get the value assumed by the task.
      * 

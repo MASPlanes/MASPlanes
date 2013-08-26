@@ -42,5 +42,4 @@ public class NearPlaneTaskNode extends AbstractTaskNode {
     public NearPlaneTaskNode(Task t, Plane own) {
         super(t, own);
     }
-    
 }
