@@ -93,7 +93,7 @@ public class GUIWorld extends AbstractWorld {
     protected void displayStep() {
         ftracker.delay(speed);
 
-        if (graphicsQueue.size() > 2) {
+        if (graphicsQueue.size() > 1) {
             return;
         }
 
