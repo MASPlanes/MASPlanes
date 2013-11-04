@@ -86,7 +86,7 @@ public class GUIWorld extends AbstractWorld {
 
     @Override public void init(DProblem d) {
         super.init(d);
-        //ftracker.calibrate(); this may be used some day.
+        ftracker.calibrate(); //this may be used some day.
     }
 
     @Override
@@ -97,15 +97,19 @@ public class GUIWorld extends AbstractWorld {
             return;
         }
 
+        // Fetch the display dimensions
+        Dimension dd = display.getDisplayDimension();
+        if (dd.height <= 0 || dd.width <= 0) {
+            return;
+        }
+
         // Create an image that does not support transparency
         GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice gs = ge.getDefaultScreenDevice();
         GraphicsConfiguration gc = gs.getDefaultConfiguration();
-        BufferedImage bimage = gc.createCompatibleImage(display.getWidth(), display.getHeight(), Transparency.TRANSLUCENT);
+        BufferedImage bimage = gc.createCompatibleImage(dd.width, dd.height, Transparency.TRANSLUCENT);
 
         Graphics2D surface = (Graphics2D)(bimage.getGraphics());
-
-        Dimension dd = display.getDisplayDimension();
 //        surface.setColor(Color.WHITE);
 //        surface.fillRect(0, 0, dd.width, dd.height);
 

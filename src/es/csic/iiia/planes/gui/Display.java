@@ -92,13 +92,13 @@ public class Display extends JFrame {
         layers.setPreferredSize(d);
 
         displayPane = new DisplayPane(world);
-        displayPane.setPreferredSize(d);
+        //displayPane.setPreferredSize(d);
         displayPane.setBounds(new Rectangle(d));
         displayPane.setOpaque(false);
         layers.add(displayPane);
 
         tasksPane = new TaskDistributionPane(this, problemDefinition);
-        tasksPane.setPreferredSize(d);
+        //tasksPane.setPreferredSize(d);
         tasksPane.setBackground(Color.WHITE);
         tasksPane.setBounds(new Rectangle(d));
         tasksPane.setOpaque(true);
@@ -139,9 +139,11 @@ public class Display extends JFrame {
         top.add(s);
         time = new JLabel("Time: ");
         top.add(time);
+
         root.add(top, BorderLayout.NORTH);
 
         this.pack();
+        this.setMinimumSize(new Dimension(top.getSize().width, top.getSize().height + 200));
         this.setVisible(true);
 
         // Observador que s'encarrega de finalitzar el programa en
@@ -157,29 +159,15 @@ public class Display extends JFrame {
 
             @Override
             public void componentResized(ComponentEvent ce) {
-
-                // Bloquegem l'aspect ratio
                 Dimension innerD = Display.this.layers.getSize();
-                Dimension outerD = Display.this.getSize();
                 int innerWidth  = innerD.width;
                 int innerHeight = innerD.height;
-                int outerWidth  = outerD.width;
-                int outerHeight = outerD.height;
 
-                double ratio = innerWidth/(double)(innerHeight);
-                ratio = Math.round(ratio*100f) / 100f;
-                System.err.println("Ratio: " + ratio);
-                if (ratio > 1) {
-                    Display.this.setSize((int) (outerWidth / ratio), outerHeight);
-                } else if (ratio < 1) {
-                    Display.this.setSize(outerWidth, (int) (outerHeight * ratio));
-                } else {
-                    super.componentResized(ce);
-                    displayPane.setBounds(new Rectangle(innerD));
-                    tasksPane.changeSize(innerWidth, innerHeight);
-                    tasksPane.setBounds(new Rectangle(innerD));
-                    System.err.println(innerD);
-                }
+                layers.setBounds(new Rectangle(innerD));
+                displayPane.setBounds(new Rectangle(innerD));
+                tasksPane.setBounds(new Rectangle(innerD));
+                tasksPane.changeSize(innerWidth, innerHeight);
+                super.componentResized(ce);
             }
 
         });
