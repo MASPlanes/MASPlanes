@@ -124,10 +124,13 @@ public class GUIWorld extends AbstractWorld {
         transform.translate(200, 200);
         surface.setTransform(transform);
 
-
-        for (Station s : getStations()) {
-            s.draw(surface);
+        // Draw recharge stations only if planes don't use an infinite battery
+        if (!getFactory().getConfiguration().getBatteryClass().equals(InfiniteBattery.class)) {
+            for (Station s : getStations()) {
+                s.draw(surface);
+            }
         }
+
         for (Operator o : getOperators()) {
             o.draw(surface);
         }

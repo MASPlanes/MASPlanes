@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.gui;
 
+import es.csic.iiia.planes.InfiniteBattery;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Positioned;
@@ -185,7 +186,7 @@ public class PlaneDrawer implements Drawable {
 
         drawTasks(g, plane.getColor());
         drawPlane(g, Color.DARK_GRAY, plane.getColor());
-        drawBattery(g);
+        drawBattery(g, new Color(0,200,0));
 
         g.setColor(previous);
     }
@@ -205,7 +206,7 @@ public class PlaneDrawer implements Drawable {
 
         drawTasks(g, Color.LIGHT_GRAY);
         drawPlane(g, Color.DARK_GRAY, Color.LIGHT_GRAY);
-        drawBattery(g);
+        drawBattery(g, Color.LIGHT_GRAY);
 
         g.setColor(previous);
 
@@ -248,29 +249,30 @@ public class PlaneDrawer implements Drawable {
         g.setStroke(olds);
     }
 
-    private void drawBattery(Graphics2D g) {
-//        if (plane.getBattery() instanceof InfiniteBattery) {
-//            return;
-//        }
+    private void drawBattery(Graphics2D g, Color c) {
+        if (plane.getBattery() instanceof InfiniteBattery) {
+            return;
+        }
 
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
 
         g.setFont(batteryFont);
-        String sid = String.valueOf(plane.getId());
-        FontMetrics m = g.getFontMetrics(batteryFont);
-        int w = m.stringWidth(sid);
-        int h = m.getHeight();
         double percent = plane.getBattery().getEnergy()/(double)plane.getBattery().getCapacity();
-        String bat =  MessageFormat.format("{0,number,#.##%}", percent);
+        //String bat =  MessageFormat.format("{0,number,#.##%}", percent);
+        //FontMetrics m = g.getFontMetrics(batteryFont);
+        //int w = m.stringWidth(bat);
+        //int h = m.getHeight();
+        int w = scale(400);
+        int h = scale(70);
 
         int offset = scale(200);
-        g.setColor(new Color(240,240,240));
+        g.setColor(c);
         g.fillRect(x-(w/2), y+offset, (int)(w*percent), h);
         g.setColor(Color.DARK_GRAY);
         g.setStroke(batteryStroke);
         g.drawRect(x-(w/2), y+offset, w, h);
-        g.drawString(bat, x-(w/2), y+offset+h-offset/8);
+        //g.drawString(bat, x-(w/2), y+offset+h-offset/8);
     }
 
     private void drawNormal(Graphics2D g) {
@@ -278,7 +280,7 @@ public class PlaneDrawer implements Drawable {
 
         drawTasks(g, plane.getColor());
         drawPlane(g, Color.DARK_GRAY, plane.getColor());
-        drawBattery(g);
+        drawBattery(g, new Color(0,200,0));
         drawFutureLocations(g);
 
         g.setColor(previous);
