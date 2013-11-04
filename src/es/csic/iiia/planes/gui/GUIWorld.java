@@ -150,7 +150,7 @@ public class GUIWorld extends AbstractWorld {
             final Plane p = ps.get(i);
             Location l2 = p.getLocation();
             double dx = l.getDistance(l2);
-            if (dx < 600) {
+            if (dx < 200) {
                 return p;
             }
         }
