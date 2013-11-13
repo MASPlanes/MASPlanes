@@ -38,6 +38,7 @@
 package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.definition.DProblem;
+import es.csic.iiia.planes.gui.util.ProportionalLayoutManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -90,15 +91,14 @@ public class Display extends JFrame {
         layers = new JLayeredPane();
         root.add(layers, BorderLayout.CENTER);
         layers.setPreferredSize(d);
+        layers.setLayout(new ProportionalLayoutManager(500, 500));
 
         displayPane = new DisplayPane(world);
-        //displayPane.setPreferredSize(d);
         displayPane.setBounds(new Rectangle(d));
         displayPane.setOpaque(false);
         layers.add(displayPane);
 
         tasksPane = new TaskDistributionPane(this, problemDefinition);
-        //tasksPane.setPreferredSize(d);
         tasksPane.setBackground(Color.WHITE);
         tasksPane.setBounds(new Rectangle(d));
         tasksPane.setOpaque(true);
@@ -191,7 +191,7 @@ public class Display extends JFrame {
     }
 
     public Dimension getDisplayDimension() {
-        return layers.getSize();
+        return displayPane.getSize();
     }
 
     public long getTime() {

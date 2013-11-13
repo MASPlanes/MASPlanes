@@ -86,14 +86,14 @@ public class GUIWorld extends AbstractWorld {
 
     @Override public void init(DProblem d) {
         super.init(d);
-        ftracker.calibrate(); //this may be used some day.
+        //ftracker.calibrate(); //this may be used some day.
     }
 
     @Override
     protected void displayStep() {
         ftracker.delay(speed);
 
-        if (graphicsQueue.size() > 1) {
+        if (graphicsQueue.size() > 2) {
             return;
         }
 

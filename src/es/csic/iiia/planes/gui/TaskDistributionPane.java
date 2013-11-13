@@ -82,6 +82,10 @@ public class TaskDistributionPane extends JPanel {
     }
 
     public void changeSize(int width, int height) {
+        if (width < 0 || height < 0) {
+            return;
+        }
+
         double xscale = ((double)width)  / DEFAULT_WIDTH;
         double yscale = ((double)height) / DEFAULT_HEIGHT;
         buffer = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);

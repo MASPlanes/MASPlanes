@@ -39,10 +39,10 @@ package es.csic.iiia.planes.gui;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.gui.util.ProportionalLayoutManager;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.Point2D;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
@@ -85,10 +85,10 @@ class DisplayPane extends JPanel {
                         }
                     } // End of 'run()' method
                 });
-                
+
             } // End of 'mouseReleased(MouseEvent)' method
         });
-        
+
     }
 
     @Override
