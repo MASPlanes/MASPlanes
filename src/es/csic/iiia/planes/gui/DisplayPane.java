@@ -39,20 +39,18 @@ package es.csic.iiia.planes.gui;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.gui.util.ProportionalLayoutManager;
 import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
+import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class DisplayPane extends JPanel {
+class DisplayPane extends JComponent {
 
     private GUIWorld world;
     private Image lastImage;
@@ -64,27 +62,20 @@ class DisplayPane extends JPanel {
             @Override
             public void mouseReleased(final MouseEvent me) {
 
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        // Select or deselect a Plane
-                        Location l = world.screenToWorld(new Point2D.Double(me.getX(), me.getY()));
-                        Plane p = world.getPlaneAt(l);
-                        world.togglePlaneSelection(p);
-                        world.graphicsQueue.clear();
-                        synchronized(world.ftracker.lock) {
-                            world.ftracker.lock.notify();
-                        }
+                // Select or deselect a Plane
+                Location l = world.screenToWorld(new Point2D.Double(me.getX(), me.getY()));
+                Plane p = world.getPlaneAt(l);
+                world.togglePlaneSelection(p);
+                world.graphicsQueue.clear();
+                world.ftracker.interrupt();
 
-                        // If no plane is selected, try to find a task to give its information
-                        if (p == null) {
-                            Task t = world.getTaskAt(l);
-                            if (t != null) {
-                                System.err.println(t);
-                            }
-                        }
-                    } // End of 'run()' method
-                });
+                // If no plane is selected, try to find a task to give its information
+                if (p == null) {
+                    Task t = world.getTaskAt(l);
+                    if (t != null) {
+                        System.err.println(t);
+                    }
+                }
 
             } // End of 'mouseReleased(MouseEvent)' method
         });
@@ -102,5 +93,4 @@ class DisplayPane extends JPanel {
             grphcs.drawImage(lastImage, 0, 0, null);
         }
     }
-
 }

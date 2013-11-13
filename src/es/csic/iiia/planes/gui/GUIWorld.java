@@ -63,11 +63,15 @@ import java.util.logging.Logger;
  */
 public class GUIWorld extends AbstractWorld {
 
-    public final FrameTracker ftracker = new FrameTracker();
+    private static final int BUFFER_DIMENSION = 1;
+
+    public final FrameTracker ftracker = new FrameTracker(100);
     private Display display;
-    private int speed = 100;
     private AffineTransform transform;
     public ConcurrentLinkedQueue<Image> graphicsQueue = new ConcurrentLinkedQueue<Image>();
+    private Dimension cachedDimension = new Dimension(0,0);
+    private BufferedImage[] buffers = new BufferedImage[BUFFER_DIMENSION];
+    private int next_buffer = 0;
 
     public GUIWorld(Factory factory) {
         super(factory);
@@ -91,9 +95,9 @@ public class GUIWorld extends AbstractWorld {
 
     @Override
     protected void displayStep() {
-        ftracker.delay(speed);
+        ftracker.delay();
 
-        if (graphicsQueue.size() > 2) {
+        if (graphicsQueue.size() > BUFFER_DIMENSION) {
             return;
         }
 
@@ -103,19 +107,23 @@ public class GUIWorld extends AbstractWorld {
             return;
         }
 
-        // Create an image that does not support transparency
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gs = ge.getDefaultScreenDevice();
-        GraphicsConfiguration gc = gs.getDefaultConfiguration();
-        BufferedImage bimage = gc.createCompatibleImage(dd.width, dd.height, Transparency.TRANSLUCENT);
+        if (!cachedDimension.equals(dd)) {
+            for (int i=0; i<BUFFER_DIMENSION; i++) {
+                // Create an image that supports transparency
+                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+                GraphicsDevice gs = ge.getDefaultScreenDevice();
+                GraphicsConfiguration gc = gs.getDefaultConfiguration();
+                buffers[i] = gc.createCompatibleImage(dd.width, dd.height, Transparency.TRANSLUCENT);
+            }
+            next_buffer = 0;
+        }
 
-        Graphics2D surface = (Graphics2D)(bimage.getGraphics());
-//        surface.setColor(Color.WHITE);
-//        surface.fillRect(0, 0, dd.width, dd.height);
-
+        Graphics2D surface = buffers[next_buffer].createGraphics();
         surface.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         surface.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         surface.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        surface.setBackground(new Color(255, 255, 255, 0));
+        surface.clearRect(0, 0, dd.width, dd.height);
 
         dd = new Dimension(dd);
         Dimension wd = getSpace().getDimension();
@@ -143,7 +151,8 @@ public class GUIWorld extends AbstractWorld {
 
         surface.dispose();
 
-        graphicsQueue.offer(bimage);
+        graphicsQueue.offer(buffers[next_buffer]);
+        next_buffer = (next_buffer+1) % BUFFER_DIMENSION;
         display.repaint();
     }
 
@@ -185,10 +194,6 @@ public class GUIWorld extends AbstractWorld {
 
     public void setDisplay(Display d) {
         display = d;
-    }
-
-    public void setSpeed(int speed) {
-        this.speed = speed;
     }
 
     private Plane selectedPlane;

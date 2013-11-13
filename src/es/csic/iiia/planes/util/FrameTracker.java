@@ -49,8 +49,20 @@ public class FrameTracker {
 
     private long lastTime = System.nanoTime();
     public final Object lock = new Object();
+    private double min_sleeptime_avg = 16e6;
+    private boolean unlocked = false;
+    private int speed;
+    private double avg = Double.NaN;
+    private long lastTick = 0;
 
-    public FrameTracker() {}
+    public FrameTracker(int speed) {
+        this.speed = speed;
+    }
+
+    public void setSpeed(int speed) {
+        this.speed = speed;
+        avg = Double.NaN;
+    }
 
     private long calibrateIter() {
         long t1 = System.nanoTime();
@@ -68,19 +80,17 @@ public class FrameTracker {
      * nanoseconds taken by a <em>sleep()<em> call.
      */
     public void calibrate() {
-        double lavg = calibrateIter();
-        long min = (long)lavg;
-        long max = (long)lavg;
+        min_sleeptime_avg = calibrateIter();
+        long min = (long)min_sleeptime_avg;
+        long max = (long)min_sleeptime_avg;
         for (int i=1; i<1000; i++) {
             final long x = calibrateIter();
-            lavg += (x - lavg)/i+1;
+            min_sleeptime_avg += (x - min_sleeptime_avg)/i+1;
             min = Math.min(min, x);
             max = Math.max(x, max);
         }
-        LOG.log(Level.SEVERE, "Sleep nanoseconds: {0}/{1}/{2}", new Object[]{min, lavg, max});
+        LOG.log(Level.SEVERE, "Sleep nanoseconds: {0}/{1}/{2}", new Object[]{min, min_sleeptime_avg, max});
     }
-
-    private double avg = 1;
 
     /**
      * Delays the execution of this thread, trying to achieve the given ratio
@@ -88,38 +98,55 @@ public class FrameTracker {
      *
      * @param ratio of executions per second that we want to accomplish.
      */
-    public void delay(int ratio) {
+    public void delay() {
         final long time = System.nanoTime();
-        final long remainder = (long)Math.max(0,1e9/ratio - (time - lastTime));
+        final long remainder = (long)Math.max(0,1e9/2* - (time - lastTime));
+        boolean local_unlocked = false;
 
-        avg = remainder*0.1 + avg*0.9;
+        avg = Double.isNaN(avg) ? remainder*0.1 : remainder*0.1 + avg*0.9;
+        avg = remainder;
 
-        try {
-            final long milis = (long)(remainder/1e6);
-            final int  nanos = (int)(remainder%1e6);
-            if (milis > 16) {
-                //System.err.println("Sleeping for (" + remainder + ") " + milis + "ms " + nanos);
-                synchronized(lock) {
-                    lock.wait(milis, nanos);
-                }
-            } else if (milis > 0 || nanos > 0) {
-                double dice = Math.random()*16e6;
-                if (dice < avg) {
-                    //System.err.println("AVGSLeep for (" + remainder + ") " + milis + "ms " + nanos + "ns. AVG: " + avg + ", DICE: " + dice);
-                    synchronized(lock) {
-                        lock.wait(milis, nanos);
-                    }
-                } else {
-                    //System.err.println("NOTSLeep for (" + remainder + ") " + milis + "ms " + nanos + "ns. AVG: " + avg + ", DICE: " + dice);
-                }
+        final long milis = (long)(remainder/1e6);
+        final int  nanos = (int)(remainder%1e6);
+        if (milis*1e3 > min_sleeptime_avg) {
+            //System.err.println("Sleeping for (" + remainder + ") " + milis + "ms " + nanos);
+            local_unlocked = sleep(milis, nanos);
+        } else if (milis > 0 || nanos > 0) {
+            double dice = Math.random()*min_sleeptime_avg;
+            if (dice < avg) {
+                //System.err.println("AVGSLeep for (" + remainder + ") " + milis + "ms " + nanos + "ns. AVG: " + avg + ", DICE: " + dice);
+                local_unlocked = sleep(milis, nanos);
+            } else {
+                //System.err.println("NOTSLeep for (" + remainder + ") " + milis + "ms " + nanos + "ns. AVG: " + avg + ", DICE: " + dice);
             }
-            //Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, "Error when trying to sleep for " + remainder + "ns:");
-        } catch (InterruptedException ex) {
-            Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, null, ex);
         }
 
-
+        if (local_unlocked) {
+            avg = 1;
+            System.err.println("Unlocked!");
+        }
         lastTime = System.nanoTime();
+    }
+
+    public boolean sleep(long milis, int nanos) {
+        boolean result;
+        synchronized(lock) {
+            try {
+                lock.wait(milis, nanos);
+            } catch (InterruptedException ex) {
+                Logger.getLogger(FrameTracker.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            result = unlocked;
+            unlocked = false;
+        }
+        return result;
+    }
+
+    public void interrupt() {
+        synchronized(lock) {
+            unlocked = true;
+            lock.notify();
+        }
     }
 
 }

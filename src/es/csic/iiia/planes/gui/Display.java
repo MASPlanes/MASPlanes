@@ -131,7 +131,8 @@ public class Display extends JFrame {
                 if (!source.getValueIsAdjusting()) {
                     int speed = (int) source.getValue();
                     speed = (int) Math.pow(10f, speed / 10f);
-                    world.setSpeed(speed);
+                    world.ftracker.setSpeed(speed);
+                    System.err.println("Speed set to " + speed);
                 }
             }
         });
@@ -153,23 +154,6 @@ public class Display extends JFrame {
             public void windowClosing(WindowEvent e) {
               System.exit(0);
             }
-        });
-
-        this.addComponentListener(new ComponentAdapter() {
-
-            @Override
-            public void componentResized(ComponentEvent ce) {
-                Dimension innerD = Display.this.layers.getSize();
-                int innerWidth  = innerD.width;
-                int innerHeight = innerD.height;
-
-                layers.setBounds(new Rectangle(innerD));
-                displayPane.setBounds(new Rectangle(innerD));
-                tasksPane.setBounds(new Rectangle(innerD));
-                tasksPane.changeSize(innerWidth, innerHeight);
-                super.componentResized(ce);
-            }
-
         });
 
     }

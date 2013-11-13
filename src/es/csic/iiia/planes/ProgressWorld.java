@@ -60,7 +60,7 @@ public class ProgressWorld extends AbstractWorld {
      */
     private ShowProgress progress = new ShowProgress();
 
-    private final FrameTracker ftracker = new FrameTracker();
+    private final FrameTracker ftracker = new FrameTracker(24);
 
     /**
      * Builds a new world, whose elements will be created by the given factory.
@@ -122,7 +122,7 @@ public class ProgressWorld extends AbstractWorld {
                 if (percent != null) {
                     System.err.print(String.format("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\bCompleted: %6.2f%%", percent));
                 }
-                ftracker.delay(24);
+                ftracker.delay();
             }
         }
 
