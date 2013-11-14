@@ -43,6 +43,8 @@ import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.Transparency;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;

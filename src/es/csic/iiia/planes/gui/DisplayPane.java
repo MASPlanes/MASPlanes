@@ -43,6 +43,7 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 
@@ -66,8 +67,6 @@ class DisplayPane extends JComponent {
                 Location l = world.screenToWorld(new Point2D.Double(me.getX(), me.getY()));
                 Plane p = world.getPlaneAt(l);
                 world.togglePlaneSelection(p);
-                world.graphicsQueue.clear();
-                world.ftracker.interrupt();
 
                 // If no plane is selected, try to find a task to give its information
                 if (p == null) {
@@ -83,7 +82,7 @@ class DisplayPane extends JComponent {
     }
 
     @Override
-    public void paint(Graphics grphcs) {
+    public void paintComponent(Graphics grphcs) {
         Image img = world.graphicsQueue.poll();
         if (img != null) {
             lastImage = img;
@@ -93,4 +92,11 @@ class DisplayPane extends JComponent {
             grphcs.drawImage(lastImage, 0, 0, null);
         }
     }
+
+    @Override
+    public void setSize(int width, int height) {
+        world.graphicsQueue.clear();
+        super.setSize(width, height);
+    }
+
 }

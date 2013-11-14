@@ -69,6 +69,8 @@ public class Display extends JFrame {
     private static int DEFAULT_WIDTH = 500;
     private static int DEFAULT_HEIGHT = 500;
 
+    private static double BOUND = 1e5 / Math.exp(Math.sqrt(100));
+
     private GUIWorld world;
     private DisplayPane displayPane;
     private JLabel time;
@@ -122,20 +124,17 @@ public class Display extends JFrame {
 
         JLabel l = new JLabel("Speed: ");
         top.add(l);
-        JSlider s = new JSlider(1, 50, 25);
-
+        JSlider s = new JSlider(0, 100, 10);
         s.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent ce) {
                 JSlider source = (JSlider) ce.getSource();
                 if (!source.getValueIsAdjusting()) {
-                    int speed = (int) source.getValue();
-                    speed = (int) Math.pow(10f, speed / 10f);
-                    world.ftracker.setSpeed(speed);
-                    System.err.println("Speed set to " + speed);
+                    setSpeed(source.getValue());
                 }
             }
         });
+        setSpeed(10);
 
         top.add(s);
         time = new JLabel("Time: ");
@@ -156,6 +155,12 @@ public class Display extends JFrame {
             }
         });
 
+    }
+
+    private void setSpeed(int speed) {
+        speed = (int)(Math.exp(Math.sqrt(speed)) / BOUND);
+        world.setDisplayEvery(speed);
+        System.err.println("Speed set to " + speed);
     }
 
     public Color getColor(int nCrisis) {

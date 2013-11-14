@@ -38,7 +38,6 @@ package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.*;
 import es.csic.iiia.planes.definition.DProblem;
-import es.csic.iiia.planes.util.FrameTracker;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -52,8 +51,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
+import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,42 +64,55 @@ import java.util.logging.Logger;
  */
 public class GUIWorld extends AbstractWorld {
 
-    private static final int BUFFER_DIMENSION = 1;
+    private static final int BUFFER_DIMENSION = 10;
 
-    public final FrameTracker ftracker = new FrameTracker(100);
     private Display display;
     private AffineTransform transform;
-    public ConcurrentLinkedQueue<Image> graphicsQueue = new ConcurrentLinkedQueue<Image>();
+    public BlockingQueue<BufferedImage> graphicsQueue = new ArrayBlockingQueue<BufferedImage>(5);
     private Dimension cachedDimension = new Dimension(0,0);
     private BufferedImage[] buffers = new BufferedImage[BUFFER_DIMENSION];
     private int next_buffer = 0;
+    private int displayEvery = 100;
+    public final Object displayEveryLock;
+    private int steps = 0;
 
     public GUIWorld(Factory factory) {
         super(factory);
+        this.displayEveryLock = new Object();
     }
 
     @Override
     public void run() {
         super.run();
-
-        while(!graphicsQueue.isEmpty()) {
-            displayStep();
-        }
+        displayStep();
     }
 
 
 
     @Override public void init(DProblem d) {
         super.init(d);
-        //ftracker.calibrate(); //this may be used some day.
     }
 
     @Override
     protected void displayStep() {
-        ftracker.delay();
-
         if (graphicsQueue.size() > BUFFER_DIMENSION) {
             return;
+        }
+
+        synchronized(displayEveryLock) {
+            while(displayEvery <= 0) {
+                try {
+                    displayEveryLock.wait();
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(GUIWorld.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+
+            if (++steps >= displayEvery) {
+                steps = 0;
+            } else {
+                return;
+            }
         }
 
         // Fetch the display dimensions
@@ -108,14 +122,17 @@ public class GUIWorld extends AbstractWorld {
         }
 
         if (!cachedDimension.equals(dd)) {
-            for (int i=0; i<BUFFER_DIMENSION; i++) {
-                // Create an image that supports transparency
-                GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-                GraphicsDevice gs = ge.getDefaultScreenDevice();
-                GraphicsConfiguration gc = gs.getDefaultConfiguration();
-                buffers[i] = gc.createCompatibleImage(dd.width, dd.height, Transparency.TRANSLUCENT);
-            }
+            Arrays.fill(buffers, null);
             next_buffer = 0;
+            cachedDimension = dd;
+        }
+
+        if (buffers[next_buffer] == null) {
+            System.err.println("Buffer " + next_buffer + " is null.");
+            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+            GraphicsDevice gs = ge.getDefaultScreenDevice();
+            GraphicsConfiguration gc = gs.getDefaultConfiguration();
+            buffers[next_buffer] = gc.createCompatibleImage(dd.width, dd.height, Transparency.TRANSLUCENT);
         }
 
         Graphics2D surface = buffers[next_buffer].createGraphics();
@@ -150,8 +167,17 @@ public class GUIWorld extends AbstractWorld {
         }
 
         surface.dispose();
+        try {
+            graphicsQueue.put(buffers[next_buffer]);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GUIWorld.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-        graphicsQueue.offer(buffers[next_buffer]);
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gs = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gs.getDefaultConfiguration();
+        System.err.println("Accelerated : " + buffers[next_buffer].getCapabilities(gc).isAccelerated());
+
         next_buffer = (next_buffer+1) % BUFFER_DIMENSION;
         display.repaint();
     }
@@ -202,5 +228,12 @@ public class GUIWorld extends AbstractWorld {
     }
     public Plane getSelectedPlane() {
         return selectedPlane;
+    }
+
+    void setDisplayEvery(int speed) {
+        synchronized (displayEveryLock) {
+            displayEvery = speed;
+            displayEveryLock.notify();
+        }
     }
 }
