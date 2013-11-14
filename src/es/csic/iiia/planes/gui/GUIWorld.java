@@ -38,23 +38,25 @@ package es.csic.iiia.planes.gui;
 
 import es.csic.iiia.planes.*;
 import es.csic.iiia.planes.definition.DProblem;
+import java.awt.AWTException;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
-import java.awt.Image;
+import java.awt.ImageCapabilities;
 import java.awt.RenderingHints;
 import java.awt.Transparency;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
+import java.awt.image.VolatileImage;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -68,10 +70,7 @@ public class GUIWorld extends AbstractWorld {
 
     private Display display;
     private AffineTransform transform;
-    public BlockingQueue<BufferedImage> graphicsQueue = new ArrayBlockingQueue<BufferedImage>(5);
-    private Dimension cachedDimension = new Dimension(0,0);
-    private BufferedImage[] buffers = new BufferedImage[BUFFER_DIMENSION];
-    private int next_buffer = 0;
+    public BlockingQueue<VolatileImage> graphicsQueue = new ArrayBlockingQueue<VolatileImage>(BUFFER_DIMENSION);
     private int displayEvery = 100;
     public final Object displayEveryLock;
     private int steps = 0;
@@ -95,9 +94,6 @@ public class GUIWorld extends AbstractWorld {
 
     @Override
     protected void displayStep() {
-        if (graphicsQueue.size() > BUFFER_DIMENSION) {
-            return;
-        }
 
         synchronized(displayEveryLock) {
             while(displayEvery <= 0) {
@@ -121,21 +117,17 @@ public class GUIWorld extends AbstractWorld {
             return;
         }
 
-        if (!cachedDimension.equals(dd)) {
-            Arrays.fill(buffers, null);
-            next_buffer = 0;
-            cachedDimension = dd;
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice gs = ge.getDefaultScreenDevice();
+        GraphicsConfiguration gc = gs.getDefaultConfiguration();
+        VolatileImage buf;
+        try {
+            buf = gc.createCompatibleVolatileImage(dd.width, dd.height, new ImageCapabilities(false), Transparency.TRANSLUCENT);
+        } catch (AWTException ex) {
+            return;
         }
 
-        if (buffers[next_buffer] == null) {
-            System.err.println("Buffer " + next_buffer + " is null.");
-            GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-            GraphicsDevice gs = ge.getDefaultScreenDevice();
-            GraphicsConfiguration gc = gs.getDefaultConfiguration();
-            buffers[next_buffer] = gc.createCompatibleImage(dd.width, dd.height, Transparency.TRANSLUCENT);
-        }
-
-        Graphics2D surface = buffers[next_buffer].createGraphics();
+        Graphics2D surface = buf.createGraphics();
         surface.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         surface.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         surface.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
@@ -167,18 +159,13 @@ public class GUIWorld extends AbstractWorld {
         }
 
         surface.dispose();
-        try {
-            graphicsQueue.put(buffers[next_buffer]);
-        } catch (InterruptedException ex) {
-            Logger.getLogger(GUIWorld.class.getName()).log(Level.SEVERE, null, ex);
+        for (boolean ok = false; !ok;) {
+            try {
+                ok = graphicsQueue.offer(buf, 1, TimeUnit.SECONDS);
+            } catch (InterruptedException ex) {}
         }
 
-        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
-        GraphicsDevice gs = ge.getDefaultScreenDevice();
-        GraphicsConfiguration gc = gs.getDefaultConfiguration();
-        System.err.println("Accelerated : " + buffers[next_buffer].getCapabilities(gc).isAccelerated());
-
-        next_buffer = (next_buffer+1) % BUFFER_DIMENSION;
+        System.err.println("Accelerated : " + buf.getCapabilities(gc).isAccelerated());
         display.repaint();
     }
 
