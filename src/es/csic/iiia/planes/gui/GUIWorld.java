@@ -52,7 +52,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.image.VolatileImage;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
@@ -165,7 +164,6 @@ public class GUIWorld extends AbstractWorld {
             } catch (InterruptedException ex) {}
         }
 
-        System.err.println("Accelerated : " + buf.getCapabilities(gc).isAccelerated());
         display.repaint();
     }
 
