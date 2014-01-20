@@ -36,13 +36,15 @@
  */
 package es.csic.iiia.planes.maxsum.centralized;
 
+import es.csic.iiia.maxsum.factors.cardinality.CardinalityFunction;
+
 /**
  * Workload function that computes the extra cost of activating <em>n</em>
  * variables (servicing <em>n</em> requests) as <em>k*n^alpha</em>.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class KAlphaFunction implements WorkloadFunction {
+public class KAlphaFunction implements CardinalityFunction {
 
     private double k;
     private double alpha;

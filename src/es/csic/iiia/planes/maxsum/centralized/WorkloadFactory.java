@@ -36,22 +36,23 @@
  */
 package es.csic.iiia.planes.maxsum.centralized;
 
+import es.csic.iiia.maxsum.factors.cardinality.CardinalityFunction;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.cli.Configuration;
 
 /**
  * CostFactor factory that builds Workload factors.
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class WorkloadFactory implements CostFactorFactory {
+public class WorkloadFactory<T> implements CostFactorFactory<T> {
 
     @Override
-    public WorkloadFactor build(Plane plane) {
+    public WorkloadFactor<T> build(Plane plane) {
         Configuration c = plane.getWorld().getFactory().getConfiguration();
 
-        WorkloadFactor f = new WorkloadFactor();
-        WorkloadFunction ff = c.getMsWorkloadFunctionFactory().build(plane);
+        WorkloadFactor<T> f = new WorkloadFactor<T>();
+        CardinalityFunction ff = c.getMsWorkloadFunctionFactory().build(plane);
         f.setFunction(ff);
         return f;
     }

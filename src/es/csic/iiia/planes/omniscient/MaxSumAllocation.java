@@ -36,16 +36,17 @@
  */
 package es.csic.iiia.planes.omniscient;
 
+import es.csic.iiia.maxsum.CommunicationAdapter;
+import es.csic.iiia.maxsum.DirectCommunicationAdapter;
+import es.csic.iiia.maxsum.Factor;
+import es.csic.iiia.maxsum.MaxOperator;
+import es.csic.iiia.maxsum.Minimize;
 import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.maxsum.centralized.CostFactor;
 import es.csic.iiia.planes.maxsum.centralized.CostFactorFactory;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFactor;
-import es.csic.iiia.planes.maxsum.centralized.WorkloadFunction;
-import es.csic.iiia.planes.maxsum.centralized.Factor;
-import es.csic.iiia.planes.maxsum.centralized.SelectorFactor;
-import es.csic.iiia.planes.maxsum.centralized.KAlphaFunction;
+import es.csic.iiia.maxsum.factors.SelectorFactor;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +60,9 @@ import java.util.TreeMap;
  */
 public class MaxSumAllocation extends AbstractAllocationStrategy {
 
+    private final static MaxOperator msOperator = new Minimize();
+    private final static DirectCommunicationAdapter commChannel = new DirectCommunicationAdapter();
+
     @Override
     public void allocate(
         World w,
@@ -68,23 +72,23 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         TreeMap<Task, OmniscientPlane> reverseMap)
     {
         // Create the workload cost function
-        CostFactorFactory factory = w.getFactory().getConfiguration().getMsCostFactorFactory();
+        CostFactorFactory<Factor<?>> factory = w.getFactory().getConfiguration().getMsCostFactorFactory();
 
-        List<Factor> factors = new ArrayList<Factor>();
+        List<Factor<Factor<?>>> factors = new ArrayList<Factor<Factor<?>>>();
 
         // Create a selector factor for each task
-        Map<Task, SelectorFactor> selectors = new HashMap<Task, SelectorFactor>();
+        Map<Task, SelectorFactor<Factor<?>>> selectors = new HashMap<Task, SelectorFactor<Factor<?>>>();
         for (Task t : w.getTasks()) {
-            final SelectorFactor s = new SelectorFactor();
+            final SelectorFactor<Factor<?>> s = new SelectorFactor<Factor<?>>();
             selectors.put(t, s);
             factors.add(s);
         }
 
         // Create a cost factor for each plane
-        Map<CostFactor, OmniscientPlane> cost2plane =
-                new HashMap<CostFactor, OmniscientPlane>();
+        Map<CostFactor<Factor<?>>, OmniscientPlane> cost2plane =
+                new HashMap<CostFactor<Factor<?>>, OmniscientPlane>();
         for (OmniscientPlane p : planes) {
-            final CostFactor c = factory.build(p);
+            final CostFactor<Factor<?>> c = factory.build(p);
             factors.add(c);
             cost2plane.put(c, p);
 
@@ -100,9 +104,9 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         // Run maxsum!
         final int n = w.getFactory().getConfiguration().getMsIterations();
         for (int i=0; i<n; i++) {
-            for (Factor f : factors) f.tick();
-            for (Factor f : factors) f.gather();
-            for (Factor f : factors) f.scatter();
+            for (Factor f : factors) {
+                f.run();
+            }
         }
 
         // Fetch the assignments
@@ -122,6 +126,12 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
             }
         }
 
+    }
+
+    private static void init(Factor f) {
+        f.setIdentity(f);
+        f.setMaxOperator(msOperator);
+        f.setCommunicationAdapter(commChannel);
     }
 
 }

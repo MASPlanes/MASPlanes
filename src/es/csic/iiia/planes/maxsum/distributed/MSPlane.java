@@ -36,10 +36,15 @@
  */
 package es.csic.iiia.planes.maxsum.distributed;
 
+import es.csic.iiia.maxsum.Factor;
+import es.csic.iiia.maxsum.MaxOperator;
+import es.csic.iiia.maxsum.Minimize;
+import es.csic.iiia.maxsum.factors.SelectorFactor;
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
+import es.csic.iiia.planes.maxsum.centralized.CostFactor;
 import es.csic.iiia.planes.messaging.Message;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,13 +61,45 @@ import java.util.logging.Logger;
 public class MSPlane extends AbstractPlane {
     private static final Logger LOG = Logger.getLogger(MSPlane.class.getName());
 
-    private MSPlaneNode planeFunction;
-    private Map<Task, MSTaskNode> taskFunctions = new TreeMap<Task, MSTaskNode>();
+    private static final MaxOperator operator = new Minimize();
+
+    private final MSCommunicationAdapter adapter = new MSCommunicationAdapter(this);
+    private CostFactor<FactorID> planeFactor;
+    private final Map<FactorID, SelectorFactor<FactorID>> taskFactors =
+            new TreeMap<FactorID, SelectorFactor<FactorID>>();
 
     private boolean inactive;
 
-    public MSPlaneNode getPlaneFunction() {
-        return planeFunction;
+    public Factor<FactorID> getFactor(FactorID id) {
+        if (planeFactor.getIdentity().equals(id)) {
+            return planeFactor;
+        }
+        return taskFactors.get(id);
+    }
+
+    public CostFactor<FactorID> getPlaneFactor() {
+        return planeFactor;
+    }
+
+    public SelectorFactor<FactorID> getTaskFactor(FactorID id) {
+        return taskFactors.get(id);
+    }
+
+    public SelectorFactor<FactorID> getTaskFactor(Task task) {
+        return taskFactors.get(new FactorID(this, task));
+    }
+
+    private SelectorFactor<FactorID> createTaskFactor(FactorID id) {
+        SelectorFactor<FactorID> factor = new SelectorFactor<FactorID>();
+        initialize(factor, id);
+        factor.addNeighbor(planeFactor.getIdentity());
+        taskFactors.put(factor.getIdentity(), factor);
+        planeFactor.addNeighbor(factor.getIdentity());
+        return factor;
+    }
+
+    public Map<FactorID, SelectorFactor<FactorID>> getTaskFactors() {
+        return taskFactors;
     }
 
     public MSPlane(Location location) {
@@ -74,21 +111,26 @@ public class MSPlane extends AbstractPlane {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public void initialize() {
         super.initialize();
-        try {
-            planeFunction = new MSPlaneNode(this);
-        } catch (Exception ex) {
-            throw new RuntimeException("Unable to instantiate the specified plane node type.", ex);
-        }
+        planeFactor = getWorld().getFactory().buildCostFactor(this);
+        initialize(planeFactor, new FactorID(this));
     }
 
-
+    private void initialize(Factor<FactorID> factor, FactorID id) {
+        factor.setIdentity(id);
+        factor.setMaxOperator(operator);
+        factor.setCommunicationAdapter(adapter);
+    }
 
     @Override
     protected void taskCompleted(Task t) {
         LOG.log(Level.FINE, "{0} completes {1}", new Object[]{this, t});
-        getPlaneFunction().removeNeighbor(t);
+
+        // TODO: I think this is not necessary
+        //planeFactor.removeNeighbor(new FactorID(this, t));
+
         replan();
     }
 
@@ -96,10 +138,10 @@ public class MSPlane extends AbstractPlane {
     protected void taskAdded(Task t) {
         // Create a node for this task
         LOG.log(Level.FINE, "{0} now owns {1}", new Object[]{this, t});
-        MSTaskNode node = new MSTaskNode(this, t);
-        node.addNeighbor(this);
-        planeFunction.addNeighbor(t, this);
-        taskFunctions.put(t, node);
+
+        FactorID id = new FactorID(this, t);
+        createTaskFactor(id);
+
         replan(t);
     }
 
@@ -107,21 +149,13 @@ public class MSPlane extends AbstractPlane {
     protected void taskRemoved(Task t) {
         // Cleanup any actions done at taskAdded...
         LOG.log(Level.FINE, "{0} is no longer the owner of {1}", new Object[]{this, t});
-        MSTaskNode n = taskFunctions.get(t);
-        n.clearNeighbors();
-        taskFunctions.remove(t);
-        planeFunction.removeNeighbor(t);
+
+        Factor<FactorID> taskFactor = taskFactors.remove(new FactorID(this, t));
+        taskFactor.clearNeighbors();
+        planeFactor.removeNeighbor(taskFactor.getIdentity());
 
         // And replan if necessary
-        setNextTask(getNearest(getLocation(), getTasks()));
-    }
-
-    MSTaskNode getTaskFunction(Task task) {
-        return taskFunctions.get(task);
-    }
-
-    Map<Task, MSTaskNode> getTaskFunctions() {
-        return taskFunctions;
+        replan();
     }
 
     @Override
@@ -179,7 +213,7 @@ public class MSPlane extends AbstractPlane {
     }
 
     private List<MSPlane> neighbors = new ArrayList<MSPlane>();
-    List<MSPlane> getNeighbors() {
+    protected List<MSPlane> getNeighbors() {
         return neighbors;
     }
 

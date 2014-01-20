@@ -1,0 +1,3 @@
+[submodule "BinaryMaxSum"]
+	path = BinaryMaxSum
+	url = https://github.com/kilburn/BinaryMaxSum.git

@@ -36,19 +36,20 @@
  */
 package es.csic.iiia.planes.maxsum.centralized;
 
+import es.csic.iiia.maxsum.factors.cardinality.CardinalityFunction;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.cli.Configuration;
 
 /**
  * Cost function factory that builds K-Alpha functions (with fixed k and alpha
  * taken from the simulator's configuration).
- * 
+ *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
 public class KAlphaFactory implements WorkloadFunctionFactory {
 
     @Override
-    public WorkloadFunction build(Plane plane) {
+    public CardinalityFunction build(Plane plane) {
         Configuration c = plane.getWorld().getFactory().getConfiguration();
         return new KAlphaFunction(c.getMsWorkloadK(), c.getMsWorkloadAlpha());
     }

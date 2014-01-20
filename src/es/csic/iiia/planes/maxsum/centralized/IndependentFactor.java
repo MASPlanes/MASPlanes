@@ -37,33 +37,17 @@
 package es.csic.iiia.planes.maxsum.centralized;
 
 /**
- * Factor representing an independent cost for each of its constituent
- * variables.
+ * Factor representing an independent cost for each of its constituent variables.
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class IndependentFactor extends CostFactor {
+public class IndependentFactor<T> extends es.csic.iiia.maxsum.factors.IndependentFactor<T>
+    implements CostFactor<T>
+{
 
-    /**
-     * This factor ignores incoming messages, so the gather phase is empty.
-     */
     @Override
-    public void gather() {
-
-    }
-
-    /**
-     * Run an iteration of this factor.
-     *
-     * In this case, this amounts to sending the cost associated to each
-     * of its neighbors out.
-     */
-    @Override
-    public void scatter() {
-        for (Factor f : getNeighbors()) {
-            Message message = new Message(this, getCost(f));
-            send(message, f);
-        }
+    public String toString() {
+        return "Independent" + getIdentity();
     }
 
 }

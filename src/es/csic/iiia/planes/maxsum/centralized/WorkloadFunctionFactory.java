@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.maxsum.centralized;
 
+import es.csic.iiia.maxsum.factors.cardinality.CardinalityFunction;
 import es.csic.iiia.planes.Plane;
 
 /**
@@ -53,6 +54,6 @@ public interface WorkloadFunctionFactory {
      * @param plane Plane that will employ this workload function.
      * @return newly built workload function.
      */
-    public WorkloadFunction build(Plane plane);
+    public CardinalityFunction build(Plane plane);
 
 }

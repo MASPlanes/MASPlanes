@@ -44,39 +44,21 @@ import es.csic.iiia.planes.messaging.AbstractMessage;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class MSMessage<LocalType, RemoteType> extends AbstractMessage {
+public class MSMessage extends AbstractMessage {
 
-    private LocalType logicalSender;
-    private RemoteType logicalRecipient;
-    private final double value;
+    public final FactorID senderFactor;
+    public final FactorID recipientFactor;
+    public final double value;
 
-    public MSMessage(double value) {
+    public MSMessage(FactorID sender, FactorID recipient, double value) {
+        this.senderFactor = sender;
+        this.recipientFactor = recipient;
         this.value = value;
-    }
-
-    public double getValue() {
-        return value;
-    }
-
-    public LocalType getLogicalSender() {
-        return logicalSender;
-    }
-
-    public void setLogicalSender(LocalType logicalSender) {
-        this.logicalSender = logicalSender;
-    }
-
-    public RemoteType getLogicalRecipient() {
-        return logicalRecipient;
-    }
-
-    public void setLogicalRecipient(RemoteType logicalRecipient) {
-        this.logicalRecipient = logicalRecipient;
     }
 
     @Override
     public String toString() {
-        return logicalSender + "[" + getSender() + "] -> " + logicalRecipient + "[" + getRecipient() + "] : " + getValue();
+        return senderFactor + "[" + getSender() + "] -> " + recipientFactor + "[" + getRecipient() + "] : " + value;
     }
 
 }

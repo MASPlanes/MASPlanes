@@ -36,9 +36,13 @@
  */
 package es.csic.iiia.planes.maxsum.distributed;
 
+import es.csic.iiia.maxsum.Factor;
+import es.csic.iiia.maxsum.factors.SelectorFactor;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.maxsum.centralized.CostFactor;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
@@ -69,44 +73,25 @@ public class MSExecutionBehavior extends AbstractBehavior<MSPlane> {
      *
      * @param msg message to collect.
      */
-    public void on(MSPlane2Task msg) {
-        MSTaskNode recipient = getAgent().getTaskFunction(msg.getLogicalRecipient());
-        if (recipient == null) {
-            if (getAgent().getTasks().contains(msg.getLogicalRecipient())) {
-                throw new RuntimeException("Unreachable code.");
-            }
-        } else {
-            recipient.receive(msg);
-        }
-    }
-
-    /**
-     * Collect {@link MSTask2Plane} messages destined to this plane.
-     *
-     * @param msg message to collect.
-     */
-    public void on(MSTask2Plane msg) {
-        getAgent().getPlaneFunction().receive(msg);
-    }
-
-    /**
-     * Every logical node that is running within this plane executes a single
-     * iteration of the max-sum algorithm.
-     */
-    @Override
-    public void afterMessages() {
-        final long remainder = getAgent().getWorld().getTime() % getConfiguration().getMsStartEvery();
-        if (getAgent().isInactive() || remainder < 1 || remainder > getConfiguration().getMsIterations()) {
+    public void on(MSMessage msg) {
+        Factor<FactorID> f = getAgent().getFactor(msg.recipientFactor);
+        if (f == null) {
+            LOG.log(Level.FINER, "Factor {0} does not exist in {1}. Recently completed?", new Object[]{msg.recipientFactor, getAgent()});
             return;
         }
+        f.receive(msg.value, msg.senderFactor);
+    }
 
-        final MSPlaneNode variable = getAgent().getPlaneFunction();
-        final Map<Task, MSTaskNode> functions = getAgent().getTaskFunctions();
+    @Override
+    public void afterMessages() {
+        final MSPlane plane = getAgent();
 
-        // Everyone gather
-        variable.gather();
-        for (MSTaskNode f : functions.values()) {
-            f.gather();
+        // Update costs according to the current positions
+        final CostFactor<FactorID> planeFactor = plane.getPlaneFactor();
+        for (FactorID id : planeFactor.getNeighbors()) {
+            LOG.log(Level.FINEST, "{0}''s potential for {1}: {2}",
+                    new Object[]{plane, id.task, plane.getCost(id.task)});
+            planeFactor.setPotential(id, plane.getCost(id.task));
         }
     }
 
@@ -117,16 +102,14 @@ public class MSExecutionBehavior extends AbstractBehavior<MSPlane> {
             return;
         }
 
-        final MSPlaneNode variable = getAgent().getPlaneFunction();
-        final Map<Task, MSTaskNode> functions = getAgent().getTaskFunctions();
+        final CostFactor<FactorID> planeFactor = getAgent().getPlaneFactor();
+        final Map<FactorID, SelectorFactor<FactorID>> taskFactors = getAgent().getTaskFactors();
 
-        // Everyone scatter
-        variable.scatter();
-        for (MSTaskNode f : functions.values()) {
-            f.scatter();
+        // Everyone run
+        planeFactor.run();
+        for (SelectorFactor<FactorID> f : taskFactors.values()) {
+            f.run();
         }
     }
-
-
 
 }

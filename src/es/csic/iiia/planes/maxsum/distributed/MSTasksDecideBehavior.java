@@ -36,9 +36,9 @@
  */
 package es.csic.iiia.planes.maxsum.distributed;
 
+import es.csic.iiia.maxsum.factors.SelectorFactor;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
-import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Plane;
 import java.util.List;
 import java.util.logging.Level;
@@ -98,9 +98,16 @@ public class MSTasksDecideBehavior extends AbstractBehavior<MSPlane> {
         List<Task> tasks = p.getTasks();
         for (int i=tasks.size()-1; i>=0; i--) {
             final Task t = tasks.get(i);
-            final MSTaskNode f = p.getTaskFunction(t);
-            final Plane choice = f.makeDecision();
-            LOG.log(Level.FINE, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f, choice, getAgent().getWorld().getTime(), getAgent()});
+            final SelectorFactor<FactorID> f = p.getTaskFactor(t);
+            if (f.select() == null && f.getNeighbors().size() < 2) {
+                LOG.log(Level.FINE, "{0} does not like any plane?!", t);
+                continue;
+            } else if (f.select() == null) {
+                LOG.log(Level.SEVERE, "{0} does not like any plane?!", t);
+                continue;
+            }
+            final Plane choice = f.select().plane;
+            LOG.log(Level.FINER, "[{2}] {0} chooses {1} (inside {3})", new Object[]{f, choice, getAgent().getWorld().getTime(), getAgent()});
             if (choice != p && choice != null) {
                 relocateTask(t, choice);
             }

@@ -36,8 +36,7 @@
  */
 package es.csic.iiia.planes.maxsum.centralized;
 
-import java.util.HashMap;
-import java.util.Map;
+import es.csic.iiia.maxsum.Factor;
 
 /**
  * Skeletal factor that includes an independent cost for each of the variables
@@ -45,39 +44,28 @@ import java.util.Map;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public abstract class CostFactor extends AbstractFactor {
-
-    private Map<Factor, Double> potential = new HashMap<Factor, Double>();
+public interface CostFactor<T> extends Factor<T> {
 
     /**
      * Remove all potential costs.
      */
-    public void clearCosts() {
-        potential.clear();
-    }
+    public void clearPotentials();
 
     /**
      * Get the cost of activating the variable shared with the given factor.
      *
-     * @param f factor to consider
-     * @return cost of activating the given factor
+     * @param f neighbor to consider
+     * @return cost of activating the given neighbor
      */
-    public double getCost(Factor f) {
-        if (!potential.containsKey(f)) {
-            throw new IllegalArgumentException("Requested potential for a non-existant factor");
-        }
-        return potential.get(f);
-    }
+    public double getPotential(T f);
 
     /**
      * Remove the cost associated to activating the given factor.
      *
-     * @param f factor to consider
+     * @param f neighbor to consider
      * @return previous cost of activating the given factor
      */
-    public Double removeCost(Factor f) {
-        return potential.remove(f);
-    }
+    public Double removePotential(T f);
 
     /**
      * Set the independent cost of activating the variable that corresponds to
@@ -87,8 +75,6 @@ public abstract class CostFactor extends AbstractFactor {
      *               variable
      * @param value
      */
-    public void setPotential(Factor factor, double value) {
-        potential.put(factor, value);
-    }
+    public void setPotential(T neighbor, double value);
 
 }

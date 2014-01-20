@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.cli;
 
+import es.csic.iiia.maxsum.Factor;
 import it.univr.ia.planes.dsa.DSAPlane;
 import es.csic.iiia.planes.Battery;
 import es.csic.iiia.planes.DefaultBattery;
@@ -141,7 +142,7 @@ public final class Configuration {
     /**
      * Class of the evaluation strategy used by the planes in this simulation.
      */
-    private Class<? extends EvaluationStrategy> evaluationClass;
+    private Class<? extends EvaluationStrategy<Plane>> evaluationClass;
 
     /* AUCTIONS specific stuff */
     private int aucEvery;
@@ -151,7 +152,7 @@ public final class Configuration {
     private int msStartEvery;
     private double msWorkloadK;
     private double msWorkloadAlpha;
-    
+
     /* DSA specific stuff */
     private int dsaIterations;
     private int dsaEvery;
@@ -161,7 +162,7 @@ public final class Configuration {
     private String dsaEvaluationFunction;
 
     private LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
-    private CostFactorFactory msCostFactorFactory;
+    private CostFactorFactory<Factor<?>> msCostFactorFactory;
     private WorkloadFunctionFactory msWorkloadFunctionFactory;
 
     private <T> T fetch(Properties settings, Map<String, T> map, String key) {
@@ -243,41 +244,43 @@ public final class Configuration {
                 }
             }
         }
-        
+
         // DSA settings
         if (values.get("planes").equals("dsa")) {
             dsaIterations = Integer.valueOf(settings.getProperty("dsa-iterations"));
             values.put("dsa-iterations", String.valueOf(dsaIterations));
-            
+
             dsaEvery = Integer.valueOf(settings.getProperty("dsa-every"));
             values.put("dsa-every", String.valueOf(dsaEvery));
-            if(dsaEvery <= dsaIterations)
+            if(dsaEvery <= dsaIterations) {
                 throw new IllegalArgumentException("dsa-iterations must be < dsa-every");
-            
+            }
+
             dsaP = Double.valueOf(settings.getProperty("dsa-p"));
             values.put("dsa-p", String.valueOf(dsaP));
-            if(dsaP < 0 ||dsaP > 1)
+            if(dsaP < 0 ||dsaP > 1) {
                 throw new IllegalArgumentException("dsa-p must be between 0 and 1.");
-            
+            }
+
             dsaEvaluationFunction = settings.getProperty("dsa-planes-function");
             if(dsaEvaluationFunction.equals("workload")){
-                
+
                 values.put("dsa-planes-function", dsaEvaluationFunction);
-                
+
                 dsaWorkloadK = Double.valueOf(settings.getProperty("dsa-workload-k"));
                 values.put("dsa-workload-k", String.valueOf(dsaWorkloadK));
-                
+
                 dsaWorkloadAlpha = Double.valueOf(settings.getProperty("dsa-workload-alpha"));
                 values.put("dsa-workload-alpha", String.valueOf(dsaWorkloadAlpha));
-   
+
             }
             else {
                 if(dsaEvaluationFunction.equals("pathcost")) {
                     values.put("dsa-planes-function", dsaEvaluationFunction);
-                }    
+                }
                 else {
                     throw new IllegalArgumentException("Two possible type of dsa function used to represent plane's preferences: pathcost or workload.");
-            
+
                 }
             }
         }
@@ -287,8 +290,8 @@ public final class Configuration {
     @Override
     public String toString() {
         StringBuilder buf = new StringBuilder("###### Settings:\n");
-        for (String key : getValues().keySet()) {
-            buf.append("# ").append(key).append(" = ").append(getValues().get(key)).append("\n");
+        for (String key : values.keySet()) {
+            buf.append("# ").append(key).append(" = ").append(values.get(key)).append("\n");
         }
 
         return buf.toString();
@@ -360,7 +363,7 @@ public final class Configuration {
     /**
      * @return the evaluationClass
      */
-    public Class<? extends EvaluationStrategy> getEvaluationClass() {
+    public Class<? extends EvaluationStrategy<Plane>> getEvaluationClass() {
         return evaluationClass;
     }
 
@@ -400,16 +403,9 @@ public final class Configuration {
     }
 
     /**
-     * @return the values
-     */
-    public LinkedHashMap<String, String> getValues() {
-        return values;
-    }
-
-    /**
      * @return the CostFactor factory
      */
-    public CostFactorFactory getMsCostFactorFactory() {
+    public CostFactorFactory<Factor<?>> getMsCostFactorFactory() {
         return msCostFactorFactory;
     }
 
@@ -452,7 +448,7 @@ public final class Configuration {
     public String getDsaEvaluationFunction() {
         return dsaEvaluationFunction;
     }
-    
+
 
     private Map<String, OperatorStrategy> getOperatorStrategies() {
         return new HashMap<String, OperatorStrategy>() {{
@@ -501,8 +497,8 @@ public final class Configuration {
         }};
     }
 
-    private Map<String, Class<? extends EvaluationStrategy>> getEvaluationClasses() {
-        return new HashMap<String, Class<? extends EvaluationStrategy>>() {{
+    private Map<String, Class<? extends EvaluationStrategy<Plane>>> getEvaluationClasses() {
+        return new HashMap<String, Class<? extends EvaluationStrategy<Plane>>>() {{
            put("independent-distance", IndependentDistanceEvaluation.class);
            put("independent-distance-battery", IndependentDistanceBatteryEvaluation.class);
         }};
@@ -519,10 +515,10 @@ public final class Configuration {
         }};
     }
 
-    private Map<String, CostFactorFactory> getCostFactorFactories() {
-        return new HashMap<String, CostFactorFactory>() {{
-           put("independent", new IndependentFactory());
-           put("workload", new WorkloadFactory());
+    private Map<String, CostFactorFactory<Factor<?>>> getCostFactorFactories() {
+        return new HashMap<String, CostFactorFactory<Factor<?>>>() {{
+           put("independent", new IndependentFactory<Factor<?>>());
+           put("workload", new WorkloadFactory<Factor<?>>());
         }};
     }
 

@@ -36,11 +36,13 @@
  */
 package es.csic.iiia.planes.maxsum.distributed;
 
+import es.csic.iiia.maxsum.factors.SelectorFactor;
 import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 import es.csic.iiia.planes.cli.Configuration;
+import es.csic.iiia.planes.maxsum.centralized.CostFactor;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -107,10 +109,10 @@ class MSUpdateGraphBehavior extends AbstractBehavior<MSPlane> {
         }
 
         // Cleanup the previous graph
-        final MSPlaneNode pn = plane.getPlaneFunction();
-        pn.clearNeighbors();
+        final CostFactor<FactorID> pf = plane.getPlaneFactor();
+        pf.clearNeighbors();
         for (Task t : plane.getTasks()) {
-            MSTaskNode f = plane.getTaskFunction(t);
+            SelectorFactor<FactorID> f = plane.getTaskFactor(t);
             f.clearNeighbors();
         }
 
@@ -123,13 +125,12 @@ class MSUpdateGraphBehavior extends AbstractBehavior<MSPlane> {
             neighbors.add(p);
 
             for (Task t : p.getTasks()) {
-                pn.addNeighbor(t, p);
+                pf.addNeighbor(new FactorID(p, t));
                 nPendingTasks++;
             }
 
             for (Task t : plane.getTasks()) {
-                MSTaskNode f = plane.getTaskFunction(t);
-                f.addNeighbor(p);
+                plane.getTaskFactor(t).addNeighbor(new FactorID(p));
             }
 
             if (LOG.isLoggable(Level.FINEST)) {
@@ -143,10 +144,9 @@ class MSUpdateGraphBehavior extends AbstractBehavior<MSPlane> {
 
         if (LOG.isLoggable(Level.FINEST)) {
             for (Task t : plane.getTasks()) {
-                MSTaskNode f = plane.getTaskFunction(t);
-                LOG.log(Level.FINEST, "Task factor: {0}", f);
+                LOG.log(Level.FINEST, "Task factor: {0}", plane.getTaskFactor(t));
             }
-            LOG.log(Level.FINEST, "Plane factor: {0}", pn);
+            LOG.log(Level.FINEST, "Plane factor: {0}", pf);
         }
     }
 

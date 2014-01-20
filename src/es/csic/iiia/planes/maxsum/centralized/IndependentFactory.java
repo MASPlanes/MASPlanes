@@ -43,11 +43,11 @@ import es.csic.iiia.planes.Plane;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public class IndependentFactory implements CostFactorFactory {
+public class IndependentFactory<T> implements CostFactorFactory<T> {
 
     @Override
-    public CostFactor build(Plane plane) {
-        return new IndependentFactor();
+    public CostFactor<T> build(Plane plane) {
+        return new IndependentFactor<T>();
     }
 
 }

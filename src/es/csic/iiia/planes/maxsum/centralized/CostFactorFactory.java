@@ -48,7 +48,7 @@ import es.csic.iiia.planes.World;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-public interface CostFactorFactory {
+public interface CostFactorFactory<T> {
 
     /**
      * Build a new {@link CostFactor}
@@ -62,6 +62,6 @@ public interface CostFactorFactory {
      * @param plane plane that this CostFactor represents
      * @return newly build CostFactor.
      */
-    public CostFactor build(Plane plane);
-    
+    public CostFactor<T> build(Plane plane);
+
 }
