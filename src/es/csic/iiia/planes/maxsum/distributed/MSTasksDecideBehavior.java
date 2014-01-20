@@ -99,11 +99,8 @@ public class MSTasksDecideBehavior extends AbstractBehavior<MSPlane> {
         for (int i=tasks.size()-1; i>=0; i--) {
             final Task t = tasks.get(i);
             final SelectorFactor<FactorID> f = p.getTaskFactor(t);
-            if (f.select() == null && f.getNeighbors().size() < 2) {
+            if (f.select() == null) {
                 LOG.log(Level.FINE, "{0} does not like any plane?!", t);
-                continue;
-            } else if (f.select() == null) {
-                LOG.log(Level.SEVERE, "{0} does not like any plane?!", t);
                 continue;
             }
             final Plane choice = f.select().plane;
