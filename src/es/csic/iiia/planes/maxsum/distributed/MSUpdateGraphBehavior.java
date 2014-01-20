@@ -53,7 +53,7 @@ import java.util.logging.Logger;
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
-class MSUpdateGraphBehavior extends AbstractBehavior<MSPlane> {
+public class MSUpdateGraphBehavior extends AbstractBehavior<MSPlane> {
     private static final Logger LOG = Logger.getLogger(MSUpdateGraphBehavior.class.getName());
 
     private NeighborTracking tracker;

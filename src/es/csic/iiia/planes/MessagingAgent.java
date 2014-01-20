@@ -36,8 +36,6 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.Agent;
-import es.csic.iiia.planes.Positioned;
 import es.csic.iiia.planes.messaging.Message;
 
 /**

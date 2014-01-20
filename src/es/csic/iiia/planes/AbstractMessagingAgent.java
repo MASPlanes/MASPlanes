@@ -36,19 +36,8 @@
  */
 package es.csic.iiia.planes;
 
-import es.csic.iiia.planes.messaging.*;
-import es.csic.iiia.planes.AbstractPositionedElement;
-import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.behaviors.Behavior;
-import es.csic.iiia.planes.util.DependencyResolver;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.apache.commons.collections.map.MultiKeyMap;
 
 /**
  * Skeletal implementation of a messaging agent.

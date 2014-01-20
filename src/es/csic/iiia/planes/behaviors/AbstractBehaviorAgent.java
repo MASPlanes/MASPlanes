@@ -248,11 +248,6 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
         final Class bClass = b.getClass();
         final Class mClass = m.getClass();
 
-        // Skip messages intended for other agents
-        if (m.getRecipient() != null && m.getRecipient() != this) {
-            return;
-        }
-
         // Memoize the method
         Method method;
         if (cache.containsKey(bClass, mClass)) {
