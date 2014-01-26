@@ -72,6 +72,7 @@ public class PlaneDrawer implements Drawable {
     private Font batteryFont;
     private Stroke planeStroke;
     private Stroke pastLocationsStroke;
+    private Stroke radiusStroke;
 
     public PlaneDrawer(Plane p) {
         this.plane = p;
@@ -86,6 +87,7 @@ public class PlaneDrawer implements Drawable {
         batteryFont = new Font(Font.SANS_SERIF, Font.BOLD, scale(160));
         planeStroke = new BasicStroke(.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND);
         pastLocationsStroke = new BasicStroke(scale(10f), BasicStroke.CAP_BUTT, BasicStroke.JOIN_BEVEL, 0f, new float[]{scale(100f),scale(100f)}, 0.0f);
+        radiusStroke = new BasicStroke(scale(10f), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND, 0f, new float[]{scale(100f),scale(100f)}, 0.0f);
     }
 
     private int scale(int size) {
@@ -242,6 +244,7 @@ public class PlaneDrawer implements Drawable {
         g.fill(PlaneGraphic.getImage());
 
         // Draw the communication circle
+        g.setStroke(radiusStroke);
         g.setTransform(oldt);
         final int r = (int)plane.getCommunicationRange();
         g.drawOval(x-r, y-r, r*2, r*2);

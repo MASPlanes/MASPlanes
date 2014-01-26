@@ -75,10 +75,10 @@ public class Configuration {
     private HashMap<String, String> generatorSettings = new HashMap<String, String>();
 
     private int[][] colorList = new int[][]{
-        new int[]{0, 0, 0}, new int[]{233, 222, 187}, new int[]{173, 35, 35},
-        new int[]{255, 238, 51}, new int[]{255, 146, 51}, new int[]{255, 205, 243},
-        new int[]{42, 75, 215}, new int[]{29, 105, 20}, new int[]{129, 74, 25},
-        new int[]{129, 38, 192}, new int[]{160, 160, 160}, new int[]{129, 197, 122},
+        new int[]{0, 0, 0}, new int[]{29, 105, 20}, new int[]{173, 35, 35},
+        new int[]{129, 38, 192}, new int[]{255, 146, 51}, new int[]{129, 197, 122},
+        new int[]{42, 75, 215}, new int[]{233, 222, 187}, new int[]{129, 74, 25},
+        new int[]{255, 238, 51}, new int[]{255, 205, 243}, new int[]{160, 160, 160},
         new int[]{157, 175, 255}, new int[]{41, 208, 208}, new int[]{87, 87, 87},
     };
 

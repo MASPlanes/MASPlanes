@@ -43,7 +43,6 @@ import java.awt.Graphics;
 import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Point2D;
-import java.awt.image.BufferedImage;
 import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 

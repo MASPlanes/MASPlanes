@@ -44,15 +44,10 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Image;
 import java.awt.RenderingHints;
-import java.awt.Toolkit;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Line2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageProducer;
-import java.awt.image.MemoryImageSource;
-import java.util.Arrays;
 import javax.swing.JPanel;
 
 /**
@@ -112,7 +107,7 @@ public class TimeHistogramPane extends JPanel {
         Graphics2D g = (Graphics2D) buffer.getGraphics();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
-        g.setColor(new Color(230,230,230));
+        g.setColor(new Color(0,0,0));
         g.fillRect(0, 0, DEFAULT_WIDTH, DEFAULT_HEIGHT);
 //        g.setColor(Color.BLACK);
 //        g.draw(new Line2D.Double(0, 0, DEFAULT_WIDTH, 0));

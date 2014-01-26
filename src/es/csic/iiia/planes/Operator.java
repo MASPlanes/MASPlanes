@@ -39,9 +39,11 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DTask;
 import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.gui.graphics.OperatorGraphic;
 import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -126,6 +128,8 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
     @Override
     public void preStep() {}
 
+    private ArrayList<Task> pendingTasks = new ArrayList<Task>();
+
     /**
      * Single-step advance of this operator.
      *
@@ -135,13 +139,9 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
      */
     @Override
     public void step() {
-        if (!isPlaneInRange()) {
-            return;
-        }
-
         while (nextTaskTime <= getWorld().getTime()) {
             Task t = createTask(tasks.get(nextTask));
-            strategy.submitTask(getWorld(), this, t);
+            pendingTasks.add(t);
 
             tasks.set(nextTask, null);
             nextTask++;
@@ -151,6 +151,13 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
             } else {
                 nextTaskTime = tasks.get(nextTask).getTime();
             }
+        }
+
+        if (isPlaneInRange() && !pendingTasks.isEmpty()) {
+            for (Task t : pendingTasks) {
+                strategy.submitTask(getWorld(), this, t);
+            }
+            pendingTasks.clear();
         }
     }
 
@@ -172,17 +179,22 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
         return t;
     }
 
+    private static OperatorGraphic og = new OperatorGraphic();
     @Override
     public void draw(Graphics2D g) {
         int x = getLocation().getXInt();
         int y = getLocation().getYInt();
 
         Color previous = g.getColor();
+        int dim = (int)(500 * getWorld().getSpace().getWidth() / 10000f);
+        /*
         g.setColor(Color.BLUE);
         int dim = (int)(200 * getWorld().getSpace().getWidth() / 10000f);
-        g.fillOval(x-dim/2, y-dim/2, dim, dim);
+        g.fillOval(x-dim/2, y-dim/2, dim, dim); */
+        og.setDimension(new Dimension(dim,dim));
+        og.paint(g, x-dim/2, y-dim/2);
 
-        g.setColor(new Color(200,200,255,50));
+        g.setColor(new Color(200,200,255,100));
         final int r = (int)getCommunicationRange();
         g.fillOval(x-r, y-r, r*2, r*2);
 

@@ -79,7 +79,6 @@ public class ProportionalLayoutManager implements LayoutManager {
 
     @Override
     public void layoutContainer(Container target) {
-        System.err.println("Laying out " + target);
         synchronized (target.getTreeLock()) {
             Insets insets = target.getInsets();
             int top = insets.top;

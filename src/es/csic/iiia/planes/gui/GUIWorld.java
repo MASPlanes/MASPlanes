@@ -70,7 +70,7 @@ public class GUIWorld extends AbstractWorld {
     private Display display;
     private AffineTransform transform;
     public BlockingQueue<VolatileImage> graphicsQueue = new ArrayBlockingQueue<VolatileImage>(BUFFER_DIMENSION);
-    private int displayEvery = 100;
+    private double displayEvery = 100;
     public final Object displayEveryLock;
     private int steps = 0;
 
@@ -85,7 +85,10 @@ public class GUIWorld extends AbstractWorld {
         displayStep();
     }
 
-
+    @Override
+    public void computeStep() {
+        super.computeStep();
+    }
 
     @Override public void init(DProblem d) {
         super.init(d);
@@ -95,7 +98,7 @@ public class GUIWorld extends AbstractWorld {
     protected void displayStep() {
 
         synchronized(displayEveryLock) {
-            while(displayEvery <= 0) {
+            while(displayEvery == 0) {
                 try {
                     displayEveryLock.wait();
                 } catch (InterruptedException ex) {
@@ -103,7 +106,11 @@ public class GUIWorld extends AbstractWorld {
                 }
             }
 
-            if (++steps >= displayEvery) {
+            if (displayEvery < 1) {
+                try {
+                    displayEveryLock.wait((int)(100 - 100*displayEvery));
+                } catch (InterruptedException ex) {}
+            } else if (++steps >= displayEvery) {
                 steps = 0;
             } else {
                 return;
@@ -215,7 +222,7 @@ public class GUIWorld extends AbstractWorld {
         return selectedPlane;
     }
 
-    void setDisplayEvery(int speed) {
+    void setDisplayEvery(double speed) {
         synchronized (displayEveryLock) {
             displayEvery = speed;
             displayEveryLock.notify();

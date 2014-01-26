@@ -51,7 +51,7 @@ public class StationGraphic {
     private static GeneralPath instance = null;
 
     /**
-     * Get the icon of the chargin stations as a java awt Polygon.
+     * Get the icon of the charging stations as a java awt Polygon.
      *
      * @return charging stations' icon.
      */

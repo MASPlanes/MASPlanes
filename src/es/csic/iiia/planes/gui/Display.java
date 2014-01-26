@@ -46,11 +46,12 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -66,8 +67,8 @@ import javax.swing.event.ChangeListener;
  */
 public class Display extends JFrame {
 
-    private static int DEFAULT_WIDTH = 500;
-    private static int DEFAULT_HEIGHT = 500;
+    private static int DEFAULT_WIDTH = 250;
+    private static int DEFAULT_HEIGHT = 250;
 
     private static double BOUND = 1e5 / Math.exp(Math.sqrt(100));
 
@@ -76,6 +77,7 @@ public class Display extends JFrame {
     private JLabel time;
     private final JLayeredPane layers;
     private final TaskDistributionPane tasksPane;
+    private final BackgroundPane backgroundPane;
     private Color[] colors;
     private final TimeHistogramPane histogramPane;
     private final DProblem problemDefinition;
@@ -101,12 +103,18 @@ public class Display extends JFrame {
         layers.add(displayPane);
 
         tasksPane = new TaskDistributionPane(this, problemDefinition);
-        tasksPane.setBackground(Color.WHITE);
+        tasksPane.setOpaque(false);
         tasksPane.setBounds(new Rectangle(d));
-        tasksPane.setOpaque(true);
         layers.add(tasksPane);
 
+        backgroundPane = new BackgroundPane();
+        backgroundPane.setBackground(Color.WHITE);
+        backgroundPane.setBounds(new Rectangle(d));
+        layers.add(backgroundPane);
+
         histogramPane = new TimeHistogramPane(this, problemDefinition);
+        histogramPane.setOpaque(true);
+        histogramPane.setBackground(Color.WHITE);
         histogramPane.setPreferredSize(new Dimension(d.width, TimeHistogramPane.DEFAULT_HEIGHT));
         root.add(histogramPane, BorderLayout.SOUTH);
 
@@ -124,7 +132,7 @@ public class Display extends JFrame {
 
         JLabel l = new JLabel("Speed: ");
         top.add(l);
-        JSlider s = new JSlider(0, 100, 10);
+        JSlider s = new JSlider(-1, 100, 0);
         s.addChangeListener(new ChangeListener() {
             @Override
             public void stateChanged(ChangeEvent ce) {
@@ -134,9 +142,24 @@ public class Display extends JFrame {
                 }
             }
         });
-        setSpeed(10);
-
+        setSpeed(-1);
         top.add(s);
+
+        JButton stepButton = new JButton("Step");
+        stepButton.addActionListener(new AbstractAction("Step") {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                setSpeed(0);
+                synchronized(world.displayEveryLock) {
+                    try {
+                        world.displayEveryLock.wait(100);
+                    } catch (InterruptedException ex) {}
+                }
+                setSpeed(-1);
+            }
+        });
+        top.add(stepButton);
+
         time = new JLabel("Time: ");
         top.add(time);
 
@@ -158,9 +181,8 @@ public class Display extends JFrame {
     }
 
     private void setSpeed(int speed) {
-        speed = (int)(Math.exp(Math.sqrt(speed)) / BOUND);
-        world.setDisplayEvery(speed);
-        System.err.println("Speed set to " + speed);
+        double s = Math.exp(Math.sqrt(speed)) / BOUND;
+        world.setDisplayEvery(speed >= 0 ? s : 0);
     }
 
     public Color getColor(int nCrisis) {
@@ -173,7 +195,7 @@ public class Display extends JFrame {
         colors = new Color[problemDefinition.getnCrisis()];
         for (int i=0; i<problemDefinition.getnCrisis(); i++) {
             Color c = Color.getHSBColor(h, 0.9f, 0.9f);
-            colors[i] = new Color(c.getRed(), c.getGreen(), c.getBlue(), 20);
+            colors[i] = new Color(c.getRed(), c.getGreen(), c.getBlue(), 60);
             h += ratio;
             h %= 1;
         }
@@ -189,7 +211,7 @@ public class Display extends JFrame {
 
     @Override
     public void paint(Graphics grphcs) {
-        time.setText("Time: " + world.getTime());
+        time.setText("Time: " + (world.getTime()/10) + "s");
         super.paint(grphcs);
     }
 }

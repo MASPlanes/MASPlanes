@@ -38,7 +38,9 @@
 package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.gui.Drawable;
+import es.csic.iiia.planes.gui.graphics.TaskGraphic;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics2D;
@@ -109,6 +111,8 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
         return buf.toString();
     }
 
+
+    private static TaskGraphic tg = new TaskGraphic();
     @Override
     public void draw(Graphics2D g) {
         int x = getLocation().getXInt();
@@ -116,10 +120,14 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
 
         Color previous = g.getColor();
         g.setColor(Color.BLUE);
-        int dim = (int)(30 * getWorld().getSpace().getWidth() / 10000f);
-        g.fillOval(x-dim/2, y-dim/2, dim, dim);
+        /*int dim = (int)(30 * getWorld().getSpace().getWidth() / 10000f);
+        g.fillOval(x-dim/2, y-dim/2, dim, dim);*/
 
+        int dim = (int)(200 * getWorld().getSpace().getWidth() / 10000f);
+        tg.setDimension(new Dimension(dim,dim));
+        tg.paint(g, x-dim/2, y-dim/2);
 
+        /*
         Font f = new Font(Font.SANS_SERIF, Font.BOLD, 8);
         String sid = String.valueOf(id);
         g.setFont(f);
@@ -127,7 +135,7 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
         int w = m.stringWidth(sid);
         int h = m.getHeight()-2;
         g.setColor(Color.WHITE);
-        g.drawString(sid, x-(w/2), y+(h/2));
+        g.drawString(sid, x-(w/2), y+(h/2));*/
         g.setColor(previous);
     }
 
