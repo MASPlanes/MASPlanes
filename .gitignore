@@ -1,4 +1,7 @@
-anifest.mf
+MASPlanes.iml
+target
+.idea
+manifest.mf
 build
 dist
 problem
