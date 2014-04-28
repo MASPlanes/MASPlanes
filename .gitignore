@@ -3,6 +3,7 @@ target
 bin
 repo
 .idea
+nbproject
 manifest.mf
 build
 dist
