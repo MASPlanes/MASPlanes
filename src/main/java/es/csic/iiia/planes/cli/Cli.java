@@ -37,16 +37,13 @@
  */
 package es.csic.iiia.planes.cli;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import org.apache.commons.cli.*;
+
+import java.io.*;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
-import org.apache.commons.cli.*;
 
 /**
  * Main class for the CLI interface.
@@ -97,7 +94,7 @@ public class Cli {
 
     private static void showHelp() {
         HelpFormatter formatter = new HelpFormatter();
-        formatter.printHelp("planes [options] <problem>", options);
+        formatter.printHelp("simulator [options] <problem>", options);
         System.exit(1);
     }
 

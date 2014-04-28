@@ -150,7 +150,7 @@
                 <artifactId>maven-assembly-plugin</artifactId>
                 <configuration>
                     <descriptors>
-                        <descriptor>src/main/assembly/all.xml</descriptor>
+                        <descriptor>src/assembly/all.xml</descriptor>
                     </descriptors>
                     <archive>
                         <manifestEntries>
@@ -171,6 +171,34 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>appassembler-maven-plugin</artifactId>
+                <version>1.8</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>assemble</goal>
+                        </goals>
+                    </execution>
+                </executions>
+               <configuration>
+                   <assembleDirectory>${project.basedir}</assembleDirectory>
+                   <licenseHeaderFile>${project.basedir}/LICENSE.TXT</licenseHeaderFile>
+                   <programs>
+                       <program>
+                           <mainClass>es.csic.iiia.planes.cli.Cli</mainClass>
+                           <id>simulator</id>
+                       </program>
+                       <program>
+                           <mainClass>es.csic.iiia.planes.generator.Cli</mainClass>
+                           <id>generator</id>
+                       </program>
+                   </programs>
+               </configuration>
             </plugin>
         </plugins>
     </build>

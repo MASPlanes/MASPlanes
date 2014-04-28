@@ -1,5 +1,7 @@
 MASPlanes.iml
 target
+bin
+repo
 .idea
 manifest.mf
 build
