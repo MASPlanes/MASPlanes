@@ -75,16 +75,20 @@ public class ProgressWorld extends AbstractWorld {
     public void init(DProblem d) {
         super.init(d);
 
-        // ftracker.calibrate(); this may be used some day...
         new Thread(progress).start();
     }
 
     @Override
     public void run() {
-        super.run();
-
-        progressQueue.clear();
-        progress.stop();
+        try {
+            super.run();
+        } catch (Exception e) {
+            System.err.println();
+            e.printStackTrace();
+        } finally {
+            progressQueue.clear();
+            progress.stop();
+        }
     }
 
     /**
