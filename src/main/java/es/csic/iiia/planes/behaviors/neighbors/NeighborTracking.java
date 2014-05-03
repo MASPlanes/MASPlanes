@@ -41,6 +41,7 @@ import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.messaging.AbstractMessage;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +52,7 @@ import java.util.logging.Logger;
  * Additionally, it allows depending behaviors to require that other agents
  * must be guaranteed to stay neighbors for a fixed number of iterations.
  *
- * @see #isNeighbor(es.csic.iiia.planes.messaging.MessagingAgent, int)
+ * @see #isNeighbor(es.csic.iiia.planes.MessagingAgent, int)
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
@@ -59,6 +60,7 @@ public class NeighborTracking extends AbstractBehavior<Plane> {
     private static final Logger LOG = Logger.getLogger(NeighborTracking.class.getName());
 
     private NeighborsCollection neighbors = new NeighborsCollection();
+    private Location lastLocation;
 
     /**
      * Builds a new neighbor tracking behavior.
@@ -67,6 +69,7 @@ public class NeighborTracking extends AbstractBehavior<Plane> {
      */
     public NeighborTracking(Plane agent) {
         super(agent);
+        lastLocation = agent.getLocation();
     }
 
     @Override
@@ -140,8 +143,8 @@ public class NeighborTracking extends AbstractBehavior<Plane> {
 
         // Compute the number of steps that the neighbor is guaranteed to still
         // be in range.
-        LOG.log(Level.FINEST, "My location: {0}, theirs: {1}", new Object[]{getAgent().getLocation(), m.getLocation()});
-        final double d = getAgent().getLocation().getDistance(m.getLocation());
+        LOG.log(Level.FINEST, "My location: {0}, theirs: {1}", new Object[]{lastLocation, m.getLocation()});
+        final double d = lastLocation.getDistance(m.getLocation());
 
         double d_step = getAgent().getSpeed();
         if (neighbor instanceof Plane) {
@@ -176,7 +179,8 @@ public class NeighborTracking extends AbstractBehavior<Plane> {
         if (LOG.isLoggable(Level.FINER)) {
             LOG.log(Level.FINER, "{0} sending beacon.", new Object[]{a});
         }
-        a.send(new TrackingMessage(a.getLocation()));
+        lastLocation = new Location(a.getLocation());
+        a.send(new TrackingMessage(lastLocation));
     }
 
     /**
