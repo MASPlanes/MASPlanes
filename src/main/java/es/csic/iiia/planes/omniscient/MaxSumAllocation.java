@@ -36,29 +36,28 @@
  */
 package es.csic.iiia.planes.omniscient;
 
-import es.csic.iiia.bms.CommunicationAdapter;
 import es.csic.iiia.bms.DirectCommunicationAdapter;
 import es.csic.iiia.bms.Factor;
 import es.csic.iiia.bms.MaxOperator;
 import es.csic.iiia.bms.Minimize;
+import es.csic.iiia.bms.factors.SelectorFactor;
 import es.csic.iiia.planes.MessagingAgent;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.World;
 import es.csic.iiia.planes.maxsum.centralized.CostFactor;
 import es.csic.iiia.planes.maxsum.centralized.CostFactorFactory;
-import es.csic.iiia.bms.factors.SelectorFactor;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
+
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author Marc Pujol <mpujol@iiia.csic.es>
  */
+@SuppressWarnings("unchecked")
 public class MaxSumAllocation extends AbstractAllocationStrategy {
+    private static final Logger LOG = Logger.getLogger(MaxSumAllocation.class.getName());
 
     private final static MaxOperator msOperator = new Minimize();
     private final static DirectCommunicationAdapter commChannel = new DirectCommunicationAdapter();
@@ -91,16 +90,19 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         for (Task t : w.getTasks()) {
             final SelectorFactor<Factor<?>> s = new SelectorFactor<Factor<?>>();
             selectors.put(t, s);
+            init(s);
             factors.add(s);
+            LOG.log(Level.FINEST, "Created {0} for {1}", new Object[]{s, t});
         }
 
         // Create a cost factor for each plane
-        Map<CostFactor<Factor<?>>, OmniscientPlane> cost2plane =
-                new HashMap<CostFactor<Factor<?>>, OmniscientPlane>();
+        Map<CostFactor<Factor<?>>, OmniscientPlane> cost2plane = new HashMap<CostFactor<Factor<?>>, OmniscientPlane>();
         for (OmniscientPlane p : planes) {
             final CostFactor<Factor<?>> c = factory.build(p);
+            init(c);
             factors.add(c);
             cost2plane.put(c, p);
+            LOG.log(Level.FINEST, "Created {0} for {1}", new Object[]{c, p});
 
             // Now link it with all the selectors of the tasks it can see
             for(Task t : visibilityMap.get(p)) {
@@ -108,6 +110,7 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
                 s.addNeighbor(c);
                 c.addNeighbor(s);
                 c.setPotential(s, p.getCost(t));
+                LOG.log(Level.FINEST, "Linked {0} with {1} (p: {2})", new Object[]{c, p, p.getCost(t)});
             }
         }
 
@@ -124,7 +127,15 @@ public class MaxSumAllocation extends AbstractAllocationStrategy {
         reverseMap.clear();
         for (Task t : w.getTasks()) {
             final SelectorFactor s = selectors.get(t);
-            final OmniscientPlane p = cost2plane.get(s.select());
+
+            // Tasks with only one play may not select it due to maxsum's inner workings.
+            Object plane = s.select();
+            if (plane == null && s.getNeighbors().size() == 1) {
+                plane = s.getNeighbors().get(0);
+            }
+
+            // Assign it
+            final OmniscientPlane p = cost2plane.get(plane);
 
             // Assign the plane to this task if its current assignment is
             // none or worse

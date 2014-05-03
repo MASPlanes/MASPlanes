@@ -63,6 +63,13 @@ public class WorkloadFactor<T> extends WeightingFactor<T> implements CostFactor<
 
     @Override
     public String toString() {
+        // The centralized solver uses the object itself as identity, so we need
+        // this check to avoid an infinite recursion.
+        final T identity = getIdentity();
+        if (identity == this) {
+            return super.toString();
+        }
+
         return "Workload" + getIdentity();
     }
 
