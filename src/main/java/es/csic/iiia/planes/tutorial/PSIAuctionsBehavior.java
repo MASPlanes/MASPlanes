@@ -149,4 +149,8 @@ public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
         taskBids.add(bid);
     }
 
+    public void on(ReallocateMessage msg) {
+        getAgent().addTask(msg.getTask());
+    }
+    
 }
