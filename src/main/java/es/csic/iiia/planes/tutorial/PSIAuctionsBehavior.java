@@ -36,14 +36,17 @@
  */
 package es.csic.iiia.planes.tutorial;
 
-import es.csic.iiia.planes.DefaultPlane;
-import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.behaviors.AbstractBehavior;
 
-public class TutorialPlane extends DefaultPlane {
+public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
 
-    public TutorialPlane(Location location) {
-        super(location);
-        addBehavior(new PSIAuctionsBehavior(this));
+    public PSIAuctionsBehavior(TutorialPlane agent) {
+        super(agent);
+    }
+
+    @Override
+    public Class[] getDependencies() {
+        return null;
     }
 
 }
