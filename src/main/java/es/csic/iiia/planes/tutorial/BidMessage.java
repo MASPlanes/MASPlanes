@@ -37,43 +37,24 @@
 package es.csic.iiia.planes.tutorial;
 
 import es.csic.iiia.planes.Task;
-import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.messaging.AbstractMessage;
 
-public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
+public class BidMessage extends AbstractMessage {
 
-    public PSIAuctionsBehavior(TutorialPlane agent) {
-        super(agent);
+    private double cost;
+    private Task task;
+
+    public BidMessage(Task t, double cost) {
+        this.task = t;
+        this.cost = cost;
     }
 
-    @Override
-    public Class[] getDependencies() {
-        return null;
+    public double getCost() {
+        return cost;
     }
 
-    @Override
-    public void afterMessages() {
-        // Open new auctions only once every four steps
-        if (getAgent().getWorld().getTime() % 4 == 0) {
-            openAuctions();
-        }
-    }
-
-    private void openAuctions() {
-        TutorialPlane plane = getAgent();
-        for (Task t : plane.getTasks()) {
-            OpenAuctionMessage msg = new OpenAuctionMessage(t);
-            plane.send(msg);
-        }
-    }
-
-    public void on(OpenAuctionMessage auction) {
-        TutorialPlane plane = getAgent();
-        Task t = auction.getTask();
-
-        double cost = plane.getLocation().distance(t.getLocation());
-        BidMessage bid = new BidMessage(t, cost);
-        bid.setRecipient(auction.getSender());
-        plane.send(bid);
+    public Task getTask() {
+        return this.task;
     }
 
 }
