@@ -57,13 +57,8 @@ public class AuctionPlane extends AbstractPlane {
 
     public AuctionPlane(Location location) {
         super(location);
-    }
-
-    @Override
-    public void initialize() {
         addBehavior(new NeighborTracking(this));
         addBehavior(new AuctionBehavior(this));
-        super.initialize();
     }
 
     @Override
