@@ -39,7 +39,15 @@ package es.csic.iiia.planes.tutorial;
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
+
+    private Map<Task, List<BidMessage>> collectedBids =
+            new HashMap<Task, List<BidMessage>>();
 
     public PSIAuctionsBehavior(TutorialPlane agent) {
         super(agent);
@@ -48,6 +56,11 @@ public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
     @Override
     public Class[] getDependencies() {
         return null;
+    }
+
+    @Override
+    public void beforeMessages() {
+        collectedBids.clear();
     }
 
     @Override
@@ -74,6 +87,20 @@ public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
         BidMessage bid = new BidMessage(t, cost);
         bid.setRecipient(auction.getSender());
         plane.send(bid);
+    }
+
+    public void on(BidMessage bid) {
+        Task t = bid.getTask();
+
+        // Get the list of bids for this task, or create a new list if
+        // this is the first bid for this task.
+        List<BidMessage> taskBids = collectedBids.get(t);
+        if (taskBids == null) {
+            taskBids = new ArrayList<BidMessage>();
+            collectedBids.put(t, taskBids);
+        }
+
+        taskBids.add(bid);
     }
 
 }
