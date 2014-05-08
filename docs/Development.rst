@@ -3,25 +3,14 @@ Development
 ===========
 
 MASPlanes is developed in java, so you will need a Java Development Kit (JDK)
-installed on your system. We recomend the usageof some Integrated Development
-Environment (IDE) to more easily explore, refactor and debug the software. The
-main developers use `Netbeans <http://www.netbeans.org/>`_, so this will be
-the easiest option unless you have a strong preference for another Java IDE.
+installed on your system. We recomend the usage of some Integrated Development
+Environment (IDE) to aid in exploring, refactoring and debuging the software. 
+The main developers use `IntelliJ IDEA <http://www.jetbrains.com/idea/>`_ and
+`Netbeans <http://www.netbeans.org/>`_, but any other Java IDE should work.
 
-
-IDE Setup
----------
-
-If you choose *Netbeans* as your platform, getting setup should be as easy as
-downloading the project to some location in your computer and opening it as a
-Netbeans project.
-
-In case you use another IDE, you can either import the Netbeans project (which
-uses ant as the build tools) or create a new project and setup everything from
-scratch, importing only the sources. If you choose to go this route, keep in
-mind that the ``src`` folder contains regular source code, ``test`` contains
-unit tests, and ``lib`` contains *jar* files of all the dependencies required
-by *MASPlanes*.
+Most java IDEs have excellent support for maven-defined projects, including
+auto-detection and configuration if you just clone the project and open it
+directly from the IDE.
 
 
 Implementing coordination algorithms
@@ -43,6 +32,9 @@ do that yet.
 If you get stuck at some point, remember that the source code is fully
 documented. Don't forget to check the javadocs, they may contain that bit of
 information that you were missing to move forward!
+
+If the javadocs do not help, please open an issue on the github page and we will
+be glad to help you if we can.
 
 
 .. Otherwise, keep reading this document, where we briefly review the major parts
