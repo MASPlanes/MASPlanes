@@ -38,6 +38,7 @@ package es.csic.iiia.planes.tutorial;
 
 import es.csic.iiia.planes.Task;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
+import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,13 +50,21 @@ public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
     private Map<Task, List<BidMessage>> collectedBids =
             new HashMap<Task, List<BidMessage>>();
 
+    private NeighborTracking neighborTracker;
+
     public PSIAuctionsBehavior(TutorialPlane agent) {
         super(agent);
     }
 
     @Override
+    public void initialize() {
+        super.initialize();
+        neighborTracker = getAgent().getBehavior(NeighborTracking.class);
+    }
+
+    @Override
     public Class[] getDependencies() {
-        return null;
+        return new Class[]{NeighborTracking.class};
     }
 
     @Override
@@ -138,6 +147,11 @@ public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
     public void on(BidMessage bid) {
         Task t = bid.getTask();
 
+        // Ignore bids from planes that may run out of range
+        if (!neighborTracker.isNeighbor(bid.getSender(), 1)) {
+            return;
+        }
+
         // Get the list of bids for this task, or create a new list if
         // this is the first bid for this task.
         List<BidMessage> taskBids = collectedBids.get(t);
@@ -152,5 +166,5 @@ public class PSIAuctionsBehavior extends AbstractBehavior<TutorialPlane> {
     public void on(ReallocateMessage msg) {
         getAgent().addTask(msg.getTask());
     }
-    
+
 }

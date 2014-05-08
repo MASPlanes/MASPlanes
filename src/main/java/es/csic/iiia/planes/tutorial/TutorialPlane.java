@@ -38,11 +38,13 @@ package es.csic.iiia.planes.tutorial;
 
 import es.csic.iiia.planes.DefaultPlane;
 import es.csic.iiia.planes.Location;
+import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
 
 public class TutorialPlane extends DefaultPlane {
 
     public TutorialPlane(Location location) {
         super(location);
+        addBehavior(new NeighborTracking(this));
         addBehavior(new PSIAuctionsBehavior(this));
     }
 
