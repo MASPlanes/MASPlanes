@@ -102,9 +102,7 @@ public abstract class AbstractBehaviorAgent extends AbstractMessagingAgent {
         DependencyResolver d = new DependencyResolver();
         for (Behavior v : behaviors) {
             Class[] dependencies = v.getDependencies();
-            if (dependencies != null) {
-                d.add(v.getClass(), dependencies);
-            }
+            d.add(v.getClass(), dependencies);
         }
 
         // Get an ordered list of behavior classes, and construct a new

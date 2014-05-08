@@ -58,17 +58,16 @@ public class DependencyResolver {
         g = new DefaultDirectedGraph<Class, DefaultEdge>(DefaultEdge.class);
     }
 
-    public void add(Class v) {
-        g.addVertex(v);
-    }
-
     public void add(Class v, Class[] dependencies) {
-        this.add(v);
-        for(Class<? extends Behavior> d : dependencies) {
-            if (!g.containsVertex(d)) {
-                g.addVertex(d);
+        g.addVertex(v);
+
+        if (dependencies != null) {
+            for(Class<? extends Behavior> d : dependencies) {
+                if (!g.containsVertex(d)) {
+                    g.addVertex(d);
+                }
+                g.addEdge(d, v);
             }
-            g.addEdge(d, v);
         }
     }
 
