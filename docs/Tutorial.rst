@@ -113,13 +113,13 @@ new entry for our custom plane type:
            put("none", DefaultPlane.class);
            put("maxsum", MSPlane.class);
            put("omniscient", OmniscientPlane.class);
-           put("tutorial"), TutorialPlane.class);
+           put("tutorial", TutorialPlane.class);
         }};
     }
 
 This part is optional, but it is also nice to document that this new type of
 planes is available in the default configuration file. Therefore, we can edit
-the ``es.csic.iiia.planes.cli.settings.properties`` file:
+the ``src/main/resources/es/csic/iiia/planes/cli/settings.properties`` file:
 
 .. sourcecode :: diff
 
@@ -132,20 +132,21 @@ the ``es.csic.iiia.planes.cli.settings.properties`` file:
      
      # Type of the battery used by the planes.
 
-Recompile the project, and check that your changes are actually effective:
+Recompile the project with ``mvn package``, and check that your changes are
+actually effective:
 
 1. If you updated the default settings file, check that the changes are shown
    when you dump the default settings file:
    
    .. code:: bash
     
-    java -jar dist/MASPlanes.jar -d
+    sh bin/simulator -d
 
 2. Then, run the simulator with your shiny new planes instead of the default ones:
    
    .. code:: bash
 
-    java -jar dist/MASPlanes.jar -o planes=tutorial problem.json -g
+    sh bin/simulator -o planes=tutorial problem.json -g
 
 If everything went well, the simulation should work normally, but the planes
 shouldn't be coordinating at all. Thus, the operator allocates tasks to
@@ -212,19 +213,20 @@ will explain later on. Before expanding this behavior, let's actually make our
 planes use it. Since we used the ``AbstractPlane`` as a base class for our
 ``TutorialPlane``, it is now very easy to incorporate a behavior to our
 planes. In fact, we only have to call the ``addBehavior(Behavior)`` method.
-Due to how behaviors are implemented, you should always add them in the
-plane's initialization function, and call the ``super.initialize()`` function
-only **after** the behaviors are added. In this case, edit the
-``TutorialPlane`` class and override its initialization method, adding our new
-behavior:
+Due to how behaviors are implemented, must always add them in the
+plane's constructor. In this case, edit the ``TutorialPlane`` class and 
+add the behavior to the constructor:
 
-.. sourcecode :: java
+.. sourcecode :: diff
 
-    @Override
-    public void initialize() {
-        addBehavior(new PSIAuctionsBehavior(this));
-        super.initialize();
-    }
+    @@ -43,6 +43,7 @@ public class TutorialPlane extends DefaultPlane {
+     
+         public TutorialPlane(Location location) {
+             super(location);
+    +        addBehavior(new PSIAuctionsBehavior(this));
+         }
+     
+     }
 
 Our planes will now execute the ``PSIAuctionBehavior``, performing any actions
 defined in their action methods and reacting to messages appropiately.
@@ -462,13 +464,23 @@ existing one:
     }
 
 The new code calls a function that we have yet to implement. Hence, we also
-need to add the following methods to our ``PSIAuctionBehavior`` class:
+need to add the following code to our ``PSIAuctionBehavior`` class:
 
 .. sourcecode:: java
 
     private void computeAuctionWinners() {
         for (Task t : collectedBids.keySet()) {
             BidMessage winner = computeAuctionWinner(collectedBids.get(t));
+            reallocateTask(winner);
+        }
+    }
+
+    private void computeAuctionWinners() {
+        // For each auction we opened
+        for (Task t : collectedBids.keySet()) {
+            // Determine the winner
+            BidMessage winner = computeAuctionWinner(collectedBids.get(t));
+            // Reallocate the task 
             reallocateTask(winner);
         }
     }
@@ -485,23 +497,6 @@ need to add the following methods to our ``PSIAuctionBehavior`` class:
         }
 
         return winner;
-    }
-
-    private void reallocateTask(BidMessage winner) {
-        TutorialPlane plane = getAgent();
-        
-        // No need to reallocate when the task is already ours
-        if (winner.getSender() == plane) {
-            return;
-        }
-
-        // Remove the task from our list of pending tasks
-        plane.removeTask(winner.getTask());
-        
-        // Send it to the auction's winner
-        ReallocateMessage msg = new ReallocateMessage(winner.getTask());
-        msg.setRecipient(winner.getSender());
-        plane.send(msg);
     }
 
 Although this is a big chunk of code, it should be pretty self-explanatory.
@@ -537,17 +532,19 @@ Testing
 First of all, we will visually inspect what the planes are doing with a simple
 scenario. If there's some problem in the coordination front, we should see the
 planes behaving erratically, not exchanging tasks, or something else
-noticeable enough. Focus on trying to see whether planes successfully
-reallocate tasks as you would expect them to::
+noticeable enough. Hence, we compile the project with `mvn package` and run
+a simulation with the GUI enabled to observe what our planes are doing.
+Focus on trying to see whether planes successfully reallocate tasks as 
+you would expect them to::
 
-    java -jar dist/MASPlanes.jar -oplanes=tutorial scenarios/short-hotspots-3planes.json -g
+    sh bin/simulator -oplanes=tutorial scenarios/short-hotspots-3planes.json -g
 
 If you followed the tutorial, planes should be behaving as expected. That's
 pretty good, but we should test a little bit more before resting. Let's start
 by letting the simulator run this whole small scenario until the end (we
 disable the gui so that it runs faster)::
 
-    java -jar dist/MASPlanes.jar -oplanes=tutorial scenarios/short-hotspots-3planes.json
+    sh bin/simulator -oplanes=tutorial scenarios/short-hotspots-3planes.json
 
 After a short while, you should see no errors and get the simulation results.
 If the simulator finishes without any error, this means that all tasks have
@@ -559,7 +556,7 @@ that we have been careful enough to avoid anything like that happening.
 However, check what happens when we use our shiny new planes in a longer, more
 intricate scenario::
 
-    java -jar dist/MASPlanes.jar -o planes=tutorial scenarios/long-uniform.json
+    sh bin/simulator -o planes=tutorial scenarios/long-uniform.json
 
 We get no java errors, so we have no code problems. Despite that, if you let
 it run long enough, you will see a very strange thing happening: the
@@ -577,7 +574,7 @@ interesting to discover specifically which tasks are those. Luckily, we can do
 that easily by using the GUI. Let's launch the simulation again, but now with
 the GUI enabled::
 
-   java -jar dist/MASPlanes.jar -o planes=tutorial scenarios/long-uniform.json -g
+   sh bin/simulator -o planes=tutorial scenarios/long-uniform.json -g
 
 Increase the simulation speed to the maximum possible. Now, if we wait long
 enough, we will see some small blue dots appearing throughout the screen.
@@ -627,14 +624,13 @@ behavior to the ``TutorialPlane`` class, by modifying its ``initialize()``
 method (remember that behaviors must be added **before** calling the parent
 ``initialize()``):
 
-.. sourcecode:: java
+.. sourcecode:: diff
 
-    @Override
-    public void initialize() {
-        addBehavior(new NeighborTracking(this));
-        addBehavior(new PSIAuctionBehavior(this));
-        super.initialize();
-    }
+     public TutorialPlane(Location location) {
+         super(location);
+    +    addBehavior(new NeighborTracking(this));
+         addBehavior(new PSIAuctionsBehavior(this));
+     }
 
 Next, we have to declare that our behavior needs the neighbor tracking one.
 This can be easily done by changing the ``getDependencies()`` method of our
