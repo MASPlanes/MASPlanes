@@ -62,12 +62,13 @@ import org.codehaus.jackson.map.ObjectMapper;
  */
 public class Generator {
 
-    private Configuration config;
+    private final Configuration config;
 
-    private Random r = new Random();
+    private final Random r;
 
     public Generator(Configuration config) {
         this.config = config;
+        this.r = new Random(config.getRandom_seed());
     }
 
     /**

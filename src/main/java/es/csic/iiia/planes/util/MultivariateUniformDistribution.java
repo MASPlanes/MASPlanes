@@ -59,7 +59,7 @@ public class MultivariateUniformDistribution extends AbstractMultivariateRealDis
 
         distributions = new UniformRealDistribution[n_vars];
         for (int i=0; i<n_vars; i++) {
-            distributions[i] = new UniformRealDistribution(lowers[i], uppers[i]);
+            distributions[i] = new UniformRealDistribution(random, lowers[i], uppers[i]);
         }
     }
 

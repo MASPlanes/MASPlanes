@@ -121,6 +121,7 @@ public class HotspotFactory implements TaskDistributionFactory {
                 {0, factor}
             });
             covDistribution = new InverseWishartDistribution(m, config.getHotspotFreedomDegrees());
+            covDistribution.reseedRandomGenerator(r.nextLong());
         }
 
         double[] means = new double[]{

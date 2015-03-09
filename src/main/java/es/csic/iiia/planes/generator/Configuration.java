@@ -52,6 +52,7 @@ import java.util.logging.Logger;
  */
 public class Configuration {
 
+    private long random_seed;
     private long duration;
     private int width;
     private int height;
@@ -84,6 +85,7 @@ public class Configuration {
 
     Configuration(Properties settings) {
         this.settings = settings;
+        random_seed = Long.valueOf(fetch("random-seed"));
         duration = Long.valueOf(fetch("duration"));
         width = Integer.valueOf(fetch("width"));
         height = Integer.valueOf(fetch("height"));
@@ -135,6 +137,10 @@ public class Configuration {
         }
         error("Missing setting \"" + key + "\".");
         return null;
+    }
+
+    public long getRandom_seed() {
+        return random_seed;
     }
 
     public long getDuration() {
