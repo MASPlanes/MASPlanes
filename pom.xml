@@ -15,6 +15,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <built-by>${user.name}</built-by>
+        <github.global.server>github</github.global.server>
     </properties>
 
     <dependencies>
@@ -113,82 +114,14 @@
                 </configuration>
             </plugin>
 
-            <!-- Do not generate artifacts for now
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>2.2.1</version>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
                 <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Built-By>${built-by}</Built-By>
-                        </manifestEntries>
-                        <manifest>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
+                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo</altDeploymentRepository>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
-
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.9.1</version>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Built-By>${built-by}</Built-By>
-                        </manifestEntries>
-                        <manifest>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <configuration>
-                    <descriptors>
-                        <descriptor>src/assembly/all.xml</descriptor>
-                    </descriptors>
-                    <archive>
-                        <manifestEntries>
-                            <Built-By>${built-by}</Built-By>
-                        </manifestEntries>
-                        <manifest>
-                            <mainClass>es.csic.iiia.planes.cli.Cli</mainClass>
-                            <addDefaultSpecificationEntries>true</addDefaultSpecificationEntries>
-                        </manifest>
-                    </archive>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>make-assembly</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            -->
 
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
@@ -216,6 +149,30 @@
                        </program>
                    </programs>
                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.11</version>
+                <configuration>
+                    <message>Maven artifacts for ${project.version}</message>  <!-- git commit message -->
+                    <noJekyll>true</noJekyll>                                  <!-- disable webpage processing -->
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory> <!-- matches distribution management repository url above -->
+                    <branch>refs/heads/mvn-repo</branch>                       <!-- remote branch name -->
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                </configuration>
+                <executions>
+                    <!-- run site-maven-plugin's 'site' target as part of the build's normal 'deploy' phase -->
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -246,10 +203,18 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/MASPlanes/MASPlanes.git</connection>
-        <developerConnection>scm:git:git://github.com/MASPlanes/MASPlanes.git</developerConnection>
-        <url>scm:git:git://github.com/MASPlanes/MASPlanes.git</url>
+        <connection>scm:git:https://github.com/MASPlanes/MASPlanes.git</connection>
+        <developerConnection>scm:git:https://github.com/MASPlanes/MASPlanes.git</developerConnection>
+        <url>scm:git:https://github.com/MASPlanes/MASPlanes.git</url>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>internal.repo</id>
+            <name>Temporary Staging Repository</name>
+            <url>file://${project.build.directory}/mvn-repo</url>
+        </repository>
+    </distributionManagement>
 
     <issueManagement>
         <system>GitHub</system>
