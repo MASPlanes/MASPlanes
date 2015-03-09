@@ -38,8 +38,10 @@ package es.csic.iiia.planes.auctions;
 
 import es.csic.iiia.planes.Plane;
 import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.auctions.bidding.BiddingRule;
 import es.csic.iiia.planes.behaviors.AbstractBehavior;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
+import es.csic.iiia.planes.cli.Configuration;
 import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.MessagingAgent;
 import java.util.ArrayList;
@@ -63,6 +65,8 @@ public class AuctionBehavior extends AbstractBehavior {
 
     private NeighborTracking neighborTracker;
 
+    private BiddingRule biddingRule;
+
     /**
      * Builds an auctioning behavior for the given agent.
      *
@@ -80,7 +84,10 @@ public class AuctionBehavior extends AbstractBehavior {
     @Override
     public void initialize() {
         super.initialize();
+        final Configuration config = getAgent().getWorld().getFactory().getConfiguration();
+
         neighborTracker = getAgent().getBehavior(NeighborTracking.class);
+        biddingRule = config.getAucBiddingRuleFactory().build(config);
     }
 
     @Override
@@ -136,13 +143,12 @@ public class AuctionBehavior extends AbstractBehavior {
 
     public void on(AskMessage ask) {
         final AuctionPlane agent = getAgent();
-        double offer = agent.getCost(ask.getTask());
+        final BidMessage bid = biddingRule.getBid(agent, ask.getTask());
 
         if (LOG.isLoggable(Level.FINEST)) {
-            LOG.log(Level.FINEST, "Plane {0} bid for {1}: {2}", new Object[]{agent.getId(), ask.getTask().getId(), offer});
+            LOG.log(Level.FINEST, "Plane {0} bid for {1}: {2}", new Object[]{agent.getId(), ask.getTask().getId(), bid.getPrice()});
         }
 
-        Message bid = new BidMessage(ask.getTask(), offer);
         bid.setRecipient(ask.getSender());
         agent.send(bid);
     }

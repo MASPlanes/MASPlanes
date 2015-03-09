@@ -39,7 +39,10 @@ package es.csic.iiia.planes.auctions;
 import es.csic.iiia.planes.AbstractPlane;
 import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.Task;
+import es.csic.iiia.planes.auctions.bidding.BiddingRule;
 import es.csic.iiia.planes.behaviors.neighbors.NeighborTracking;
+import es.csic.iiia.planes.cli.Configuration;
+
 import java.util.ArrayList;
 import java.util.List;
 

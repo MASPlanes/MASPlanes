@@ -1,0 +1,11 @@
+# Algorithm specific settings
+planes=maxsum
+maxsum-iterations = 9
+maxsum-start-every = 10
+maxsum-planes-function=independent
+
+# Common settings
+operator-strategy=nearest-inrange
+battery=infinite
+task-evaluation=independent-distance
+idle-strategy = fly-towards-operator

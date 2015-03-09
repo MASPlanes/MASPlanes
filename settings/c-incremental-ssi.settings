@@ -1,0 +1,9 @@
+# Algorithm specific settings
+planes=omniscient
+omniscient-allocation=incremental-ssi
+
+# Common settings
+operator-strategy=omniscient
+battery=infinite
+task-evaluation=independent-distance
+idle-strategy = fly-towards-operator

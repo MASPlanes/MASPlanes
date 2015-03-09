@@ -1,0 +1,12 @@
+# Algorithm specific settings
+planes=auction
+auction-bidding-rule=workload
+auction-workload-k=1000
+auction-workload-alpha=1.36
+auction-start-every = 10
+
+# Common settings
+operator-strategy=nearest-inrange
+battery=infinite
+task-evaluation=independent-distance
+idle-strategy = fly-towards-operator

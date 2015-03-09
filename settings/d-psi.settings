@@ -1,0 +1,9 @@
+# Algorithm specific settings
+planes=auction
+auction-bidding-rule=cost
+
+# Common settings
+operator-strategy=nearest-inrange
+battery=infinite
+task-evaluation=independent-distance
+idle-strategy = fly-towards-operator

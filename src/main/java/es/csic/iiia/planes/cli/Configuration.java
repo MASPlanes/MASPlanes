@@ -37,6 +37,7 @@
 package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.bms.Factor;
+import es.csic.iiia.planes.auctions.bidding.*;
 import it.univr.ia.planes.dsa.DSAPlane;
 import es.csic.iiia.planes.Battery;
 import es.csic.iiia.planes.DefaultBattery;
@@ -146,6 +147,9 @@ public final class Configuration {
 
     /* AUCTIONS specific stuff */
     private int aucEvery;
+    private BiddingRuleFactory aucBiddingRuleFactory;
+    private double aucWorkloadK;
+    private double aucWorkloadAlpha;
 
     /* MAXSUM specific stuff */
     private int msIterations;
@@ -216,6 +220,15 @@ public final class Configuration {
         if (values.get("planes").equals("auction")) {
             aucEvery = Integer.valueOf(settings.getProperty("auction-every"));
             values.put("auction-every", String.valueOf(aucEvery));
+
+            aucBiddingRuleFactory = fetch(settings, getBiddingRuleFactories(), "auction-bidding-rule");
+            if (values.get("auction-bidding-rule").equals("workload")) {
+                aucWorkloadK = Double.valueOf(settings.getProperty("auction-workload-k"));
+                values.put("auction-workload-k", String.valueOf(aucWorkloadK));
+
+                aucWorkloadAlpha = Double.valueOf(settings.getProperty("auction-workload-alpha"));
+                values.put("auction-workload-alpha", String.valueOf(aucWorkloadAlpha));
+            }
         }
 
         // Max-sum settings
@@ -375,6 +388,25 @@ public final class Configuration {
     }
 
     /**
+     * @return the aucBiddingRuleFactory
+     */
+    public BiddingRuleFactory getAucBiddingRuleFactory() { return aucBiddingRuleFactory; }
+
+    /**
+     * @return the aucWorkloadK
+     */
+    public double getAucWorkloadK() {
+        return aucWorkloadK;
+    }
+
+    /**
+     * @return the aucWorkloadAlpha
+     */
+    public double getAucWorkloadAlpha() {
+        return aucWorkloadAlpha;
+    }
+
+    /**
      * @return the msIterations
      */
     public int getMsIterations() {
@@ -512,6 +544,13 @@ public final class Configuration {
            put("false", false);
            put("no", false);
            put("0", false);
+        }};
+    }
+
+    private Map<String, BiddingRuleFactory> getBiddingRuleFactories() {
+        return new HashMap<String, BiddingRuleFactory>() {{
+            put("cost", new CostBiddingRuleFactory());
+            put("workload", new WorkloadBiddingRuleFactory());
         }};
     }
 

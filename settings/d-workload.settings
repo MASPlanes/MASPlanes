@@ -1,0 +1,14 @@
+# Algorithm specific settings
+planes=maxsum
+maxsum-iterations = 9
+maxsum-start-every = 10
+maxsum-planes-function=workload
+maxsum-workload-function=k-alpha
+maxsum-workload-k=1000
+maxsum-workload-alpha=1.36
+
+# Common settings
+operator-strategy=nearest-inrange
+battery=infinite
+task-evaluation=independent-distance
+idle-strategy = fly-towards-operator
