@@ -52,7 +52,7 @@ Simulator
 
 Once you have an example problem, the simulator can "solve" it using any of 
 the inbuilt UAV coordination algorithms.  For instance, to solve the problem
-``scenarios/short-hotspots.hson``, you can execute the following command::
+``scenarios/short-hotspots.json``, you can execute the following command::
 
   sh bin/simulator -g scenarios/short-hotspots.json
 
