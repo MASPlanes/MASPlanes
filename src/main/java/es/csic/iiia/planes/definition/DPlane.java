@@ -95,8 +95,8 @@ public class DPlane extends DLocation {
     /**
      * Get the battery capacity of this plane.
      *
-     * At the beggining of a simulation, all of the planes are supposed to be
-     * fully charged.
+     * Notice that this is different from the <em>initial</em> battery
+     * of each plane, which you can check through {@link #getInitialBattery()}.
      *
      * @return battery capacity of this plane.
      */
@@ -134,7 +134,7 @@ public class DPlane extends DLocation {
     /**
      * Get the initial amount of battery of this plane.
      *
-     * @return intial amount of battery of this plane.
+     * @return initial amount of battery of this plane.
      */
     public long getInitialBattery() {
         return initialBattery;
