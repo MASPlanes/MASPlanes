@@ -42,6 +42,8 @@ import es.csic.iiia.planes.gui.Drawable;
 import es.csic.iiia.planes.gui.graphics.OperatorGraphic;
 import es.csic.iiia.planes.messaging.Message;
 import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
+import es.csic.iiia.planes.operator_behavior.SendAll;
+
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
@@ -77,6 +79,11 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
      * Time step at which the next task has to be submitted.
      */
     private long nextTaskTime;
+
+    /**
+     * The strategy that this operator will initially use to submit tasks.
+     */
+    private OperatorStrategy initStrategy = new SendAll();
 
     /**
      * The strategy that this operator will use to submit tasks.
@@ -128,7 +135,21 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
     @Override
     public void preStep() {}
 
+    /**
+     * Tasks that should have been submitted to some UAV, but were not because
+     * no plane is range.
+     */
     private ArrayList<Task> pendingTasks = new ArrayList<Task>();
+
+    public ArrayList<Task> getPendingTasks() {
+        return pendingTasks;
+    }
+
+    /**TODO: Incorporate into step method
+     * Tasks that were not completed in time because
+     * no plane was able to rescue them before they expired.
+     */
+    private ArrayList<Task> lostSurvivors = new ArrayList<Task>();
 
     /**
      * Single-step advance of this operator.
@@ -141,7 +162,7 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
     public void step() {
         while (nextTaskTime <= getWorld().getTime()) {
             Task t = createTask(tasks.get(nextTask));
-            pendingTasks.add(t);
+            lostSurvivors.add(t);
 
             tasks.set(nextTask, null);
             nextTask++;
@@ -151,6 +172,13 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
             } else {
                 nextTaskTime = tasks.get(nextTask).getTime();
             }
+        }
+
+        if (isPlaneInRange() && !lostSurvivors.isEmpty()) {
+            for (Task t : lostSurvivors) {
+                initStrategy.submitTask(getWorld(), this, t);
+            }
+            lostSurvivors.clear();
         }
 
         if (isPlaneInRange() && !pendingTasks.isEmpty()) {
@@ -170,12 +198,39 @@ public class Operator extends AbstractMessagingAgent implements Drawable {
     /**
      * Create a simulation Task from the given Task definition.
      *
-     * @param task definition.
+     * @param nt definition.
      * @return actual simulation Task.
      */
     private Task createTask(DTask nt) {
         Location l = new Location(nt.getX(), nt.getY());
         Task t = getWorld().getFactory().buildTask(l);
+        Block nearest = null;
+        Block[][] blockCopy = getWorld().getBlocks().clone();
+
+        int regionIndex = 0;
+        int blockIndex = 0;
+        int indx1 = 0;
+        int indx2;
+        for(Block[] r: blockCopy) {
+            indx2 = 0;
+            for (Block b: r) {
+                Location bCenter = b.getCenter();
+                if (nearest == null) {
+                    nearest = b;
+                    regionIndex = indx1;
+                    blockIndex = indx2;
+                }
+                else if (bCenter.getDistance(l) < nearest.getCenter().getDistance(l) && !b.hasSurvivor()) {
+                    nearest = b;
+                    regionIndex = indx1;
+                    blockIndex = indx2;
+                }
+                indx2++;
+            }
+            indx1++;
+        }
+
+        getWorld().getBlocks()[regionIndex][blockIndex].setSurvivor(t);
         return t;
     }
 

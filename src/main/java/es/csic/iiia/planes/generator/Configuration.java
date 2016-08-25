@@ -54,6 +54,8 @@ public class Configuration {
 
     private long random_seed;
     private long duration;
+    private int widthRegions;
+    private int heightRegions;
     private int width;
     private int height;
     private int num_planes;
@@ -63,6 +65,7 @@ public class Configuration {
     private int num_crisis;
     private long batteryCapacity;
     private double communicationRange;
+    private int blockSize;
     private double planeSpeed;
     private BufferedWriter outputFile;
     private Properties settings;
@@ -87,16 +90,23 @@ public class Configuration {
         this.settings = settings;
         random_seed = Long.valueOf(fetch("random-seed"));
         duration = Long.valueOf(fetch("duration"));
-        width = Integer.valueOf(fetch("width"));
-        height = Integer.valueOf(fetch("height"));
+        blockSize = Integer.valueOf(fetch("block-size"));
+        widthRegions = Integer.valueOf(fetch("width-regions"));
+        heightRegions = Integer.valueOf(fetch("height-regions"));
         num_planes = Integer.valueOf(fetch("planes"));
         num_operators = Integer.valueOf(fetch("operators"));
-        num_tasks = (int)(Double.valueOf(fetch("task-frequency")) * duration);
+        num_tasks = Integer.valueOf(fetch("task-quantity"));
         num_stations = Integer.valueOf(fetch("charging-stations"));
         num_crisis = Integer.valueOf(fetch("crises"))+1;
         batteryCapacity = Long.valueOf(fetch("battery-capacity"));
         communicationRange = Integer.valueOf(fetch("communication-range"));
         planeSpeed = Double.valueOf(fetch("plane-speed"));
+
+        // Calculate and record simulation space dimensions
+        width = widthRegions*3*blockSize;
+        height = heightRegions*3*blockSize;
+        generatorSettings.put("width", Integer.toString(width));
+        generatorSettings.put("height", Integer.toString(height));
 
         String td = fetch("task-distribution");
         if (td.equals("hotspot")) {
@@ -155,6 +165,10 @@ public class Configuration {
         return height;
     }
 
+    public int getWidthRegions() { return widthRegions; }
+
+    public int getHeightRegions() { return heightRegions; }
+
     public int getNum_planes() {
         return num_planes;
     }
@@ -186,6 +200,8 @@ public class Configuration {
     double getCommunicationRange() {
         return communicationRange;
     }
+
+    int getBlockSize() { return blockSize; }
 
     double getPlaneSpeed() {
         return planeSpeed;

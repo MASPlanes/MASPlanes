@@ -147,6 +147,24 @@ public class Cli {
 
         Configuration c = new Configuration(settings);
         System.out.println(c.toString());
+        /**
+         * Modified by Guillermo B.
+         * Print settings to a result file, titled "results.txt"
+         */
+        try{
+            FileWriter fw = new FileWriter("results.txt", true);
+            BufferedWriter bw = new BufferedWriter(fw);
+            PrintWriter out = new PrintWriter(bw);
+            String[] results = c.toString().split("\n");
+            for (String s:results) {
+                out.println(s);
+            }
+            //out.println(results[2]);
+            //out.println(results[8]);
+            out.close();
+        }
+        catch (IOException e) {
+        }
 
         if (line.hasOption('t')) {
             System.exit(0);

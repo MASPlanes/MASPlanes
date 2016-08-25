@@ -38,6 +38,7 @@
 package es.csic.iiia.planes;
 
 import java.awt.geom.Point2D;
+import java.util.ArrayList;
 
 /**
  * Represents a point in the world's space.
@@ -65,8 +66,8 @@ public class Location extends Point2D {
      * Moves this location towards the given destination, at speed meters per
      * millisecond.
      *
-     * @param destination
-     * @param speed
+     * param destination
+     * param speed
      * @return true if the destination has been reached, false otherwise.
      *
     public boolean move(Location destination, double speed) {
@@ -100,6 +101,103 @@ public class Location extends Point2D {
 
         return false;
     }*/
+
+    /**
+     * Characterizes the blocks that the simulation space is broken into by calculating
+     * the corners of all blocks given the height, width and block side-length.
+     *
+     * @param blockSize side length of blocks
+     * @param widthRegions width of scenario space in regions
+     * @param heightRegions height of scenario space in regions
+     * @return a 2-D array of Locations that identify the locations of each block's corners.
+     *
+     */
+    public static Location[][] buildBlocks(int blockSize, int widthRegions, int heightRegions){
+        double locX, locY;
+        locX = 0;
+        locY = 0;
+
+        int blocksWidth, blocksHeight, numBlocks;
+        blocksWidth = widthRegions*3;
+        blocksHeight = heightRegions*3;
+        //numBlocks = blocksHeight*blocksWidth;
+
+        //Location[][] corners = new Location[2][numBlocks];
+        Location[][] blocks = new Location[blocksWidth][blocksHeight];
+
+        //int index = 0;
+        for (int i = 0; i < blocksWidth; i++) {
+            for (int j = 0; j < blocksHeight; j++) {
+                blocks[i][j] = new Location(locX+blockSize, locY+blockSize);
+                //corners[0][index] = new Location(locX, locY);
+                //corners[1][index] = new Location(locX+blockSize, locY+blockSize);
+                locY += blockSize;
+                //index++;
+            }
+            locX += blockSize;
+            locY = 0;
+        }
+
+        return blocks;
+    }
+
+    /**
+     * Characterizes the regions that the simulation space is broken into by calculating
+     * the corners of all regions given the height, width and block side-length.
+     *
+     * @param blockSize side length of blocks
+     * @param widthRegions width of scenario space in regions
+     * @param heightRegions height of scenario space in regions
+     * @return an array of Locations that identify the locations of each region's corners.
+     *
+     */
+    public static ArrayList<Region> buildRegions(int blockSize, int widthRegions, int heightRegions){
+        double locX, locY;
+        locX = 0;
+        locY = 0;
+
+        ArrayList<Region> regions = new ArrayList<Region>();
+
+        int regionID = 0;
+        for (int i = 0; i < widthRegions; i++) {
+            for (int j = 0; j < heightRegions; j++) {
+                Region r = new Region(new Location(locX, locY), regionID, i, j, blockSize);
+                regions.add(r);
+                locY += 3*blockSize;
+                regionID++;
+            }
+            locX += 3*blockSize;
+            locY = 0;
+        }
+
+        return regions;
+    }
+
+    public static Block[][] buildBlocks(ArrayList<Region> regions, int blockSize) {
+        Block[][] blocks = new Block[regions.size()][9];
+
+        int index = 0;
+        for (Region r: regions) {
+            double locX = r.getCorner().getX();
+            double locY = r.getCorner().getY();
+
+            for (int j = 0; j < 3; j++) {
+                for (int k = 0; k < 3; k++) {
+                    int xLoc = r.getyLoc()*3 + j;
+                    int yLoc = r.getxLoc()*3 + k;
+                    Location blockLoc = new Location(locX+blockSize,locY+blockSize);
+                    blocks[r.getID()][index] = new Block(blockSize, blockLoc, xLoc, yLoc, r.getID());
+                    locY += blockSize;
+                    index++;
+                }
+                locX += blockSize;
+                locY = r.getCorner().getY();
+            }
+            index = 0;
+        }
+
+        return blocks;
+    }
 
     /**
      * Continue advancing along a MoveStep plan built with 

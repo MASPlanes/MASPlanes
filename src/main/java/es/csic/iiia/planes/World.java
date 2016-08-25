@@ -39,6 +39,8 @@ package es.csic.iiia.planes;
 
 import es.csic.iiia.planes.definition.DProblem;
 import es.csic.iiia.planes.messaging.Message;
+
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,6 +68,13 @@ public interface World extends Runnable {
     public void addPlane(Plane p);
 
     /**
+     * Get the duration of the World for this simulation.
+     *
+     * @return the duration.
+     */
+    public long getDuration();
+
+    /**
      * Get the list of planes in this simulation.
      *
      * @return list of the simulation's planes.
@@ -78,6 +87,20 @@ public interface World extends Runnable {
      * @return the {@link Space} of this simulation.
      */
     Space getSpace();
+
+    /**
+     * Get the {@link Block} of this simulation.
+     *
+     * @return the {@link Block} of this simulation.
+     */
+    Block[][] getBlocks();
+
+    /**
+     * Get the {@link Region} of this simulation.
+     *
+     * @return the {@link Region} of this simulation.
+     */
+    ArrayList<Region> getRegions();
 
     /**
      * Add a chargin station.
@@ -125,13 +148,35 @@ public interface World extends Runnable {
      */
     void removeTask(Task task);
 
+    //TODO: comment what this does
+    void foundTask(Task task);
+
+    void removeExpired(Task task);
+
     /**
      * Get the list of tasks in the world.
      *
      * This method should not be used by any simulation agent, unless it is
      * considered as being omniscient.
      */
-    public List<Task> getTasks();
+    List<Task> getTasks();
+
+    //TODO: Explain this
+    List<Block> getUnassignedBlocks();
+
+    Block[][] getBlockGrid();
+
+    List<SARPlane> getStandbyAvailable();
+
+    boolean sendStandby(Block b);
+
+    double getTimeRescuePenalty();
+
+    double getRescuePowerPenalty();
+
+    double getPowerFactor();
+
+    double getTimeFactor();
 
     /**
      * Get the current simulation time (in tenths of second).

@@ -59,6 +59,14 @@ public interface Plane extends MessagingAgent {
     }
 
     /**
+     * @author Guillermo Bautista
+     * Plane types for LIAM agents (SARPlane Class)
+     */
+    public enum Type {
+        SCOUT, EAGLE, STANDBY, RESCUER, BASIC
+    }
+
+    /**
      * Gets the plane's id.
      *
      * @return the id.
@@ -73,6 +81,7 @@ public interface Plane extends MessagingAgent {
      */
     public State getState();
 
+
     /**
      * Adds a new task to the list of tasks owned by this plane
      *
@@ -81,6 +90,16 @@ public interface Plane extends MessagingAgent {
      * @param task to add
      */
     public void addTask(Task task);
+
+    /**
+     * @author Guillermo Bautista
+     * Adds a new task to the list of tasks still being searched for by this plane
+     *
+     * Task addition triggers a reevaluation of the next task to be completed.
+     *
+     * @param task to add
+     */
+    public void addSearchTask(Task task);
 
     /**
      * Removes a task from the list of tasks owned by this plane.
@@ -97,6 +116,14 @@ public interface Plane extends MessagingAgent {
      * @return list of tasks.
      */
     List<Task> getTasks();
+
+    /**
+     * @author Guillermo Bautista
+     * Gets the list of tasks assigned to this plane.
+     *
+     * @return list of tasks.
+     */
+    List<Task> getSearchForTasks();
 
     /**
      * Set the plane's battery.
@@ -266,4 +293,31 @@ public interface Plane extends MessagingAgent {
      */
     public void setColor(int[] color);
 
+    /**
+     * @author Guillermo Bautista
+     *
+     * Set a period of time (in tenths of a second) that a plane must
+     * remain inactive for. Used as penalty function.
+     *
+     * @param time
+     */
+    public void waitFor(long time);
+
+    /**
+     * @author Guillermo Bautista
+     *
+     * Gets the amount of time that the agent is required to wait before
+     * returning to it's normal behavior.
+     *
+     * @return
+     */
+    public long getWaitingTime();
+
+    /**
+     * @author Guillermo Bautista
+     *
+     * Decreases waiting time of agents every step, by one unit of time.
+     * Only to be used if the waiting time is greater than zero.
+     */
+    public void tick();
 }

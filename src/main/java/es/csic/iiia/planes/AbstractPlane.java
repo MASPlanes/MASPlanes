@@ -86,6 +86,14 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      */
     private double speed = 0;
 
+    private long waitingTime = 0;
+
+    public void waitFor(long time) { waitingTime = time; }
+
+    public long getWaitingTime() { return waitingTime; }
+
+    public void tick() { waitingTime--; }
+
     /**
      * Remaining battery in tenths of second
      */
@@ -95,6 +103,16 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      * List of completed tasks' locations, for tracking purposes
      */
     private RotatingList<Location> completedLocations;
+
+    /** G.B.
+     * List of tasks that the plane is searching for
+     */
+    private List<Task> searchForTasks = null;
+
+    /** G.B.
+     * List of tasks that the plane is searching for
+     */
+    public List<Task> tasksToRemove = null;
 
     /**
      * List of tasks owned by this plane
@@ -143,6 +161,8 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     public AbstractPlane(Location location) {
         super(location);
         tasks = new ArrayList<Task>();
+        tasksToRemove = new ArrayList<Task>();
+        searchForTasks = new ArrayList<Task>();
         completedLocations = new RotatingList<Location>(Plane.NUM_COMPLETED_TASKS);
     }
 
@@ -155,6 +175,10 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         }
     }
 
+    public Logger getLog() {
+        return LOG;
+    }
+
     @Override
     public int getId() {
         return id;
@@ -163,6 +187,10 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     @Override
     public State getState() {
         return state;
+    }
+
+    public void setState(State state) {
+        this.state = state;
     }
 
     @Override
@@ -218,6 +246,8 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         currentDestination = getLocation().buildMoveStep(l, getSpeed());
     }
 
+    public Location.MoveStep getCurrentDestination() { return currentDestination; }
+
     protected Task getNearest(List<Task> tasks) {
         final Location l = getLocation();
         double mind = Double.MAX_VALUE;
@@ -254,8 +284,8 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      * Retrieve the task from the candidates list that is nearest to the given
      * position
      *
-     * @param position
-     * @param candidates
+     * @param position location of plane
+     * @param candidates list of task locations being evaluated
      * @return nearest task to the given location.
      */
     protected Task getNearest(Location position, List<Task> candidates) {
@@ -299,10 +329,21 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         // Handle this iteration's messages
         super.step();
 
-        // Move the plane if it has some task to fulfuill and is not charging
+        // Move the plane if it has some task to fulfill and is not charging
         // or going to charge
         if (nextTask != null) {
+            if (getWaitingTime() > 0) {
+                idleAction();
+                tick();
+                return;
+            }
+            setDestination(nextTask.getLocation());
             if (move()) {
+                if (nextTask.isAlive()) {
+                    final long timeLeft = getWorld().getDuration() - getWorld().getTime()%getWorld().getDuration();
+                    waitFor((long)(timeLeft*getWorld().getTimeRescuePenalty()));
+                    battery.consume((long)(getBattery().getEnergy()*getWorld().getRescuePowerPenalty()));
+                }
                 final Task completed = nextTask;
                 nextTask = null;
                 triggerTaskCompleted(completed);
@@ -319,9 +360,12 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      * Action done by the plane whenever it is ready to handle tasks but no
      * task has been assigned to it.
      */
-    private void idleAction() {
+    protected void idleAction() {
         if (!idleStrategy.idleAction(this)) {
             angle += 0.01;
+            if(getWorld().getTime()%3 == 0) {
+                getBattery().consume(1);
+            }
         }
     }
 
@@ -339,6 +383,7 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     public boolean move() {
         flightDistance += getSpeed();
         battery.consume(1);
+        angle = currentDestination.alpha;
         return getLocation().move(currentDestination);
     }
 
@@ -346,9 +391,9 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
      * Method executed when a plane has just enough battery to go recharge
      * itself
      *
-     * @param st chargin station where to recharge
+     * @param st charging station where to recharge
      */
-    private void goCharge(Station st) {
+    protected void goCharge(Station st) {
         state = State.TO_CHARGE;
         if (move()) {
             state = State.CHARGING;
@@ -416,6 +461,11 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         taskAdded(task);
     }
 
+    @Override
+    public void addSearchTask(Task task) {
+        searchForTasks.add(task);
+    }
+
     /**
      * Signals that a task has been removed.
      *
@@ -425,6 +475,7 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
 
     @Override
     public Task removeTask(Task task) {
+        searchForTasks.remove(task);
         tasks.remove(task);
         taskRemoved(task);
         return task;
@@ -433,6 +484,11 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
     @Override
     public List<Task> getTasks() {
         return tasks;
+    }
+
+    @Override
+    public List<Task> getSearchForTasks() {
+        return searchForTasks;
     }
 
     @Override
@@ -523,6 +579,10 @@ public abstract class AbstractPlane extends AbstractBehaviorAgent
         int hash = 7;
         hash = 79 * hash + this.id;
         return hash;
+    }
+
+    public void behaviorStep() {
+        super.step();
     }
 
 }

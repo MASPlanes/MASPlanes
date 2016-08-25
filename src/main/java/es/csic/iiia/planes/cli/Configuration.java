@@ -37,7 +37,10 @@
 package es.csic.iiia.planes.cli;
 
 import es.csic.iiia.bms.Factor;
+import es.csic.iiia.planes.*;
 import es.csic.iiia.planes.auctions.bidding.*;
+import es.csic.iiia.planes.evaluation.PercentageBatteryEvaluation;
+import es.csic.iiia.planes.operator_behavior.*;
 import it.univr.ia.planes.dsa.DSAPlane;
 import es.csic.iiia.planes.Battery;
 import es.csic.iiia.planes.DefaultBattery;
@@ -69,11 +72,7 @@ import es.csic.iiia.planes.omniscient.NofirstSSIAllocation;
 import es.csic.iiia.planes.omniscient.Omniscient;
 import es.csic.iiia.planes.omniscient.OmniscientPlane;
 import es.csic.iiia.planes.omniscient.SSIAllocation;
-import es.csic.iiia.planes.operator_behavior.Nearest;
-import es.csic.iiia.planes.operator_behavior.NearestInRange;
-import es.csic.iiia.planes.operator_behavior.OperatorStrategy;
-import es.csic.iiia.planes.operator_behavior.Random;
-import es.csic.iiia.planes.operator_behavior.RandomInRange;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
@@ -164,6 +163,15 @@ public final class Configuration {
     private double dsaWorkloadK;
     private double dsaWorkloadAlpha;
     private String dsaEvaluationFunction;
+
+    /* LIAM specific stuff */
+    private double eaglePower;
+    private double standbyPower;
+    private double scoutSpeed;
+    private double eagleSpeed;
+    private double scoutJumpDistance;
+    private double eagleJumpDistance;
+    private int eagleCrowdDistance;
 
     private LinkedHashMap<String, String> values = new LinkedHashMap<String, String>();
     private CostFactorFactory<Factor<?>> msCostFactorFactory;
@@ -295,6 +303,32 @@ public final class Configuration {
                     throw new IllegalArgumentException("Two possible type of dsa function used to represent plane's preferences: pathcost or workload.");
 
                 }
+            }
+        }
+
+        if (values.get("planes").equals("liam")) {
+            eaglePower = Double.valueOf(settings.getProperty("eagle-power"));
+            values.put("eagle-power", String.valueOf(eaglePower));
+            if(eaglePower < 0 ||eaglePower > 1) {
+                throw new IllegalArgumentException("Eagle power conversion level must be between 0 and 1.");
+            }
+
+            standbyPower = Double.valueOf(settings.getProperty("standby-power"));
+            values.put("standby-power", String.valueOf(standbyPower));
+            if(standbyPower < 0 ||standbyPower > 1) {
+                throw new IllegalArgumentException("Standby power conversion level must be between 0 and 1.");
+            }
+
+            scoutSpeed = Double.valueOf(settings.getProperty("scout-speed"));
+            values.put("scout-speed", String.valueOf(scoutSpeed));
+            if(scoutSpeed < 0 ||scoutSpeed > 1) {
+                throw new IllegalArgumentException("Scout speed level must be between 0 and 1.");
+            }
+
+            eagleSpeed = Double.valueOf(settings.getProperty("eagle-speed"));
+            values.put("eagle-speed", String.valueOf(eagleSpeed));
+            if(eagleSpeed < 0 ||eagleSpeed > 1) {
+                throw new IllegalArgumentException("Scout speed level must be between 0 and 1.");
             }
         }
 
@@ -489,6 +523,7 @@ public final class Configuration {
            put("random-inrange", new RandomInRange());
            put("nearest-inrange", new NearestInRange());
            put("omniscient", new Omniscient());
+           put("send-all", new SendAll());
         }};
     }
 
@@ -499,6 +534,7 @@ public final class Configuration {
            put("maxsum", MSPlane.class);
            put("omniscient", OmniscientPlane.class);
            put("dsa", DSAPlane.class);
+           put("liam", SARPlane.class);
         }};
     }
 
@@ -533,6 +569,7 @@ public final class Configuration {
         return new HashMap<String, Class<? extends EvaluationStrategy<Plane>>>() {{
            put("independent-distance", IndependentDistanceEvaluation.class);
            put("independent-distance-battery", IndependentDistanceBatteryEvaluation.class);
+           put("percentage-battery-time", PercentageBatteryEvaluation.class);
         }};
     }
 

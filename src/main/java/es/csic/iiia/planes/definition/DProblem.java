@@ -56,12 +56,71 @@ public class DProblem {
 
     private int width = 1000;
     private int height = 1000;
+
+    private int widthRegions = 100;
+    private int heightRegions = 100;
+    private int blockSize = 3;
+
     private long duration = 3600*24*30;
     private int nCrisis = 5;
     private ArrayList<DOperator> operators = new ArrayList<DOperator>();
     private ArrayList<DPlane> planes = new ArrayList<DPlane>();
     private ArrayList<DStation> stations = new ArrayList<DStation>();
     private HashMap<String, String> generatorSettings = new HashMap<String, String>();
+
+    /**
+     * Get the blockSize of the simulation space.
+     *
+     * @return blockSize of the simulation space.
+     */
+    public int getBlockSize() {
+        return blockSize;
+    }
+
+    /**
+     * Set the blockSize of the simulation space.
+     *
+     * @param blockSize of the simulation space.
+     */
+    public void setBlockSize(int blockSize) {
+        this.blockSize = blockSize;
+    }
+
+    /**
+     * Get the widthRegions of the simulation space.
+     *
+     * @return widthRegions of the simulation space.
+     */
+    public int getWidthRegions() {
+        return widthRegions;
+    }
+
+    /**
+     * Set the widthRegions of the simulation space.
+     *
+     * @param widthRegions of the simulation space.
+     */
+    public void setWidthRegions(int widthRegions) {
+        this.widthRegions = widthRegions;
+    }
+
+    /**
+     * Get the heightRegions of the simulation space.
+     *
+     * @return heightRegions of the simulation space.
+     */
+    public int getHeightRegions() {
+        return heightRegions;
+    }
+
+    /**
+     * Set the heightRegions of the simulation space.
+     *
+     * @param heightRegions of the simulation space.
+     */
+    public void setHeightRegions(int heightRegions) {
+        this.heightRegions = heightRegions;
+    }
 
     /**
      * Get the width of the simulation space.

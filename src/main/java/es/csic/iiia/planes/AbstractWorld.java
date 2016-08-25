@@ -72,6 +72,55 @@ public abstract class AbstractWorld implements World {
     private ArrayList<Operator> operators = new ArrayList<Operator>();
 
     /**
+     * List of regions in space.
+     */
+    private ArrayList<Region> regions = new ArrayList<Region>();
+
+    public ArrayList<Region> getRegions() { return regions; }
+
+    private Region[][] regionGrid;
+
+    /**
+     * List of blocks in space.
+     */
+    private Block[][] blocks;
+
+    public Block[][] getBlocks() { return blocks; }
+
+    private Block[][] blockGrid;
+
+    public Block[][] getBlockGrid() { return blockGrid; }
+
+    private List<Block> unassignedBlocks = new ArrayList<Block>();
+
+    public List<Block> getUnassignedBlocks() { return unassignedBlocks; }
+
+    private List<SARPlane> standbyAvailable = new ArrayList<SARPlane>();
+
+    public List<SARPlane> getStandbyAvailable() { return standbyAvailable; }
+
+    public boolean sendStandby(Block b) {
+        if (standbyAvailable.isEmpty()) {
+            return false;
+        }
+        else {
+            double dist = Double.MAX_VALUE;
+            SARPlane closest = null;
+            for (SARPlane plane: standbyAvailable) {
+                if (plane.getLocation().getDistance(b.getCenter()) < dist) {
+                    closest = plane;
+                    dist = plane.getLocation().getDistance(b.getCenter());
+                }
+            }
+            standbyAvailable.remove(closest);
+            closest.setNextBlockStandby(b);
+            return true;
+        }
+    }
+
+    private long timeoutStart = -1;
+
+    /**
      * Current simulation time.
      */
     private long time = 0;
@@ -81,6 +130,7 @@ public abstract class AbstractWorld implements World {
      */
     protected long duration;
 
+    public long getDuration() { return duration; }
     /**
      * Factory used to create elements for this simulation.
      */
@@ -135,6 +185,30 @@ public abstract class AbstractWorld implements World {
     @Override
     public void init(DProblem d) {
         space = new Space(d.getWidth(), d.getHeight());
+
+        //TODO: Fix so that it gets block size, number of regions from configuration.
+        int widthRegions = d.getWidthRegions();
+        int heightRegions = d.getHeightRegions();
+        int blockSize = d.getBlockSize();
+        //regions = Location.buildRegions(blockSize, widthRegions, heightRegions);
+        //regionGrid = new Region[heightRegions][widthRegions];
+        regions = Location.buildRegions(3, 111, 111);
+        regionGrid = new Region[111][111];
+        for (Region r : regions) {
+            regionGrid[r.getxLoc()][r.getyLoc()] = r;
+        }
+
+        //blocks = Location.buildBlocks(regions, blockSize);
+        //blockGrid = new Block[widthRegions*3][heightRegions*3];
+        blocks = Location.buildBlocks(regions, 3);
+        blockGrid = new Block[111*3][111*3];
+        for (Block[] blockSet : blocks) {
+            for (Block b : blockSet) {
+                blockGrid[b.getxLoc()][b.getyLoc()] = b;
+                unassignedBlocks.add(b);
+            }
+        }
+
         setDuration(d.getDuration());
 
         for (DOperator o : d.getOperators()) {
@@ -188,9 +262,15 @@ public abstract class AbstractWorld implements World {
             computeStep();
             displayStep();
 
+            if (tasks.isEmpty()) {
+                break;
+            }
+            if (unassignedBlocks.isEmpty() && timeoutStart < 0) {
+                timeoutStart = time;
+            }
             // TODO: Replace this maximum duration factor by something that detects if tasks are
             // being completed or not.
-            if (time > duration*10) {
+            if (time > duration*10 || ((time-timeoutStart) > 36000 && unassignedBlocks.isEmpty())) {
                 System.err.println("It looks like some tasks will never be completed: ");
                 for (Task t : tasks) {
                     System.err.println("\t" + t);
@@ -216,6 +296,15 @@ public abstract class AbstractWorld implements World {
 
         for (Agent a : agents) {
             a.preStep();
+        }
+        for (Task t : tasks) {
+            if (t.getExpireTime() <= getTime()) {
+                for (Agent a : agents) {
+                    if (a instanceof AbstractPlane) {
+                        ((AbstractPlane) a).tasksToRemove.add(t);
+                    }
+                }
+            }
         }
         for (Agent a : agents) {
             a.step();
@@ -271,6 +360,22 @@ public abstract class AbstractWorld implements World {
             stats.collect(t);
         }
     }
+
+    @Override
+    public void foundTask(Task t) { stats.collectFound(t); }
+
+    //TODO: Comment what this does
+    public void removeExpired(Task t){
+        tasks.remove(t);
+    }
+
+    public double getRescuePowerPenalty() { return 0.01; }
+
+    public double getTimeRescuePenalty() { return 0.001; }
+
+    public double getPowerFactor() { return 0.4; }
+
+    public double getTimeFactor() { return 0.6; }
 
     @Override
     public Station getNearestStation(Location location) {
