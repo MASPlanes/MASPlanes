@@ -50,6 +50,7 @@ public class DPlane extends DLocation {
     private long initialBattery;
     private int[] color;
     private double communicationRange;
+    private double searchRange;
 
     /**
      * Get the color of this plane.
@@ -95,8 +96,8 @@ public class DPlane extends DLocation {
     /**
      * Get the battery capacity of this plane.
      *
-     * Notice that this is different from the <em>initial</em> battery
-     * of each plane, which you can check through {@link #getInitialBattery()}.
+     * At the beggining of a simulation, all of the planes are supposed to be
+     * fully charged.
      *
      * @return battery capacity of this plane.
      */
@@ -130,6 +131,20 @@ public class DPlane extends DLocation {
     public void setCommunicationRange(double communicationRange) {
         this.communicationRange = communicationRange;
     }
+
+    /** Modified by Guillermo B.:
+     * Get the search range of this plane.
+     *
+     * @return the search range of this plane.
+     */
+    public double getSearchRange() { return searchRange; }
+
+    /** Modified by Guillermo B.:
+     * Set the search range of this plane.
+     *
+     * @param searchRange communication range to set.
+     */
+    public void setSearchRange(double searchRange) { this.searchRange = searchRange; }
 
     /**
      * Get the initial amount of battery of this plane.

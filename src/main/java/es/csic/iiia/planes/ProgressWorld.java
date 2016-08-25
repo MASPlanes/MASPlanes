@@ -55,6 +55,9 @@ public class ProgressWorld extends AbstractWorld {
     private ConcurrentLinkedQueue<Double> progressQueue =
             new ConcurrentLinkedQueue<Double>();
 
+    private ConcurrentLinkedQueue<Integer> progressQueue2 =
+            new ConcurrentLinkedQueue<Integer>();
+
     /**
      * Runnable that will keep printing the progress
      */
@@ -87,6 +90,7 @@ public class ProgressWorld extends AbstractWorld {
             e.printStackTrace();
         } finally {
             progressQueue.clear();
+            progressQueue2.clear();
             progress.stop();
         }
     }
@@ -103,6 +107,15 @@ public class ProgressWorld extends AbstractWorld {
         if (progressQueue.isEmpty()) {
             final Double percent = getTime()*100 / (double)duration;
             progressQueue.add(percent);
+        }
+        /**
+         * @author Guillermo Bautista
+         * Secondary queue added to track number of survivors that remain
+         * alive in the simulation world.
+         */
+        if (progressQueue2.isEmpty()) {
+            final Integer survivorsRemaining = getTasks().size();
+            progressQueue2.add(survivorsRemaining);
         }
 
     }
@@ -123,8 +136,18 @@ public class ProgressWorld extends AbstractWorld {
         public void run() {
             while (!isStop()) {
                 final Double percent = progressQueue.poll();
-                if (percent != null) {
-                    System.err.print(String.format("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\bCompleted: %6.2f%%", percent));
+                /**
+                 * @author Guillermo Bautista
+                 * Also prints out number of survivors still alive in the
+                 * simulation, and whether all the blocks have been
+                 * assigned to be searched by an agent.
+                 */
+                final Integer survivors = progressQueue2.poll();
+                if (percent != null && survivors != null) {
+                    System.err.print(String.format("\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
+                            "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b" +
+                            "Completed: %6.2f%%\tAll blocks assigned: %b" +
+                            "\tRemaining Survivors: %d   ", percent, getUnassignedBlocks().isEmpty(), survivors));
                 }
                 ftracker.delay();
             }

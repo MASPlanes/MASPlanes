@@ -36,6 +36,7 @@
  */
 package es.csic.iiia.planes.generator;
 
+import es.csic.iiia.planes.Location;
 import es.csic.iiia.planes.util.MultivariateUniformDistribution;
 import es.csic.iiia.planes.definition.DOperator;
 import es.csic.iiia.planes.definition.DPlane;
@@ -51,8 +52,8 @@ import org.apache.commons.math3.distribution.MultivariateRealDistribution;
 import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.distribution.RealDistribution;
 import org.apache.commons.math3.distribution.UniformRealDistribution;
-import org.apache.commons.math3.random.EmpiricalDistribution;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+//import org.apache.commons.math3.random.EmpiricalDistribution;
+//import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.codehaus.jackson.map.ObjectMapper;
 
 /**
@@ -102,6 +103,9 @@ public class Generator {
         p.setnCrisis(config.getNum_crisis());
         p.setWidth(config.getWidth());
         p.setHeight(config.getHeight());
+        p.setBlockSize(config.getBlockSize());
+        p.setHeightRegions(config.getHeightRegions());
+        p.setWidthRegions(config.getWidthRegions());
 
         return p;
     }
@@ -116,7 +120,8 @@ public class Generator {
             pl.setY(r.nextInt(p.getHeight()));
             // battery capacity in tenths of second
             pl.setBatteryCapacity(config.getBatteryCapacity());
-            pl.setInitialBattery((long)(pl.getBatteryCapacity()*r.nextDouble()));
+            // If  wish to set initial batteries to random, use *r.nextDouble()
+            pl.setInitialBattery((long)(pl.getBatteryCapacity()));
             pl.setCommunicationRange(config.getCommunicationRange());
             pl.setColor(config.getColor(i));
             planes.add(pl);
@@ -177,50 +182,152 @@ public class Generator {
         }
 
         // 3. Uniformly sample tasks from these distributions
+        int i = 0;
         for (DTask t : tasks) {
-            final int i = (int)(r.nextDouble()*(config.getNum_crisis()));
-            t.setnCrisis(i);
+            final int j = (int)(r.nextDouble()*(config.getNum_crisis()));
+            t.setnCrisis(j);
 
             // Time sampling
+            /** UNCOMMENT TO MAKE TIMES RANDOMLY DISTRIBUTED
             long time = (long)timeDistributions[i].sample();
             while (time < 0 || time > config.getDuration()) {
                 time = (long)timeDistributions[i].sample();
             }
-            t.setTime(time);
+            */
+            // Set all tasks to appear at the start of the simulation. To change
+            // this, delete the 0 and replace it with the long variable "time"
+            t.setTime(0);
+
+            // Divide simulation space into (a x a) sized blocks
+            final Location[][] blocks = Location.buildBlocks(config.getBlockSize(), config.getWidthRegions(),
+                    config.getHeightRegions());
 
             // Position sampling
-            double[] position = spaceDistributions[i].sample();
-            while (  position[0] < 0 || position[1] < 0
-                  || position[0] > p.getWidth() || position[1] > p.getHeight())
-            {
-                position = spaceDistributions[i].sample();
+            double[] position = spaceDistributions[j].sample();
+            /*
+            * Sample a point until its position is not conflicting with
+            * any previous point positions (i.e. it is not located in the same block
+            * as a previously assigned point), AND it is a valid position
+            * that falls inside the simulation space.
+            */
+
+            while (invalidPosition(position[0], position[1], p)){
+                    //|| blockConflict(blocks, position[0], position[1], tasks, i)) {
+                position = spaceDistributions[j].sample();
             }
+//            int k = 0;
+//            for (DTask t2: tasks) {
+//                if(k < i) {
+//                    // Check if the position sampled is within the simulation space
+//                    while (invalidPosition(position[0], position[1], p)
+//                            || sameBlocks(blocks, position[0], position[1], t2)) {
+//                        position = spaceDistributions[j].sample();
+//                    }
+//                }
+//                else {
+//                    while (invalidPosition(position[0], position[1], p)) {
+//                        position = spaceDistributions[j].sample();
+//                    }
+//                }
+//                k++;
+//            }
+//            while (invalidPosition(position[0], position[1], p)) {
+//                position = spaceDistributions[j].sample();
+//            }
+
+//            int posX;
+//            int posY;
+//            if (i < blocks[0].length) {
+//                posX = (int)blocks[0][i].getX();
+//                posY = (int)blocks[0][i].getY();
+//            }
+//            else {
+//                posX = (int)blocks[1][0].getX();
+//                posY = (int)blocks[1][0].getY();
+//            }
+
             t.setX((int)position[0]);
             t.setY((int)position[1]);
+
+//            t.setX(posX);
+//            t.setY(posY);
+            i++;
         }
 
         // 4. Debug stuff
         //printTaskHistogram(tasks);
     }
 
-    private void printTaskHistogram(ArrayList<DTask> tasks) {
-
-        double[] data = new double[tasks.size()];
-        for (int i=0; i<tasks.size(); i++) {
-            data[i] = tasks.get(i).getTime();
-        }
-
-        EmpiricalDistribution d = new EmpiricalDistribution(30);
-        d.load(data);
-
-        for (SummaryStatistics stats : d.getBinStats()) {
-            StringBuilder buf = new StringBuilder();
-            for (int i=0, len=Math.round(stats.getN()/50f); i<len; i++) {
-                buf.append('#');
-            }
-            System.err.println(buf);
-        }
+    private boolean invalidPosition(double x, double y, DProblem p) {
+        return x < 0 || y < 0 || x > p.getWidth() || y > p.getHeight();
     }
+
+//    private boolean sameBlocks(Location[][] blocks, double x, double y, DTask t) {
+//        for (int i = 0; i < blocks.length; i++) {
+//            for (int j = 0; j < blocks[0].length; j++) {
+//                double locX = blocks[i][j].getX();
+//                double locY = blocks[i][j].getY();
+//                if((x < locX && t.getX() >= locX) || (y < locY && t.getY() >= locY)
+//                        || (x >= locX && t.getX() < locX) || (y >= locY && t.getY() < locY)) {
+//                    return false;
+//                }
+//            }
+//        }
+//        return true;
+//    }
+
+    private boolean blockConflict(Location[][] blocks, double x, double y, ArrayList<DTask> tasks, int ind1) {
+        int k = 0;
+        boolean conflictExists = true;
+        for (DTask t: tasks) {
+            if(k < ind1) {
+                for (int i = 0; i < blocks.length; i++) {
+                    for (int j = 0; j < blocks[0].length; j++) {
+                        double locX = blocks[i][j].getX();
+                        double locY = blocks[i][j].getY();
+                        if((x < locX && t.getX() >= locX) || (y < locY && t.getY() >= locY)
+                                || (x >= locX && t.getX() < locX) || (y >= locY && t.getY() < locY)) {
+                            conflictExists = false;
+                            break;
+                        }
+                    }
+                    if (!conflictExists) {
+                        break;
+                    }
+                }
+                if (conflictExists) {
+                    return true;
+                }
+                else {
+                    conflictExists = true;
+                }
+            }
+            else {
+                return false;
+            }
+            k++;
+        }
+        return false;
+    }
+
+//    private void printTaskHistogram(ArrayList<DTask> tasks) {
+//
+//        double[] data = new double[tasks.size()];
+//        for (int i=0; i<tasks.size(); i++) {
+//            data[i] = tasks.get(i).getTime();
+//        }
+//
+//        EmpiricalDistribution d = new EmpiricalDistribution(30);
+//        d.load(data);
+//
+//        for (SummaryStatistics stats : d.getBinStats()) {
+//            StringBuilder buf = new StringBuilder();
+//            for (int i=0, len=Math.round(stats.getN()/50f); i<len; i++) {
+//                buf.append('#');
+//            }
+//            System.err.println(buf);
+//        }
+//    }
 
     private void addStations(DProblem p) {
         ArrayList<DStation> stations = p.getStations();

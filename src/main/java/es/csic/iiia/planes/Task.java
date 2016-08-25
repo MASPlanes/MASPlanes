@@ -69,6 +69,22 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
     private long submissionTime;
 
     /**
+     * Time at which this task expires.
+     */
+    private long expireTime;
+
+    public long getExpireTime() { return expireTime; }
+
+    /**
+     * Status of survivor.
+     */
+    private boolean alive;
+
+    public boolean isAlive() { return alive; }
+
+    public void expire() { this.alive = false; }
+
+    /**
      * Builds a new task.
      *
      * @param location that must be checked by some plane.
@@ -80,6 +96,9 @@ public class Task extends AbstractPositionedElement implements Drawable, Compara
     @Override
     public void initialize() {
         submissionTime = getWorld().getTime();
+        //TODO: Make this dependent on settings
+        expireTime = (long)(Math.random()*(2592000-360000))+360000;
+        alive = true;
     }
 
     /**
