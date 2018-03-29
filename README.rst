@@ -190,7 +190,7 @@ Contact
 =======
 
 If you have any questions, problems or suggestions, please contact us at
-`mpujol@iiia.csic.es`_.
+`marc.iiia@la3.org`_.
 
-.. _`mpujol@iiia.csic.es`: mailto:mpujol@iiia.csic.es
+.. _`marc.iiia@la3.org`: mailto:marc.iiia@la3.org
 
